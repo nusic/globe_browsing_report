@@ -1,21 +1,22 @@
 \chapter{Introduction}
 
-\section{Background and Recent Research}
-\subsection{<any sub section here>}
+Scientific visualization of space research, also known as astro-visualization, becomes increasingly important for scientists to communicate their work in exploring the cosmos. 3D computer graphics has shown to be an efficient tool for bringing insights from geological and astronomical data, as spatial and temporal relations can intuitively be interpreted through 3D visualizations.
 
-\subsection{Literature Survey}
+Researching and mapping out celestial bodies other than the Earth is an important part of expanding the space frontier and virtually rendering these globes using real gathered map and terrain data is a natural part of any scientifically accurate space visualization software.
 
-\subsubsection{<Sub-subsection title>}
-some text\cite{citation-1-name-here}, some more text
+Two important parts of a software for visualizing celestial bodies are terrain and atmosphere. The focus of this thesis is put on terrain rendering on globes using high fidelity geographical data such as texture maps and digital terrain models. The globe rendering feature with the research involved was implemented for the software OpenSpace. The implementation was separated enough from the main program to avoid dependencies and make the thesis independent of specific implementation details. 
 
-asdasd
+\section{Background}
 
-%\includegraphics[scale=0.5]{figures/map_projection/projection_geo.png}
+\subsection{OpenSpace}
 
-\begin{picture}(0,0)
-\put(0,0){\includegraphics[scale=0.2]{figures/wgs84.png} }
-\put(30,45){$x$}
-\end{picture}
+OpenSpace is an open-source, interactive data visualization software with the goal of bringing astro-visualization to the broad public and serve as a platform for scientists to talk about their research. The software supports rendering across multiple screens, allowing immerse visualizations on tiled displays as well as in dome theatres \cite{openspace}.
+
+With a real time rendering software such as OpenSpace, the human curiosity involved in exploration easily becomes obvious when the user is given the ability to freely fly around in space and near the surface of other worlds and discover places they probably never can visit in real life. This is also true for public presentations where researchers such as geologists can go into details about their knowledge in these places.
+
+An important part of the software is to avoid the use of procedurally generated data. This is to express where the frontier of science and exploration is currently at, and how it progresses through space missions with the goal of mapping the Universe. A general globe browsing feature provides a means of communicating this progress through continuous mapping of our planets and moons.
+
+\subsection{Globe Browsing}
 
 \subsubsection{<Sub-subsection title>}
 even more text\footnote{<footnote here>}, and even more.
