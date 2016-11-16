@@ -18,7 +18,12 @@ An important part of the software is to avoid the use of procedurally generated 
 
 \subsection{Globe Browsing}
 
-\subsubsection{<Sub-subsection title>}
-even more text\footnote{<footnote here>}, and even more.
+\section{Tesselating the Ellipsoid}
 
-\section{Motivation}
+Triangle models are still the most common way of modeling renderable objects in 3D computer graphics softwares, even though other rendering techniques such as volumetric ray casting also can be considered for terrain rendering \cite{cozzi11}.
+
+A triangle mesh, or more generally a polygon mesh, is defined by a limited number of surface elements. This means that ellipsoids need to be approximated by some sort of tessellation or subdivision surface when modeled as a polygon mesh. There are several techniques for tessellating an ellipsoid. Some of them are covered in this section.
+
+\subsection{Geographic Grid Tessellation}
+
+Tessellating the ellipsoid using a geographic grid is a very straightforward approach. Ellipsoid vertex positions can be calculated using a transform from geographic (latitude and longitude) space to a cartesian coordinate space. An implementation of such a transform is implemented and described by Cozzi and Ring \cite[p. 25]{cozzi11}. Figure (fisk) shows three geographic grid tessellations of ellipsoids with constant number of latitudinal segments of 2, 4 and 8 respectively. A common issue with this approach is something referred to as polar pinching. At both of the poles, segments will be pinched to one point which leads to an increasing amount of segments per area. This in turn results in oversampling and visual artifacts in texture mapping due to the very thin quads.
