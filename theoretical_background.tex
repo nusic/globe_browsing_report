@@ -153,3 +153,54 @@ In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ra
     \caption{Geographic tessellation of an ellipsoid with polar caps.}
     \label{fig:tesselation_caps}
 \end{figure}
+
+\subsection{2D Parameterisation for Map Projections}
+
+A map projection $P$ defines a transformation from cartesian model space coordinates to georeferenced (projected) coordinates, as in equation \ref{eq:proj}. The inverse projection $P^{-1}$ is used to find positions on the globe surface in model space given georeferenced coordinates as in equation \ref{eq:invproj}.
+
+\begin{equation}
+\label{eq:proj}
+\begin{pmatrix} \phi  \\ \theta  \end{pmatrix}_{ georeferenced }=\vec { P } (x,y,z),
+\end{equation}
+
+\begin{equation}
+\label{eq:invproj}
+\begin{pmatrix} x \\ y \\ z \end{pmatrix}_{ modelspace }=\vec { P }^{-1} (\phi ,\theta ),
+\end{equation}
+
+Where $(x,y,z)^T$ is the cartesian coordinates of a point on the ellipsoid surface. The parameters $\phi$ and $\theta$ are georeferenced coordinates defining all positions on the globe. The georeferenced coordinates can have different definition range depending on which projection is used.
+
+The globally positive gaussian curvature of any ellipsoid makes it impossible to unproject it on a flat 2D surface without any distortions. Different projections are used for different purposes. Equal-area projections preserve the size of a projected area as $\partial \phi \partial \theta / \partial \phi_0 \partial \theta_0 = 1$, while conformal projections preserve the shape of projected objects as $\partial \phi / \partial \theta = 1$; $\phi_0$ and $\theta_0$ are coordinates at the center of the projection with no distortion. No global projection can be both area-preserving and conformal \cite{dimi15}.
+
+There are several possibilities for defining a coordinate transform for map projections. A common approach is to project the ellipsoid onto another shape that allows for being flattened out without distortion, such as a cube, a cylinder or a plane. These types of shapes are known as developable shapes and have zero gaussian curvature.
+
+Choosing a map projection is tied together with the choice of ellipsoid tessellation. This is because the map often needs to be tiled up when rendering. Each tile has its local texture coordinate system which need to have a simple transform from the georeferenced coordinate system for texture sampling. If the tiles can be affinely transformed to the geo referenced coordinate system, texture sampling can be done on the fly; otherwise the geo referenced coordinates need to be reprojected which may be computationally heavy or impossible for real time applications.
+
+The European Petroleum Survey Group (EPSG) has defined several standards for map projections of the Earth. Many of these are mentioned when discussing the different projections.
+
+\subsubsection{Geographic Projections}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/developable_projected/equirectangular.png}
+    \end{subfigure}
+    \qquad
+    \begin{subfigure}[bt]{0.15\textwidth}
+        \includegraphics[width=\textwidth]{figures/map_projection/projection_geo.png}
+    \end{subfigure}
+    \caption{Geographic map projection.}
+    \label{fig:proj_cube}
+\end{figure}
+
+\paragraph{Geocentric projection}
+asd
+\paragraph{Geodetic projection}
+asd
+\subsubsection{Geographic Projections}
+asd
+\subsubsection{Geographic Projections}
+asd
+\subsubsection{Geographic Projections}
+asd
+\subsubsection{Geographic Projections}
