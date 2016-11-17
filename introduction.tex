@@ -18,6 +18,44 @@ An important part of the software is to avoid the use of procedurally generated 
 
 \subsection{Globe Browsing}
 
+The term globe browsing can be described as exploration of geospatial data on a virtual representation of a globe. The word globe is a general term used to describe nearly elliptical celestial objects such as planets, moons and asteroids.
+
+Globe rendering with the purpose of multi scale browsing has been used for quite some time in flight simulators, map services and astro-visualization. Prerendered flight paths were visualized as early as the late 1970s by NASA's Jet Propulsion Laboratory \cite{cozzi11}. 
+
+Google Earth \cite{googlemaps} enables browsing of the Earth within a web browser using geometries for cities of high detail. The National Oceanic and Atmospheric Administration (NOAA) provides a sophisticated sphere rendering system, ''Science On a Sphere'', with the ability to visualize a vast amount of geospatial data on spheres with a temporal dimension \cite{sos}. The project is not only a software but includes projection displays and floor plans to aid in public presentations.
+
+There are other commercial softwares that enables larger scale visualization of the Universe with real positional data gathered through research by the National Aeronautics and Space Administration (NASA), European Space Agency (ESA) and others. Satellite Toolkit (STK) enables this by integrating ephemeris information through the SPICE interface \cite{spice} which allows accurate placing of celestial bodies and space crafts within our solar system. Uniview from SCISS AB also enables SPICE integration with sophisticated rendering techniques and dome theatre support \cite{uniview}.
+
+There are other significant globe browsing softwares used in dome theatres such as Microsoft's World Wide Telescope (WWT) \cite{wwt}, Evans \& Sutherland's Digistar \cite{digistar}, and Sky-Skans DigitalSky \cite{digitalsky}.
+
+Other relevant softwares that currently do not support dome configuration rendering but none the less are very adequate in their techniques of integrating globe browsing and globe rendering include Outerra \cite{outerra} and Space Engine \cite{spaceengine}. Both focusing on merging real data with procedurally generated terrains where real data is not available.
+
+Geographic information systems (GIS) are softwares with the purpose of gathering a wide range of geographic map data and visualizing it in various different ways. Even though most of these softwares use GIS features, many of them are not considered GIS. However, they all have the globe browsing feature in common. Technicalities in how it is implemented varies as their end target users are different.
+
+In table \ref{table:softwares}, features relevant to globe browsing in public presentations are shown and compared between different globe browsing softwares.
+
+\begin{center}
+  \begin{table}
+  \caption[]{Relevant features of different globe browsing softwares}
+    \label{table:softwares}
+  \resizebox{\textwidth}{!}{\begin{tabular}{| r | c | c | c | c | c | c |}
+    \hline
+                            & \textbf{Observable Universe scale} & \textbf{Focus on DOME configuration support} & \textbf{Ephemeris information integrated} & \textbf{Real world scientific data only} & \textbf{Free to use} & \textbf{Open source} \\ \hline
+
+    Google Maps &  s  &  s  &  s  &  s  & s & s \\
+    STK &  s  &  s  &  s  &  s  & s & s \\
+    Uniview &  s  &  s  &  s  &  s  & s & s \\
+    WWT &  s  &  s  &  s  &  s  & s & s \\
+    Digistar &  s  &  s  &  s  &  s  & s & s \\
+    DigitalSky &  s  &  s  &  s  &  s  & s & s \\
+    Outerra &  s  &  s  &  s  &  s  & s & s \\
+    Space Engine &  s  &  s  &  s  &  s  & s & s \\
+    OpenSpace &  s  &  s  &  s  &  s  & s & s \\
+    \hline
+  \end{tabular}}
+  \end{table}
+\end{center}
+
 \section{Tesselating the Ellipsoid}
 
 Triangle models are still the most common way of modeling renderable objects in 3D computer graphics softwares, even though other rendering techniques such as volumetric ray casting also can be considered for terrain rendering \cite{cozzi11}.
