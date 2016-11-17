@@ -561,6 +561,92 @@ By adding skirts to the chunk meshes, the model will not be rendered with visibl
     \label{fig:skirts}
 \end{figure}
 
+
+\subsection{Clipmaps Geometry}
+A clipmap texture is a dynamic mip map where each image in the so called clipmap stack is clipped down to a constant size. This reduces the amount of memory of the whole texture to increase linearly instead of exponentially with the number of overlays for LOD textures. However, clipmaps demands updating as the focus point of the texture moves . Figure \ref{fig:flipmapmipmap} a shows the difference between the amount of texture data stored in a regular mip map compared to a clipmap.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap_mipmap.pdf}
+    \end{subfigure}
+    \caption{Comparison of MipMaps and ClipMaps}
+    \label{fig:clipmapmipmap}
+\end{figure}
+
+The Idea of clipmaps can be applied not only to textures but also to geometries. By representing a terrain by a stack of clipmap geometries of different size, the resolution increases closer to the focus point which can be the horizontal position of a virtual camera, see figure fnöske b. The position of each of the levels of the clip map geometries snaps to a discrete coordinate grid with cell sizes equal to the distance between two adjacent vertices.
+
+Geometry clipmaps limits the terrain representation to be in the form of height maps. This is because the clipmap geometry moves around when the focus point changes and since the underlying terrain should not follow the camera position, the clipmap geometries requires vertex shader texture fetching. The texture coordinates are offset as the geometry clipmap moves to follow the focus point.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.6\textwidth}
+        \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap_geo.pdf}
+    \end{subfigure}
+    \caption{Geometry Clipmaps}
+    \label{fig:clipmapgeometry}
+\end{figure}
+
+One of the main selling points for geometry clipmaps is the decrease in CPU workload and the increase in GPU triangle throughput. There is no need to traverse a hierarchical structure such a quadtree. The number of draw calls will decrease to the number of clip maps instead of the number of chunks which is often larger. The framerate will also be relatively consistent if the number of layers in the clipmap stack remains constant.
+
+\subsubsection{2D Grid Geometry Clipmaps}
+Using geometry clipmaps to achieve dynamic level of detail for a height mapped grid was proposed by Dimitrijevi\'{c} and Ran\v{c}i\'{c} \cite{dimi15}. The method is limited to rendering of equirectangular grids. It works well when the viewer has a constant distance to the surface and when the scales are small enough to disregard the curvature of the globe.
+
+When considering the ellipsoidal shape of a globe, the clipmap grid can be represented in geographic coordinates mapped on an ellipsoid where the map texture coordinates in the longitudinal direction wraps around the anti meridian. Rendering the clipmap close to the poles however will lead to polar pinching which breaks the globe, see figure \ref{fig:mipclip}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap1.png}
+        \caption{Near the equator}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[bt]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap2.png}
+        \caption{Near a pole}
+    \end{subfigure}
+    \caption{Geometry Clipmaps on a geographic grid cause pinching effect around the poles, which needs to be handled explicitly.}
+    \label{fig:mipclip}
+\end{figure}
+
+Clipmap grids can also be used to model a spherical cube representation of a globe to avoid polar issues. This requires six clipmap partitions; one for each side of the cube.
+
+\subsubsection{Spherical Clipmaps}
+Spherical clipmaps takes advantage of the fact that no observer will ever see more than half a globe at any time instance. The vertices of the clipmap are described in polar coordinates with the center of the grid always following the camera position. The coordinates of the vertices will therefore not have any correspondence to texture coordinates which is why the algorithm is not widely adopted\cite{dimi15}. 
+
+\subsubsection{Ellipsoidal Clipmaps}
+Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces ellipsoidal clipmaps as a level of detail rendering method for globes \cite{dimi15}. It uses a geographic grid for the polar regions of the globe and solves the polar issues with the use of polar caps. The advantages compared to spherical cube clipmaps is that it uses the well known geographic map projection and reduces the number of geometry clipmap partitions from six to two. The globe is divided into one equatorial region and two polar regions. If the distance is close enough to the globe (3,000 km above the surface for the Earth), a maximum of two partitions is needed at any time \cite{dimi15}.
+
+The area distortion and the aspect distortion of the map projection of the ellipsoidal clipmap method is low compared to cube map projections but requires extra care to hide the discontinuities that appear at the edges between the equatorial and polar partitions \cite{dimi15}.
+
+The most generally used level of detail algorithms of today are chunked LOD and varieties of geometry clipmaps. AAA and BBB compares the algorithms and gives the advantages and disadvantages depending on the needs of the globe browsing software. A summation of the comparison is shown in table jox. The differences were considered when choosing the algorithm for the implementation, however noting that some of the properties can be shared between the two algorithms to more effectively meet the objectives.
+
+The main differences between the Chunked LOD approach and Geometry Clipmaps are summarized and presented in Table \ref{table:lodcomparison} \cite[p. 464]{cozzi11}.
+\begin{center}
+  \begin{table}
+  \caption[]{Comparing geometry clipmapping and chunked LOD}
+    \label{table:lodcomparison}
+  \begin{tabular}{| r | c | c |}
+    \hline
+                            & \textbf{Geometry Clipmaps} & \textbf{Chunked LOD} \\ \hline
+
+    Preprocessing           & Minimal           & Extensive \\
+    Mesh Flexibility        & None              & Good \\
+    Triangle Count          & High              & Lower \\
+    Ellipsoid Mapping       & Challenging       & Straightforward \\
+    Error Control           & Poor              & Excellent \\
+    Frame-Rate Consistency  & Excellent         & Poor \\
+    Mesh Continuity         & Excellent         & Poor \\
+    Terrain Data Size       & Small             & Large \\
+    Legacy Hardware Support & Poor              & Good \\
+    \hline
+  \end{tabular}
+  \end{table}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \section{Large Scale Map Datasets}
 
 Global maps with high level of detail can easily become too large to be stored and read locally on a single machine. A common way of storing large maps is by representing them using several overviews. An overview is a map representing the same geographical area as the original map but containing only one fourth as many pixels just like a lower level of a mip map texture. Figure \ref{fig:overview} shows how the size of the maps in raster coordinates decreases with the overview number.
