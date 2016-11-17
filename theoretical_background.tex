@@ -683,3 +683,51 @@ To standardize web requests for map data, the Open GIS Consortium (OGS) specifie
 The WMS interface produces maps as image files with well defined geographic and dimensional parameters. The image files can have different format and compression depending on the provider. A WMS server has the ability to dynamically produce map patches of arbitrary size which puts some load on the server side \cite{wms06}. The basic elements supported by all WMS providers are the \emph{GetCapabilities} and the \emph{GetMap} operations. \emph{GetCapabilities} gives information about the available maps on the server and their corresponding geo referenced metadata. The \emph{GetMap} operation returns the map or a part of the map as an image file.
 
 The structure of a WMS request using HTTP GET is of the form \\ \texttt{http://host\lbrack:port\rbrack/path\lbrack?\{name\lbrack=value\rbrack\&\}} where the name and value pairs are defined for each operation by the standard \cite{wms06}. For example, setting the parameter \texttt{BBOX=-180,-90,180,90} specifies the size of the map in geo referenced coordinates while the parameters \texttt{WIDTH} and \texttt{HEIGHT} specifies the requested image in raster coordinates. All name and value pairs for the \emph{GetMap} request are defined under the reference \cite{wms06}.
+
+\subsubsection{TMS}
+
+Tile Map Service (TMS) was developed by the Open Source Geospatial Foundation (OSGeo) as a simpler solution to requesting maps from remote servers. The specification uses integer indexing for requesting specific precomputed tiles instead of letting the server side spend time on producing maps of arbitrary dimensions. The TMS interface is similar to WMS but simpler and it does not support all the features of WMS \cite{tms}.
+
+\subsubsection{WMTS}
+
+Web Map Tile Service is the standard by OGS that requires tiled requests. It supports many of the features of WMS but, similar to TMS, removes the load of image processing from the server side and instead forces the client to handle combination and cutouts of patches if required. The standard specifies the \emph{GetCapabilities}, \emph{GetTile} and \emph{GetFeatureInfo} operations. These operations can be requested with different message encodings such as Key-Value Pairs, XML messages or XML messages embedded in SOAP envelopes \cite{wmts10}.
+
+\subsubsection{Tiled WMS}
+
+Before the WMTS standard was developed, some servers had already embarked on the tiled requests by limiting the valid bounding boxes to values that only produce precomputed tiles. These services can be referred to as Tiled WMS and are nothing more than specified WMS services where the server limits the number of valid requests \cite{wmts10}.
+
+\subsection{Georeferenced Image Formats}
+
+There are several different standards for handling image data used in GIS softwares. Some common file formats with image data and/or geo referenced information that are used in the below mentioned imagery products are:
+
+\begin{itemize}  
+\item \emph{GeoTIFF}, TIFF image with the extension of containing geo referenced metadata. 
+\item \emph{IMG}, Image file format with geo referenced metadata. 
+\item \emph{JPEG2000}, Geo referenced image format with lossy or lossless compression.
+\item \emph{CUB}, Geo referenced image file standard created by ISIS (Integrated Software for Imagers and Spectrometers)
+\end{itemize}
+
+\subsection{Available Imagery Products}
+
+There are several organizations working on gathering GIS data that can be visualized as flat 2D maps or projected on globes. Many of them provide their map data through web map services. However, they are often defined in different formats and sometimes available only as downloadable image files.
+
+\subsubsection{Earth}
+
+\textbf{NASA Global Imagery Browse Services (GIBS)} provides several global map datasets with information about Earth's changing climate. The two satellites Aqua and Terra orbit the Earth and are continuously measuring multi band quantities such as corrected reflectance and surface reflectance along with a range of scientific parameters such as surface- and water temperatures, ozone, carbon dioxide and more. Many of the GIBS datasets are updated daily or monthly so that changes can be seen over time. Map tiles are downloaded through a TMS interface and a date and time parameter can be set if the dataset is temporal.
+
+\textbf{Environmental Systems Research Institute (ESRI)} is the provider of the software ArcGIS that lets their users create and publish map data through different types of web map services. There are a lot of free maps to use; not only for Earth but other globes are covered too. ESRI supports a web publication interface where web maps can be searched and studied in an online map viewer. Many of the maps are given in mercator coordinates since they are meant to be viewed projected on a flat surface such as a screen where aspect ratio should be preserved.
+
+\textbf{National Oceanic and Atmospheric Administration (NOAA)} for the U.S. Department of Commerce gathers and provides weather data of the US that are hosted through different web map services using the ArcGIS online \cite{arcgis} interface by ESRI.
+
+\textbf{Open Street Map} is a free global map of streets and roads created and editable by the public and usable by anyone through a TMS interface. The map uses the web mercator projection.
+
+\subsubsection{Mars}
+
+The first global color images taken of Mars were by the two orbiters of the Viking missions that launched in late 1975. NASA Ames worked on creating the Mars Digital Image Models (MDIM) by blending a mosaic of images taken by the orbiters. United States Geological Survey (USGS) provides downloading of image files in CUB or JPEG2000 format. The maps are still the highest resolution global color maps of the planet.
+
+NASA's Mars Reconnaissance Orbiter (MRO) is a satellite that has been orbiting Mars since 2006, gathering map data by taking pictures of the surface. The satellite has three cameras; the Mars Color Imager (MARCI) for mapping out daily weather forecasts, the Context camera (CTX) for imaging terrain and the High Resolution Imaging Science Experiment (HiRISE) camera for mapping out smaller high resolution patches covering limited surface areas of interest. NASA enables downloading of local patches and digital elevation models (DEMs) and grayscale images taken by the CTX and the HiRISE cameras in IMG and GeoTIFF formats.
+
+\subsubsection{Moon}
+
+The Lunar Mapping Modeling Project (LMMP) is an initiative by NASA to gather and publish map data of the Moon from a vast range of lunar missions. The Lunar Reconnaissance Orbiter (LRO) is a satellite orbiting the moon and gathering map data for future landing missions. These maps have been put together into global image mosaics as well as DEMs. Most global maps from LMMP can be accessed via the onmoon web interface \cite{onmoon}.
+
