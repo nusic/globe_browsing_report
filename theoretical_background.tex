@@ -350,7 +350,7 @@ Dimitrijevi\'{c} and Ran\v{c}i\'{c} uses another polar coordinate system to repr
 \end{figure}
 
 
-\subsection{Dynamic Level of Detail}
+\section{Dynamic Level of Detail}
 Dynamic level of detail (LOD) is an important part in handling the extensive amount of data used in an out of core rendering software. The goal is to maximize the visual information on screen while minimizing the workload. In their book Rendering virtual 3D globes, Cozzi and Ring describes LOD rendering algorithms by three typical steps. \cite[p. 367]{cozzi11}
 
 \begin{enumerate}
@@ -361,7 +361,7 @@ Dynamic level of detail (LOD) is an important part in handling the extensive amo
 
 There are different types of LOD approaches for terrain rendering, and a suitable approach should be chosen based on characteristics of the terrain. Terrains can for example be restricted to being represented as height maps - a characteristic that can be exploited by the rendering algorithm. Cozzi and Ring describe the following three categories of LOD approaches: Discrete Level of Detail, Continuous Level of Detail and Hierarchical Level of Detail \cite[p. 368-371]{cozzi11}.
 
-\subsubsection{Discrete Level of Detail}
+\subsection{Discrete Level of Detail}
 In the Discrete Level Of Detail (DLOD) approach, multiple different representations of the terrain are created at different resolutions. DLOD is arguably the most simple LOD algorithm. It works not only for digital terrain models, but for arbitrary meshes. The set of terrain representations can either be predefined or generated using mesh simplification algorithms.
 
 \begin{figure}[htbp]
@@ -376,7 +376,7 @@ In the Discrete Level Of Detail (DLOD) approach, multiple different representati
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.2\textwidth}
-        \includegraphics[width=\textwidth]{figures/lod/decimation1.png}
+        \includegraphics[width=\textwidth]{figures/lod/decimation3.png}
     \end{subfigure}
     ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
       %(or a blank line to force the subfigure onto a new line)
@@ -386,16 +386,16 @@ In the Discrete Level Of Detail (DLOD) approach, multiple different representati
     ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
     %(or a blank line to force the subfigure onto a new line)
     \begin{subfigure}[b]{0.2\textwidth}
-        \includegraphics[width=\textwidth]{figures/lod/decimation3.png}
+        \includegraphics[width=\textwidth]{figures/lod/decimation1.png}
     \end{subfigure}
-    \caption{A range of predefined meshes with decreasing resolution}
+    \caption{A range of predefined meshes with increasing resolution}
     \label{fig:dlod}
 \end{figure}
 
 At run time, the main objective is to select one (or generate) a suitable representation. This approach does not provide any means of dealing with large scale datasets, which makes it unsuitable for globe rendering (ref virtual globes).
 
-\subsubsection{Continuous Level of Detail}
-The continuous LOD (CLOD) approach represents a model in a way that allows the resolution to be selected arbitrary. This is usually implemented by a base mesh combined with a sequence of operations that successively changes the level of detail of the model. Two typical such operations are ``edge collapse'' (removes two triangles from the mesh) and its inverse, ``vertex split'' (adds two triangles to the mesh). 
+\subsection{Continuous Level of Detail}
+The continuous LOD (CLOD) approach represents a model in a way that allows the resolution to be selected arbitrary. This is usually implemented by a base mesh combined with a sequence of operations that successively changes the level of detail of the model. Two typical such operations are ``edge collapse'' (removes two triangles from the mesh) and its inverse, ``vertex split'' (adds two triangles to the mesh) are illustrated in Figure \ref{fig:clod}.
 
 \begin{figure}
     \centering
@@ -415,7 +415,7 @@ According to Cozzi and Ring \cite[p. 368]{cozzi11} CLOD has previously been the 
 
 A special branch of CLOD worth mentioning is the so called infinite LOD. In this approach the terrain is represented by a mathematical function - an implicit surface. These functions can be defined by fractal algorithms and produce complex characteristics, or they can define simple geometric shapes such as spheres or ellipsoids. As every point on these types of surfaces are precisely defined, triangle meshes can be generated with no limit on the level of detail. This approach is not suitable for incorporating real world data, but it is used by terrain engines such as Outerra and Terragen to procedurally generate terrain at any desired level of detail \cite{outerraprocedural09}. 
 
-\subsubsection{Hierarchical Level of Detail}
+\subsection{Hierarchical Level of Detail}
 Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLOD algorithms operates on hierarchically arranged, predefined chunks of the full model. Each chunk is processed, stored and rendered separately. By doing this, HLOD approaches tackles the weaknesses of CLOD, essentially by doing the following.
 
 \begin{enumerate}
@@ -423,7 +423,7 @@ Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLO
     \item Reduce the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can't be cached on the GPU. Being able to perform GPU caching allow HLOD to better minimize the traffic to the GPU.
 \end{enumerate}
 
-HLOD uses spatial hierarchical data structures such as quadtrees or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail a one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated in figure hlod.
+HLOD uses spatial hierarchical data structures such as quadtrees or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail a one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated in Figure \ref{fig:hlod}.
 
 \begin{figure}[htbp]
     \centering
@@ -451,10 +451,117 @@ Generally, selecting all the chunks at a specific level in the tree yields a com
   \caption{Algorithm with procedure}
 \end{algorithm} 
 
-
 This example uses a depth first approach for rendering of chunks. Other common schemes for traversing the hierarchy are breadth first and inverse breadth first.
 
 The algorithm traverses the tree and calculates an error metric at each node with respect to the current camera position. If the calculated error is larger than a certain threshold, the algorithm recursively repeats the procedure for all the chunk's children, which has higher level of detail. This general scheme can be used for rendering one-dimensional curves (using a binary tree structure), two-dimensional surfaces (using a quadtree) or volumes (using an octree).
 
 Another key feature of HLOD as opposed to DLOD and CLOD is that it can naturally be integrated with out-of-core rendering, as chunks can be loaded into memory on-demand and thrown away when not needed.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Level of Detail Algorithms for Globes}
+A number of different LOD algorithms has been introduced for the purpose of globe rendering. Two common algorithms used are Chunked LOD and Geometry Clipmaps, as pointed out by Cozzi and Ring\cite{cozzi11}.
+
+\subsection{Chunked LOD}
+The Chunked LOD method fits into the category of a HLOD system and works by breaking down the surface of the globe into a quadtree of chunks. There are several different tiling schemes that can be used for spatially organizing the chunks. Some tiling schemes are defined as the ellipsoidal tessellation methods described under ``Tessellating the Ellipsoid''. 
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/chunkedlodglobe.png}
+    \end{subfigure}
+    \caption{Chunk LOD for a globe}
+    \label{fig:chunkedlod}
+\end{figure}
+
+Figure \ref{fig:chunkedlod} demonstrates the layout of chunks as they are mapped in geographic coordinates onto an ellipsoid representation of a globe.
+
+\subsubsection{Chunks}
+Chunks should store the following data:
+
+\begin{enumerate}
+    \item A mesh defining the terrain geometry (positions, normals, uv-coordinates). 
+    \item A monotonic geometric error, based on the vertices distances to the fully detailed mesh. The children of a chunk should always have a smaller geometric error as they can better fit the highest level of detail model.
+    \item A known bounding volume encapsulating the mesh and optimally all the chunk's children. This is used along with the geometric error metric when selecting suitable chunks for rendering.
+\end{enumerate}
+
+Depending on the implementation of the chunked LOD algorithm, these properties can be either calculated on the fly or preprocessed as suggested by Cozzi and Ring\cite[p. 447]{cozzi11}. Furthermore, the chunk mesh must fulfill two important requirements: 
+
+\begin{enumerate}
+    \item Have vertices defined in each corner of the mesh
+    \item Have defined edges along its sides such that when two adjacent chunks are rendered next to each other, there is no gap in between them. See subsection Cracks below for more about this topic
+\end{enumerate}
+
+Cozzi and Ring suggests rectangular chunk meshes, although triangular tiling schemes (such as HTM) can also be used.\cite{htm}.
+
+\subsubsection{Selection}
+There are different ways of selecting chunks for rendering, based on different ways of calculating an error metric for each chunk. (See Algorithm chunk selection in HLOD section). As an example, a very simple view-dependent error metric could use the chunk size divided by the distance between the camera and the chunk. If the ratio is larger than a certain threshold, the algorithm should instead consider each of the chunk's children by splitting the chunk into four. Another approach is to consider the actual visual effect on the screen. With a geometric error stored in each chunk, it is possible to calculate a maximum screen space error in pixels with respect to the current camera view. [Cozzi and Ring] This gives the user the convenience of being able to specify a maximum pixel error threshold.
+
+\subsubsection{Culling}
+An important thing to consider when dealing with chunks of a virtual globe is the fact that the chunks that are selected for rendering might not actually be visible on the screen. Needless to say, this is a waste of computational power and by eliminating these unnecessary draw calls, the performance of the globe renderer can be increased noticeable (ref).
+
+\paragraph{Camera frustum culling} This is done by testing a bounding box of the chunk for intersection with the camera frustum. If the chunk is completely outside the frustum, the chunk can safely be culled as it will not be visible in the rendered image. See Figure \ref{fig:frustumculling}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/frustumculling.pdf}
+    \end{subfigure}
+    \caption{Frustum culling}
+    \label{fig:frustumculling}
+\end{figure}
+
+\paragraph{Horizon culling} Even after camera frustum culling there are chunks that still do not contribute to the rendered image. Figure \ref{fig:horizonculling} illustrates that most of a globe is actually invisible to any observer. This can be used as a basis for culling some of the remaining chunks. 
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/horizonculling.png}
+    \end{subfigure}
+    \caption{Horizon culling}
+    \label{fig:horizonculling}
+\end{figure}
+
+
+\subsubsection{Switching}
+Even with sophisticated methods for selecting and culling chunks, users of a globe rendering system will notice ``popping'' effects as chunks are splitted and merged. Even when chunks can be selected in a way that guarantees a maximum pixel error per vertex, the fact that full areas of multiple triangles are replaced all at once causes a drastic change in the rendered view. Even when the updates are small per vertex, the update of whole chunk areas may be easily noticed. This is what is referred to as popping.
+
+Minimizing popping artifacts are typically done by smoothly transitioning between levels over time. Cozzi and Ring suggest an approach where along with each vertex, a delta offset is also stored\cite[p. 451]{cozzi11}. This delta offset stores the difference between the chunk itself and the same region within the parent chunk. Using this difference, new vertices can be placed on already defiend edges, and then interpolated into their actual positions. Figure switch below illustrates the idea.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.7\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/switching.png}
+    \end{subfigure}
+    \caption{a) An edge at chunk level i-1. b) The same edge after level i has been selected. c) The new vertex is interpolated into its true place.}
+    \label{fig:lodswitch}
+\end{figure}
+
+The interpolation parameter can be based on the distance to the camera or time based animation.
+
+\subsubsection{Cracks and skirts}
+As chunks are tiled and rendered next to each other, it is desireable to make the borders between chunks as unnoticeable as possible. Even though the chunk meshes are generated according the requirements mentioned in the Chunk subsection above, it is not possible to guarantee a watertight edge between two adjacent chunks of different level of detail. Where adjacent chunks have different detail level, so called T-junctions till emerge. These T-junctions cause cracks between the chunks as an unwanted visual artifact. Figure \ref{fig:noskirts} below illustrates this issue.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.7\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/skirts_without.png}
+    \end{subfigure}
+    \caption{Chunks of different LOD produce visible cracks between them.}
+    \label{fig:noskirts}
+\end{figure}
+
+The easiest way to tackle this issue is not to try to remove the cracks, but instead try to hide them. The most common approach hides the cracks by simply adding an extra layer of vertices to the sides of sides of the mesh. This extra layer of vertices, which are also known as skirts, are offset down towards the ground, as illustrated in figure \ref{fig:skirts}. 
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.6\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/skirts_with.png}
+    \end{subfigure}
+    \caption{Chunks with skirts hide the undesired cracks between them}
+    \label{fig:skirts}
+\end{figure}
+
+By adding skirts to the chunk meshes, the model will not be rendered with visible holes in it. Instead, the holes will be filled up with textured triangles.
