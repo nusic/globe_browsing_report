@@ -348,3 +348,150 @@ Dimitrijevi\'{c} and Ran\v{c}i\'{c} uses another polar coordinate system to repr
     \caption{Polar map projections.}
     \label{fig:proj_polar}
 \end{figure}
+
+
+\subsection{Dynamic Level of Detail}
+Dynamic level of detail (LOD) is an important part in handling the extensive amount of data used in an out of core rendering software. The goal is to maximize the visual information on screen while minimizing the workload. In their book Rendering virtual 3D globes, Cozzi and Ring describes LOD rendering algorithms by three typical steps. \cite[p. 367]{cozzi11}
+
+\begin{enumerate}
+    \item Generation - Create versions at different level of detail of a model
+    \item Selection - Choose a version based on some criteria or error metric (e.g., distance to object or the projected area it occupies on the screen)
+    \item Switching - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
+\end{enumerate}
+
+There are different types of LOD approaches for terrain rendering, and a suitable approach should be chosen based on characteristics of the terrain. Terrains can for example be restricted to being represented as height maps - a characteristic that can be exploited by the rendering algorithm. Cozzi and Ring describe the following three categories of LOD approaches: Discrete Level of Detail, Continuous Level of Detail and Hierarchical Level of Detail \cite[p. 368-371]{cozzi11}.
+
+\subsubsection{Discrete Level of Detail}
+In the Discrete Level Of Detail (DLOD) approach, multiple different representations of the terrain are created at different resolutions. DLOD is arguably the most simple LOD algorithm. It works not only for digital terrain models, but for arbitrary meshes. The set of terrain representations can either be predefined or generated using mesh simplification algorithms.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.9\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/lod_overview.pdf}
+    \end{subfigure}
+    \caption{DLOD. Generate offline, select and switch at runtime.}
+    \label{fig:lod}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/decimation1.png}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/decimation2.png}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+    %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/decimation3.png}
+    \end{subfigure}
+    \caption{A range of predefined meshes with decreasing resolution}
+    \label{fig:dlod}
+\end{figure}
+
+At run time, the main objective is to select one (or generate) a suitable representation. This approach does not provide any means of dealing with large scale datasets, which makes it unsuitable for globe rendering (ref virtual globes).
+
+\subsubsection{Continuous Level of Detail}
+The continuous LOD (CLOD) approach represents a model in a way that allows the resolution to be selected arbitrary. This is usually implemented by a base mesh combined with a sequence of operations that successively changes the level of detail of the model. Two typical such operations are ``edge collapse'' (removes two triangles from the mesh) and its inverse, ``vertex split'' (adds two triangles to the mesh). 
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/vertex_split1.png}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/vertex_split2.png}
+    \end{subfigure}
+    \caption{Edge collapse in continous LOD}
+    \label{fig:clod}
+\end{figure}
+
+According to Cozzi and Ring \cite[p. 368]{cozzi11} CLOD has previously been the most popular approach for rendering terrain at interactive rates, with implementations such as Real-time Optimally Adaptive Mesh (ROAM). The main reason CLOD algorithms are not widely employed these days is due to the increase in triangle throughput on modern GPUs, causing the CLOD operations done on the CPU in many cases to act as a bottleneck for the rendering time.
+
+A special branch of CLOD worth mentioning is the so called infinite LOD. In this approach the terrain is represented by a mathematical function - an implicit surface. These functions can be defined by fractal algorithms and produce complex characteristics, or they can define simple geometric shapes such as spheres or ellipsoids. As every point on these types of surfaces are precisely defined, triangle meshes can be generated with no limit on the level of detail. This approach is not suitable for incorporating real world data, but it is used by terrain engines such as Outerra and Terragen to procedurally generate terrain at any desired level of detail \cite{outerraprocedural09}. 
+
+\subsubsection{Hierarchical Level of Detail}
+Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLOD algorithms operates on hierarchically arranged, predefined chunks of the full model. Each chunk is processed, stored and rendered separately. By doing this, HLOD approaches tackles the weaknesses of CLOD, essentially by doing the following.
+
+\begin{enumerate}
+    \item Reduce processing time on CPU: The only CPU task that HLOD algorithms has to deal with during runtime is to select a suitable subset of the predefined chunks for rendering. This is a relatively fast procedure in contrast to iteratively applying changes to the raw geometry, as done in CLOD.
+    \item Reduce the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can't be cached on the GPU. Being able to perform GPU caching allow HLOD to better minimize the traffic to the GPU.
+\end{enumerate}
+
+HLOD uses spatial hierarchical data structures such as quadtrees or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail a one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated in figure hlod.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/hlod_tmp.png}
+    \end{subfigure}
+    \caption{HLOD using a quadtree.}
+    \label{fig:hlod}
+\end{figure}
+
+Generally, selecting all the chunks at a specific level in the tree yields a complete representation of the model. Furthermore, chunks may be selected from different levels for different parts of the model and still yield a full representation of the model. This allows for view dependent rendering of the model. Algorithm chunk selection describes pseudo code for recursively rendering the full model at view dependent level of detail.
+
+\begin{algorithm}[htp]
+  \SetKwFunction{RenderLOD}{}
+  \SetKwProg{myalg}{RenderLOD}{}{}
+  \myalg{\RenderLOD{Camera C, ChunkNode N}}{
+  \eIf{ErrorMetric($C$, $N$) < threshold}{
+        Render($N$, $C$)
+    }{
+        \For{$child$ \textbf{in} $children(N)$}{
+            RenderLOD($child$, $C$)
+        }
+    }
+  }{}
+  \caption{Algorithm with procedure}
+\end{algorithm} 
+
+
+This example uses a depth first approach for rendering of chunks. Other common schemes for traversing the hierarchy are breadth first and inverse breadth first.
+
+The algorithm traverses the tree and calculates an error metric at each node with respect to the current camera position. If the calculated error is larger than a certain threshold, the algorithm recursively repeats the procedure for all the chunk's children, which has higher level of detail. This general scheme can be used for rendering one-dimensional curves (using a binary tree structure), two-dimensional surfaces (using a quadtree) or volumes (using an octree).
+
+Another key feature of HLOD as opposed to DLOD and CLOD is that it can naturally be integrated with out-of-core rendering, as chunks can be loaded into memory on-demand and thrown away when not needed.
+
+\section{Large Scale Map Datasets}
+
+Global maps with high level of detail can easily become too large to be stored and read locally on a single machine. A common way of storing large maps is by representing them using several overviews. An overview is a map representing the same geographical area as the original map but containing only one fourth as many pixels just like a lower level of a mip map texture. Figure \ref{fig:overview} shows how the size of the maps in raster coordinates decreases with the overview number.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{picture}(130,60)
+        \put(0,0){\includegraphics[width=0.5\textwidth]{figures/overview.pdf}}
+    	\put(-50,50){Overview:}
+    	\put(45,50){0}
+    	\put(127,50){1}
+    	\put(176,50){n}
+    	\put(-5,25){$y$}
+    	\put(45,-5){$x$}
+	\put(100,35){$\frac{y}{2}$}
+	\put(127,15){$\frac{x}{2}$}
+	\put(155,37){$\frac{y}{2^n}$}
+    	\put(176,25){$\frac{x}{2^n}$}
+
+    	\label{fig:proj_equirectangular}
+    \end{picture}
+    \caption{The size of the map is decreasing exponentially with the overview.}
+    \label{fig:overview}
+\end{figure}
+
+The physical disk space of large global map datasets is often measured in terabytes or even petabytes. In order to deal with such large datasets, web based services allow users to specify only parts of the map to download at a time. This is an important aspect in the out of core rendering required for globe visualization.
+
+\subsection{Web Map Services}
+
+To standardize web requests for map data, the Open GIS Consortium (OGS) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some more specific examples of WMS-like services are WorldWind, VirtualEarth and AGS. The last three are not covered in this thesis.
+
+\subsubsection{WMS}
+
+The WMS interface produces maps as image files with well defined geographic and dimensional parameters. The image files can have different format and compression depending on the provider. A WMS server has the ability to dynamically produce map patches of arbitrary size which puts some load on the server side \cite{wms06}. The basic elements supported by all WMS providers are the \emph{GetCapabilities} and the \emph{GetMap} operations. \emph{GetCapabilities} gives information about the available maps on the server and their corresponding geo referenced metadata. The \emph{GetMap} operation returns the map or a part of the map as an image file.
+
+The structure of a WMS request using HTTP GET is of the form \\ \texttt{http://host\lbrack:port\rbrack/path\lbrack?\{name\lbrack=value\rbrack\&\}} where the name and value pairs are defined for each operation by the standard \cite{wms06}. For example, setting the parameter \texttt{BBOX=-180,-90,180,90} specifies the size of the map in geo referenced coordinates while the parameters \texttt{WIDTH} and \texttt{HEIGHT} specifies the requested image in raster coordinates. All name and value pairs for the \emph{GetMap} request are defined under the reference \cite{wms06}.
+
