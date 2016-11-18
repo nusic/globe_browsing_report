@@ -729,5 +729,60 @@ The Lunar Mapping Modeling Project (LMMP) is an initiative by NASA to gather and
 
 \section{Precision Issues}
 
+Modern graphics cards work with floating point variables and single precision is the common standard \cite{segal10}. With OpenGL 4.0 came the introduction of double precision floating point numbers within the GLSL shader programming language \cite{segal10}. The double precision floating point operations are significantly slower than their single precision counterparts \cite{dimi15}; we choose to avoid double precision floating point operations on the GPU for this reason.
 
+In most computer graphics applications it is often sufficient to describe positional information in single precision floating point values. However, when simulating and visualizing the full scale of the universe and at the same time globes with sub meter resolution, the issues of low precision float operations easily become predominant unless handled right.
 
+\subsection{Floating Point Numbers}
+A floating point number $y$ is represented by a sign bit $s$, a significand $c \in N$, a base (also known as the radix) $b \in Z, b > 2$, and an exponent $q \in Z$. See equation \ref{eq:float}.
+
+\begin{equation}
+\label{eq:float}
+y=(-1)^s c b^q
+\end{equation}
+
+These numbers are flexible since they can represent big ranges. They have varying accuracy depending on the exponent $q$ since the numbers $c$ and $q$ are stored as integers with a limited number of bits.
+
+In the Institute of Electrical and Electronics Engineers 754 (IEEE 754) standard, the base $b$ is a constant 2 or 10 and the significand $c$ and the exponent $q$ are set according to a well defined scheme \cite{ieee754}. With floating point numbers, operations such as addition and subtraction of values decreases precision due to a drop in the least significant bits \cite{cozzi11}. The precision is reduced even more due to accumulating errors \cite{cozzi11}.
+
+\subsection{Single Precision Floating Point Numbers}
+
+A 32 bit floating point number can accurately represent around 7 significant decimal figures in the IEEE 754 standard \cite{cozzi11}.
+
+Considering an Earth sized globe with the origin in the center and a radius of $6 \times 10^6$ meters, the theoretical vertical resolution is approximately $6 \times 10^{6-7} = 0.6$ meters. However, due to arithmetic operations the resolution reduces even more. Furthermore,  these issues get worse when considering rendering of more objects in a scene that is representing not only one planet but the entire solar system. The distance from the sun to the earth is roughly $1.5 \times 10^{11}$ meters which leaves a positional resolution in the order of $10^{11 - 7} = 10^4$ meters which is far from acceptable when browsing globes.
+
+\subsection{Double Precision Floating Point Numbers}
+
+A double precision floating point number is able to accurately represent 16 decimal figures \cite{cozzi11}. Consider the Voyager 1 spacecraft, which left the solar system and entered interstellar space in August 25, 2012, and currently is at a distance in the order of magnitude of $10^{13}$ meters. This spacecraft is the farthest any human made object has gone; farther away than all the planets, and can still be accurately positioned with sub meter resolution using double precision floating point variables (of course assuming that the positional data is correct).
+
+NASA's Navigation and Ancillary Information Facility (NAIF) is the producer of the SPICE interface. In SPICE, ephemeri (positional information) of celestial bodies within our solar system are defined in double precision floating point numbers. Utilizing this precision makes it possible to accurately visualize space crafts in relation to globes.
+
+\subsection{Rendering Artifacts}
+\subsubsection{Vertex Position Jittering}
+
+One noticeable artefact related to the 32 bit floating point limitation of graphics cards is the discrete positioning of vertices when the origin is far away from the rendered object. A clear example of this is shown in figure \ref{fig:jittering} where Jupiter's moon Europa is rendered with single precision floating point operations and the origin is placed at the barycenter of the solar system.
+
+The artefact is shown as discrete positioning of vertices which causes jagged edges of the globe when the positions of the vertices exceeds sub-pixel precision. When moving the camera, the discrete positioning of the vertices appears to jitter due to the fact that they are transformed to camera space with limited precision.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.3\textwidth]{figures/europa.png}
+    \caption{Jupiter's moon Europa rendered with single precision floating point operations. The precision errors in the placement of the vertices is apparent even at a distance far from the globe.}
+    \label{fig:jittering}
+\end{figure}
+
+Cozzi and Ring propose several different solutions to this problem which include ''rendering relative to center'', ''CPU - relative to eye'', ''GPU - relative to eye'', and ''GPU - relative to eye - FUN90'' \cite{cozzi11}. 
+
+The techniques implemented to solve the issue is described under implementation \todo{ref here} and differs somewhat from from the methods proposed by Cozzi and Ring, though the basics are derived from the underlying theories.
+
+\subsubsection{Z-Fighting}
+
+Another well known issue related to precision in rendering of highly detailed objects with a large range of possible distances to the camera is z-fighting. Z-fighting appears as triangles or fragments flipping between being positioned in front of or behind each other, see figure (smask) \todo{Image needed}.
+
+The problem is due to the inverse relationship that OpenGL implicitly puts on the depth buffer when the perspective division is performed together with the change in precision in the size of the floating point numbers. This causes redundant precision close to the camera and increasingly lower precision for coordinates with big depth values \cite{cozzi11}.
+
+The problem is already handled in OpenSpace by using a linear depth buffer. The depth buffer value is changed by explicitly setting the value of \texttt{gl\_FragDepth} in all fragment shaders. The value is simply set to the z-coordinate in camera space negated and normalized to fit all distances within the observable Universe.
+
+A negative aspect about setting the value of \texttt{gl\_FragDepth} explicitly is that early depth testing is not possible. This is OpenGL's method of discarding fragments before the fragment shader has been invoked. Not performing early depth testing leads to lower frame rates if the fragment shader is heavy. Kemen discussed the implications of setting \texttt{gl\_FragDepth} explicitly and concluded that for regular fragment processing, the change in frame rate was not significant for the Outerra software \cite{kemen12}.
+
+Other previously proposed methods for handling depth buffer issues include logarithmic depth buffer and multiple view frustums and complementary depth buffering \cite{cozzi11}.
