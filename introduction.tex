@@ -57,12 +57,27 @@ In table \ref{table:softwares}, features relevant to globe browsing in public pr
   \end{table}
 \end{center}
 
-\section{Tesselating the Ellipsoid}
+\section{Objectives}
 
-Triangle models are still the most common way of modeling renderable objects in 3D computer graphics softwares, even though other rendering techniques such as volumetric ray casting also can be considered for terrain rendering \cite{cozzi11}.
+The goal of this thesis is not only to provide OpenSpace with a globe browsing feature. There are some specific demands that play a significant role in the focus of this work. These features are listed below:
 
-A triangle mesh, or more generally a polygon mesh, is defined by a limited number of surface elements. This means that ellipsoids need to be approximated by some sort of tessellation or subdivision surface when modeled as a polygon mesh. There are several techniques for tessellating an ellipsoid. Some of them are covered in this section.
+\begin{enumerate}
+    \item Ability to retrieve map data from the most common standardized web map data interfaces: WMS, TMS, WMTS
+    \item Ability to render height maps and color textures with up to 25 cm per pixel resolution
+    \item Ability to layer multiple map datasets on top of each other. This makes it possible to visualize a range of scientific data about the atmosphere and the ocean on top of a textured globe
+    \item Globe browsing should be done at interactive framerates: at least 60 frames per second on a modern consumer gaming graphics cards
+    \item Correct positional mapping of objects rendered near the globe surface
+    \item Support animation of map datasets with time resolution
+\end{enumerate}
 
-\subsection{Geographic Grid Tessellation}
+\section{Delimitations}
 
-Tessellating the ellipsoid using a geographic grid is a very straightforward approach. Ellipsoid vertex positions can be calculated using a transform from geographic (latitude and longitude) space to a cartesian coordinate space. An implementation of such a transform is implemented and described by Cozzi and Ring \cite[p. 25]{cozzi11}. Figure (fisk) shows three geographic grid tessellations of ellipsoids with constant number of latitudinal segments of 2, 4 and 8 respectively. A common issue with this approach is something referred to as polar pinching. At both of the poles, segments will be pinched to one point which leads to an increasing amount of segments per area. This in turn results in oversampling and visual artifacts in texture mapping due to the very thin quads.
+To focus on the important aspects of globe browsing and its purposes for public presentations, some important delimitations had to be taken into consideration.
+
+We do not consider rendering of globes with distances to the origin greater than the radius of our solar system. Direct imaging of exoplanets is far from usable for mapping and is mainly a method for locating planets \cite{exoplanets}. Since OpenSpace does not currently aim at producing procedurally generated content, visualization of exoplanets is not the focus.
+
+One important delimitation for the project is to limit the geometry of a globe to height mapped grids. This will make it possible to perform vertex blending on the GPU as well as simplify the implementation to a uniform method of rendering across the whole globe.
+
+We will not focus on re-projecting maps between different georeferenced coordinate systems. Therefore the implementation must be limited to reading a specific map projection. Reprojecting maps can be considered future work to generalize the ability to read map data as well as optimizing rendering output and performance.
+
+One goal of OpenSpace is to produce awe inspiring visual effects. The current state of the project requires the foundations to be in place and globe browsing is one of the main features that need to be implemented before real sophisticated rendering techniques can be developed. We will not consider rendering of atmospheres or water effects and we will not consider shading that requires changing of the current rendering pipeline of OpenSpace such as deferred shading.
