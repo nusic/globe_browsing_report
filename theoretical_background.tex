@@ -773,15 +773,20 @@ The artefact is shown as discrete positioning of vertices which causes jagged ed
 
 Cozzi and Ring propose several different solutions to this problem which include ''rendering relative to center'', ''CPU - relative to eye'', ''GPU - relative to eye'', and ''GPU - relative to eye - FUN90'' \cite{cozzi11}. 
 
-The techniques implemented to solve the issue is described under implementation \todo{ref to our implementation here} and differs somewhat from from the methods proposed by Cozzi and Ring, though the basics are derived from the underlying theories.
-
 \subsubsection{Z-Fighting}
 
-Another well known issue related to precision in rendering of highly detailed objects with a large range of possible distances to the camera is z-fighting. Z-fighting appears as triangles or fragments flipping between being positioned in front of or behind each other, see figure (smask) \todo{Image needed}.
+Another well known issue related to precision in rendering of highly detailed objects with a large range of possible distances to the camera is z-fighting. Z-fighting appears as triangles or fragments flipping between being positioned in front of or behind each other. Normally the issue appears when it is undecidable what relative depth two objects have, see figure \ref{fig:zfighting}. When dealing with large distances, undecidable depths can appear for objects such as terrains with bigger relative depths.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/zfighting.png}
+    \caption{Z-fighting.}
+    \label{fig:zfighting}
+\end{figure}
 
 The problem is due to the inverse relationship that OpenGL implicitly puts on the depth buffer when the perspective division is performed together with the change in precision in the size of the floating point numbers. This causes redundant precision close to the camera and increasingly lower precision for coordinates with big depth values \cite{cozzi11}.
 
-The problem is already handled in OpenSpace by using a linear depth buffer. The depth buffer value is changed by explicitly setting the value of \texttt{gl\_FragDepth} in all fragment shaders. The value is simply set to the z-coordinate in camera space negated and normalized to fit all distances within the observable Universe.
+The problem is already handled in OpenSpace with the use of a linear depth buffer. The depth buffer value is changed by explicitly setting the value of \texttt{gl\_FragDepth} in all fragment shaders. The value is simply set to the z-coordinate in camera space negated and normalized to fit all distances within the observable Universe.
 
 A negative aspect about setting the value of \texttt{gl\_FragDepth} explicitly is that early depth testing is not possible. This is OpenGL's method of discarding fragments before the fragment shader has been invoked. Not performing early depth testing leads to lower frame rates if the fragment shader is heavy. Kemen discussed the implications of setting \texttt{gl\_FragDepth} explicitly and concluded that for regular fragment processing, the change in frame rate was not significant for the Outerra software \cite{kemen12}.
 
