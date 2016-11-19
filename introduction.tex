@@ -81,3 +81,19 @@ One important delimitation for the project is to limit the geometry of a globe t
 We will not focus on re-projecting maps between different georeferenced coordinate systems. Therefore the implementation must be limited to reading a specific map projection. Reprojecting maps can be considered future work to generalize the ability to read map data as well as optimizing rendering output and performance.
 
 One goal of OpenSpace is to produce awe inspiring visual effects. The current state of the project requires the foundations to be in place and globe browsing is one of the main features that need to be implemented before real sophisticated rendering techniques can be developed. We will not consider rendering of atmospheres or water effects and we will not consider shading that requires changing of the current rendering pipeline of OpenSpace such as deferred shading.
+
+\section{Challenges}
+
+There are multiple technical challenges to tackle when designing a virtual globe renderer. Cozzi and Ring \cite{cozzi11} define the main challenges as following:
+
+\begin{itemize}
+
+\item \textbf{Precision} - In order to render small scale details of a virtual globe and also dolly out to see multiple virtual globes in the same solar system, the limited precision of computer arithmetics needs to be considered.
+\item \textbf{Accuracy} - Modelling globes as spheres is usually not a very accurate approach, as many planets and moons that rotate have different polar and equatorial radii.
+\item \textbf{Curvature} - The curved nature of globes implies some extra challenges as opposed to worlds modelled based on flat surfaces. The challenge includes finding a suitable 2D-parameterization for tessellation and mapping.
+\item \textbf{Massive datasets} - It is not unusual for real world geographical datasets to be too large to fit in GPU memory, RAM and even local drives. Instead, data need to be fetched from remote servers on demand using a so called out-of-core approach to rendering.
+\item \textbf{Multithreading} - The need for multithreading is necessary as the program needs to retrieve geographical data from multiple sources, while at the same time retain a steady frame rate for rendering.
+
+\end{itemize}
+
+Details in issues and proposed solutions to these challenges will be discussed throughout the thesis.
