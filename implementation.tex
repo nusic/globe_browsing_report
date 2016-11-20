@@ -1,7 +1,5 @@
 \chapter{Implementation}
-The virtual globe rendering system was implemented as a separate module, programmed in C++ for OpenSpace, which, if desired, can be opted out in CMake. The implementation defines a namespace with all the necessary data structures, classes and functionality specifically related to globe rendering.
-
-The base of the globe renderer uses a modified version of Cozzi and Rings Chunked LOD algorithm. The globe is tessellated as an ellipsoid with a geometrical grid using geodetic map projection.
+The virtual globe rendering system was implemented as a separate module, programmed in C++ for OpenSpace which, if desired, can be opted out when building the software in CMake. The implementation defines a namespace with all the necessary data structures, classes and functionality specifically related to globe rendering. The basic structure of a renderable globe with its necessary components is illustrated as a UML diagram in figure \ref{fig:renderableglobe}.
 
 \begin{figure}[htbp]
     \centering
@@ -11,6 +9,8 @@ The base of the globe renderer uses a modified version of Cozzi and Rings Chunke
     \caption{Overviewing class diagram of RenderableGlobe and its related classes.}
     \label{fig:renderableglobe}
 \end{figure}
+
+The base of the globe renderer uses a modified version of Cozzi and Rings Chunked LOD algorithm. The globe is tessellated as an ellipsoid with a geometrical grid using geodetic map projection.
 
 The full LOD rendering system required several components of different complexity to be implemented. These along with their puruposes are listed below.
 
@@ -27,21 +27,21 @@ The full LOD rendering system required several components of different complexit
 
 
 \section{Reference Ellipsoid}
-The reference ellipsoid was implemented to handle all geographic related calculations.  These calculations include conversions between geodetic and cartesian coordinates and different kinds of projections onto the ellipsoid surface. These calculations are sped up by internal caching of a range of precalculated values. Cozzi and Ring provide a complete reference on the implementation \cite[p. 17]{cozzi11}.
+The reference ellipsoid class was implemented to handle all geographic related calculations.  These calculations include conversions between geodetic and cartesian coordinates and different kinds of projections onto the ellipsoid surface. These calculations are sped up by internal caching of a range of precalculated values. Cozzi and Ring provide a complete reference on the implementation \cite[p. 17]{cozzi11}.
 
-The Ellipsoid uses several geographically related classes, which were used in multiple place within the implementation. These include:
+The Ellipsoid uses several geographically related classes, which were used in multiple places within the implementation. These are:
 \begin{enumerate}
-	\item Angle - Handle angle related arithmetics, normalizations and abstract away unit (degrees and radians)
+	\item Angle - Handles angle related arithmetics, normalizations and abstract away units (degrees and radians)
 	\item Geodetic2 - Represents a 2D geodetic coordinate (latitude, longitude)
 	\item Geodetic3 - Represents a 3D geodetic coordinate (latitude, longitude, altitude)
 	\item GeodeticPatch - Represents a rectangular region in geodetic space
 \end{enumerate}
 
 \section{Chunked LOD}
-The base of the chunked LOD algorithm revolves around the self updating chunk tree. The chunk tree is a data structure built up of chunk nodes which have the ability to split or merge dynamically. Besides storing four children chunk nodes, each chunk node stores a Chunk.
+The base of the chunked LOD algorithm revolves around the self updating chunk tree. The chunk tree is a data structure built up of chunk nodes which have the ability to split or merge dynamically. Besides storing four chunk node children, each chunk node stores a Chunk.
 
 \subsection{Chunks}
-As opposed to the definition of chunks in Theoretical Background, this implementation of chunks is very lightweight - it does not store any texture or triangle mesh data. Instead, it stores the information needed to query texture tiles from local in-memory caches. In the implementation suggested by Cozzi and Ring, terrain triangle meshes are stored in each chunk. In the case of this implementation however, all terrain is rendered using height mapped vertex grids. Thus there is no need for each chunk to store their own vertex arrays. Instead they can simply share one single instance of a vertex grid within a whole chunk tree. This of course also means that vertices need to be offset by height mapping on the GPU.
+As opposed to the definition of chunks in the background section \ref{section:chunkedlodbacground}, this implementation of chunks is very lightweight - it does not store any texture or triangle mesh data. Instead, it stores the information needed to query texture tiles from local in-memory caches. In the implementation suggested by Cozzi and Ring, terrain triangle meshes are stored in each chunk. In the case of this implementation however, all terrain is rendered using height mapped vertex grids. Thus there is no need for each chunk to store their own vertex arrays. Instead they can simply share one single instance of a vertex grid within a whole chunk tree. This means that vertices need to be offset by height mapping on the GPU.
 
 The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. 
 
@@ -58,14 +58,14 @@ By letting the error depend on the distance between the closest point on the chu
 Where $e$ is the error, $l$ is the current level of the chunk, $s$ is a LOD scaling factor and $d$ is the distance between the closest point of the chunk and the camera. The closest point of the chunk can be either a corner or a point along one of the chunk edges. Using this distance as an error metric leads to bigger chunks farther from the camera where less detail is needed.
 
 
-\subsubsection{By Projection Area}
+\subsubsection{By Projected Area}
 Another error metric is the area that the chunk take up on the screen. The bigger the area, the higher the error. 
 
-The error must not be dependent of the direction of the camera. This is because a chunk rendered on a multi screen display should not have different errors between two or more screens which might lead to different levels and tearing between screens. Therefore the chunk is projected on a unit sphere and not a view plane which would lead to view direction dependent desired levels.
+The error must not be dependent of the direction of the camera. This is because a chunk rendered on a multi screen display should not have different errors between two or more screens which might lead to different levels and tearing between screens. Therefore the chunk is projected on a unit sphere and not a view plane which would lead to view direction dependent error metrics.
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.6\textwidth}
+    \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunklod/projectedarea.png}
     \end{subfigure}
     \caption{Chunk are projected onto a unit sphere}
@@ -87,7 +87,7 @@ Splitting a chunk will not result in higher level of detail unless the correspon
 Being able to limit the chunk tree in these two scenarios, unnecessary chunk rendering calls can be avoided.
 
 \subsection{Chunk Culling}
-Given a chunk tree with chunks selected based on the camera position, each chunk can be tested using chunk cullers to determine if they are ``cullable'' and therefore can be set to invisible so that the chunk renderer will not bother in rendering them. The two implemented chunk cullers are the frustum culler and the horizon culler. They both rely on - and have access to - minimum and maximum values of the Chunk's height maps. 
+Given a chunk tree with chunks selected based on the camera position, each chunk can be tested using chunk cullers to determine if they are ``cullable'' and therefore can be set to invisible so that the chunk renderer will not bother in rendering them. The two implemented chunk cullers are the frustum culler and the horizon culler. They both rely on - and have access to - minimum and maximum values of the chunk's height maps. 
 
 \subsubsection{Frustum Culling}
 The frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC). Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view, and thus can be cullable. This is illustrated in Figure \ref{fig:frustumculling}.
@@ -97,34 +97,41 @@ The frustum culling is implemented by first calculating a convex bounding polyhe
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunklod/frustumculling.pdf}
     \end{subfigure}
-    \caption{Frustum culling algorithm. The chunk cannot be culled.}
+    \caption{Frustum culling algorithm. The chunk cannot be frustum culled.}
     \label{fig:frustumculling}
 \end{figure}
 
 \subsubsection{Horizon Culling}
-Given an object in position $p$ with a bounding radius $r$, it can be determined if it is completely below the globe's horizon or not. The calculations are simplified by approximating the globe as a sphere using the minimum radius of its ellipsoid. Using the minimum radius and not a bigger number ensures that false occluding (chunks marked as invisible actually being visible) is not possible \cite[p. 393]{cozzi11}. The minimum allowed distance $l$ to the object can be calculated as the distance to the horizon $l_h$ added to the minimum allowed distance to the object from the horizon $l_m$. See equation horizon and figure horizon.
+Given an object in position $\vec{p}$ with a bounding radius $r$, it can be determined if it is completely behind the globe's horizon or not. The calculations are simplified by approximating the globe as a sphere using the minimum radius $r_g$ of its ellipsoid. Using the minimum radius and not a bigger number ensures that false occluding (chunks marked as invisible actually being visible) is not possible \cite[p. 393]{cozzi11}. The minimum allowed distance $l$ to the object can be calculated as the distance to the horizon $l_h$ added to the minimum allowed distance to the object from the horizon $l_m$. See figure \ref{fig:horizonculling}. Once the minimum allowed distance is calculated it can be compared to the actual distance to the object to determine if it is cullable or not.
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.25\textwidth}
-        \includegraphics[width=\textwidth]{figures/implementation/chunklod/horizonculling.pdf}
-    \end{subfigure}
-    \caption{The horizon culling algorithm}
+    \begin{picture}(130,130)
+        \put(0,0){\includegraphics[width=0.4\textwidth]{figures/implementation/chunklod/horizonculling.pdf}}
+        \put(-50,50){Overview:}
+        \put(60,145){$l_h$}
+        \put(115,125){$l_m$}
+        \put(135,95){$r$}
+        \put(70,95){$r_g$}
+        \put(130,80){$\vec{p}$}
+        
+    \end{picture}
+    \caption{Horizon culling.}
     \label{fig:horizonculling}
 \end{figure}
 
-When culling chunks, the closest position on the chunk is used as the position $p$ and the bounding height value as $r$.
+When culling chunks, the closest position on the chunk is used as the position $\vec{p}$ and the bounding height value as $r$.
 
 \section{Reading and Tiling Image Data}
-Fetching the right texture prepare it for rendering onto chunks is a fairly complicated process. Before digging into the details of this process, there are three concepts that need to be established, as they will be referenced to throughout the description of the texture pipeline. Those are:
+Fetching the right texture and preparing it for rendering onto chunks is a fairly complicated process. Before digging into the details of this process, there are three concepts that need to be established, as they will be referred to throughout the description of the texture pipeline. These are:
 
 \begin{enumerate}
-	\item TileIndex - A tuple of three integers $(level, x, y)$ indexing a specific chunk region on the globe.
-	\item RawTile - A texture carved out fit the geographical region of a specific chunk, along with some meta data. Each RawTile is associated with a TileIndex. 
-	\item Tile - Just like RawTile, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to RawTiles, Tiles rely on a OpenGL context.	
+	\item \textbf{Tile index} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe.
+	\item \textbf{Raw tile} - A texture carved out to fit the geographical region of a specific chunk, along with some meta data. Each raw tile is associated with a tile index. They can be instantiated concurrently.
+	\item \textbf{Tile} - Like a raw tile, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to raw tiles, tiles rely on an OpenGL context and must therefore be initialized on the rendering thread.
 \end{enumerate}
 
-All Chunk height and texture data are represented using Tiles. Tiles are created on the client side (i.e. in OpenSpace) on the fly as they are needed. As the pixel data may need to be read from disk or even requested from remote servers, the whole tile preparation pipeline was implemented to be executed on separate threads in order to avoid blocking the rendering thread with image data reads. 
+All chunk height and texture data are represented using tiles. Tiles are created on the client side (i.e. in OpenSpace) on the fly when they are needed. As the pixel data may need to be read from disk or even requested from remote servers, the whole tile preparation pipeline was implemented to be executed on separate threads in order to avoid blocking the rendering thread with image data reads. 
 
 During the iterative process of developing the texture tile pipeline, three layers of abstraction were introduced in order to deal with the fairly high complexity. These are listed in Table \ref{table:tilepipeline}.
 
@@ -132,22 +139,21 @@ During the iterative process of developing the texture tile pipeline, three laye
   \begin{table}
   \caption[]{Abstraction layers used in the texture data pipeline}
     \label{table:tilepipeline}
-  \begin{tabular}{| c | c | c | c |}
+  \resizebox{\textwidth}{!}{\begin{tabular}{| c | c | c | c |}
     \hline
-      & \textbf{Component} 	& \textbf{Responsibility} & \textbf{Input --> Output} \\ \hline 
-    1 & Async Tile Dataset 	& Async RawTile fetching  & TileIndex --> RawTile \\ \hline
+     Layer & \textbf{Component} 	& \textbf{Responsibility} & \textbf{Input --> Output} \\ \hline 
+    3 & Async Tile Dataset 	& Async RawTile fetching  & TileIndex --> RawTile \\ \hline
     2 & Tile Dataset        & Tiling, georeferencing, preprocessing & TileIndex --> RawTile \\ \hline
-    3 & GDAL         		& Image formats, I/O Operations & pixel region --> pixel data \\
+    1 & GDAL         		& Image formats, I/O Operations & pixel region --> pixel data \\
     \hline
-  \end{tabular}
+  \end{tabular}}
   \end{table}
 \end{center}
 
 The subsequent sections of this chapter will cover each abstraction layer in more detail, starting from the bottom and going up the stack.
 
-
 \subsection{GDAL}
-Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. GDAL is used as an abstraction layer between all the map formats and the representation of Tile Datasets. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. Reading pixel data using the GDAL interface requires a set of parameters listed below and illustrated in Figure \ref{fig:gdalio}:
+Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. GDAL is used as an abstraction layer between all the map formats and the representation of tile datasets. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. Reading pixel data using the GDAL RasterIO interface requires a set of parameters listed below and illustrated in Figure \ref{fig:gdalio}:
 
 \begin{enumerate}
 	\item A map overview to read pixel data from (if the dataset has overviews)
@@ -179,12 +185,12 @@ With the given input parameters shown in Figure \ref{fig:gdalio}, the resulting 
     \label{fig:gdalioresult}
 \end{figure}
 
-The using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \textbf{majs} goes through a detailed example of how to use GDAL as an abstraction layer for sparse, non global, datasets such as local georeferenced image patches and use them in our globe browsing software.
+Using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \todo{\textbf{add appendix}} goes through a detailed example of how to use GDAL as an abstraction layer for sparse, non global, datasets such as local, georeferenced, image patches and use them in our globe browsing software.
 
-GDAL also provides the coefficients of a geo-transform which defines the mapping from pixel coordinates to georeferenced coordinates.
+GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates.
 
 \subsection{Tile Dataset}
-Tile datasets carves out Raw tiles from GDAL datasets based on a Tile index. Along with the pixel data, the served Raw tiles also contain some metadata. The metadata includes an error code if something went wrong during the pixel reading process and some basic information about the read pixel data, such as minimum and maximum pixel values. Figure \ref{fig:tiledataset} illustrates how the process from Tile index to raw Tile is carried out. 
+Tile datasets carves out raw tiles from GDAL datasets based on a tile index. Along with the pixel data, the served raw tiles also contain some metadata. The metadata includes an error code if something went wrong during the pixel reading process and some basic information about to read pixel data, such as minimum and maximum pixel values. Figure \ref{fig:tiledataset} illustrates how the process from tile index to raw tile is carried out. There are three gray subroutines; $Get IO description$, $Read image data$ and $Calculate metadata$. These subroutines are explained below.
 
 \begin{figure}[htbp]
     \centering
@@ -195,18 +201,16 @@ Tile datasets carves out Raw tiles from GDAL datasets based on a Tile index. Alo
     \label{fig:tiledataset}
 \end{figure}
 
-In Figure \ref{fig:tiledataset}, there are three gray subroutines; $Get IO description$, $Read image data$ and $Calculate metadata$. These subroutines are explained below.
-
 \subsubsection{Get IO Description}
-The IO Description contains all tile specific information needed to perform a map read request using GDAL. This includes the pixel region to read, and where to store the result, as described in the GDAL subsection above. The derivation of this information is summarized the follow steps, and illustrated in Figure \ref{fig:getiodescription}.
+The IO description contains all tile specific information needed to perform a map read request using GDAL. This includes the pixel region to read, and where to store the result. The derivation of this information is summarized in the following steps, and illustrated in Figure \ref{fig:getiodescription}.
 
 \begin{enumerate}
-\item Calculate Geodetic patch from Tile index
-\item Calculate Geodetic patch's pixel coordinates in map pixel space
+\item Calculate geodetic patch from Tile index
+\item Calculate the pixel coordinates for the patch in raster coordinate space
 \item Calculate a suitable map overview
 \item Transform pixel region to map overview
 \item Add padding to the down scaled pixel region
-\item Finalize the gatherd to an IO description object.
+\item Finalize the gathered data to an IO description object.
 \end{enumerate}
 
 \begin{figure}[htbp]
@@ -219,7 +223,7 @@ The IO Description contains all tile specific information needed to perform a ma
 \end{figure}
 
 % @TODO
-In the scheme in Figure IO Description, step one is done as described in theoretical background, eqation wat is defined under section hej. 
+In the scheme in Figure \ref{fig:getiodescription}, step one is performed as described in \todo{theoretical background}, equation wat is defined under section hej. 
 Calculating the corresponding GDAL overview is done according to
 
 \begin{equation}
