@@ -370,6 +370,24 @@ As opposed to regular tiles, chunk tiles can always be used for rendering since 
 
 \subsection{Chunk Tile Pile}
 
+A chunk tile pile represents multiple chunk tiles across multiple levels of detail and contains all the information needed to perform the LOD switching described under section \todo{ref Switching}.
+
+Retrieving a chunk tile pile for a specific chunk simply requires a chunk index of the most detailed chunk and the number of desired chunk tiles in the pile as described in Algorithm \ref{alg:getchunktilepile}.
+
+\begin{algorithm}[htp]
+ \caption{Get a chunk tile for a specific tile index}
+ \KwResult{ ChunkTilePile }
+  \SetKwProg{myalg}{getChunkTilePile}{(tileProvider, tileIndex, pileSize)}{}
+  \myalg{}{
+  chunkTilePile = [ ] \\
+  \For{i in range [1, pileSize]}{
+  	chunkTilePile.append(getChunkTile(tileIndex))
+  	tileIndex = tileIndex.parent()
+  }
+  Return ChunkTilePile
+  }{}
+  \label{alg:getchunktilepile}
+\end{algorithm}
 
 
 \section{Managing Multiple Data Sources}
