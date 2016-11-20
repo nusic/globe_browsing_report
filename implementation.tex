@@ -240,13 +240,13 @@ Where $n$ is the destination map overview and $m$ is the source map overview. Th
 
 Padding is added to the pixel region in order to do correct interpolation of pixel values across different tiles later during rendering. However, this may cause the pixel region to extend outside the map region. Therefor the last finalize step also handles wrapping of the pixel regions before return the final IO description. The wrapping used is a CPU implementation of $GL\_REPEAT$.
 
-\subsection{Tile Meta Data}
+\subsubsection{Tile Meta Data}
 As mentioned, tile datasets can be configured to calculate some metadata on the fly based on the pixel data that has been read. This information cannot be requested directly from GDAL, so this had to be implemented by explicitly looping through all the pixel values an extra time client side. In this case, raw tiles will be served with some additional information. The metadata includes minimum and maximum pixel values within the pixel data and whether or not the pixeldata contains missing-data values. Having access to minimum and maximum values for height layer tiles is required for the culling to be performed correctly since the cullers rely on having bounding boxes for the chunks.
 
-\subsection{Summary}
+\subsubsection{Summary}
 To summarize, the implementation of TileDataset allow reading pixeldata from a GDAL dataset corresponding to a specific TileIndex, along with some metadata unless opted out. The RawTiles that are served are padded for correct interpolation avoiding visible edges in the texture between tiles. RawTiles are not available for rendering since the data is not yet on the GPU.
 
-\section{Async Tile Dataset}
+\subsection{Async Tile Dataset}
 Async tile datasets utilize a shared thread pool and own a tile dataset. It provides a concurrent job posting interface for concurrent reads within the tile dataset. It has two important methods: 1) enqueueTileReadJob and 2) getFinishedTileReadJobs. Reading raw tiles on separate threads ensures that the render thread will not be delayed by image data requests, see Figure \ref{fig:asynctiledataset}.
 
 \begin{figure}[htbp]
@@ -268,6 +268,56 @@ Async tile datasets utilize a shared thread pool and own a tile dataset. It prov
 \end{figure}
 
 The Async tile dataset internally keeps track of what tile indices it has enqueued and what tile index pixel regions are currently being read. If a pixel region for a specific Tile index already is currently being read, the request is simply ignored.
+
+
+\section{Providing Tiles}
+
+\subsection{Caching Tile Provider}
+
+\subsection{Temporal Tile Provider}
+
+\subsection{Single Image Tile Provider}
+
+\subsection{Text Tile Provider}
+
+
+\section{Mapping Tiles onto Chunks}
+
+\subsection{Chunk Tiles}
+
+\subsection{Chunk Tile Pile}
+
+
+\section{Managing Multiple Data Sources}
+
+\subsection{Layers}
+
+\subsection{Layers on the GPU}
+
+\subsubsection{CPU to GPU Data Mapping}
+
+\subsubsection{Updating the GPU Data}
+
+
+\section{Chunk Rendering}
+
+\subsection{Grid}
+
+\subsection{Vertex Pipeline}
+
+\subsubsection{High Precision Rendering}
+
+\subsubsection{Model Space Rendering}
+
+\subsubsection{Camera Space Rendering}
+
+\subsection{Fragment Pipeline}
+
+\subsection{Dynamic Shader Programs}
+
+\subsection{Lod Switching}
+
+
 
 \begin{figure}[htb]
 \centering
