@@ -500,14 +500,35 @@ Retrieving a chunk tile pile for a specific chunk simply requires a chunk index 
   \myalg{}{
   chunkTilePile = [ ] \\
   \For{i in range [1, pileSize]}{
-  	chunkTilePile.append(getChunkTile(tileIndex))
+  	chunkTilePile.append(getChunkTile(tileIndex)) \\
   	tileIndex = tileIndex.parent()
   }
-  Return ChunkTilePile
+  Return chunkTilePile
   }{}
   \label{alg:getchunktilepile}
 \end{algorithm}
 
+As an example: 
+Given that the texture data has already been locally cached, invoking the getChunkTilePile method with index $\{x: 2240, y: 4824, level: 13 \}$ and a chunk tile pile of size 3, would return the \class{Chunk Tile Pile} represented in Figure \ref{fig:chunktilepile}. All the chunk tiles represent the same geodetic area, however at different LOD; which means that the image data might be different. One dataset can be a combination of multiple different sources such as satellite imagery and aerial photography which makes blending to avoid popping more important.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile3.png}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile2.png}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile1.png}
+    \end{subfigure}
+    \caption{Only the highlighted subset of the parent tile is used for rendering the chunk.}
+    \label{fig:chunktilepile}
+\end{figure}
+
+As chunk tiles are guaranteed to be good for rendering on the GPU (since their tiles are guaranteed to have the status ``OK''), all \class{Chunk Tile Pile}s are guaranteed to be good for rendering as well. 
 
 \section{Managing Multiple Data Sources}
 
