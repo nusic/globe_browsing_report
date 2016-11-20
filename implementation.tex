@@ -264,7 +264,7 @@ Async tile datasets utilize a shared thread pool and own a tile dataset. It prov
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{0.7\textwidth}
-        \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset2.pdf}
+        \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset_gettiles.pdf}
     \end{subfigure}
     \caption{Retrieving finished Raw tiles.}
     \label{fig:asynctiledataset2}
@@ -274,15 +274,134 @@ The Async tile dataset internally keeps track of what tile indices it has enqueu
 
 
 \section{Providing Tiles}
+Tiles has a three properties: a texture, some texture metadata and a tile status. The status is used to report any type of problem with the tile. This includes IO errors, Out-of-range errors or simply Unavailable. Tiles that have the ``OK'' status however, are uploaded to the GPU and can used for rendering. 
+
+Tiles are provided for rendering through Tile providers - an interface that allow accessing tiles meta data about the tiles. There are different types of tile providers, but they must all implement the following functionality.
+
+
+\begin{itemize}
+\item GetTile(TileIndex) - access the tile at the provided tile index
+\item GetDefaultTile() - returns a default tile with status ``OK''
+\item GetDepthTransform() - pixel value scale factor, e.g. for converting heightmap values to meters
+\item GetMaxLevel() - the highest mip level defined for the dataset
+\item GetNoDataValue() - get value that should be interpreted as ``no data''
+\item CheckTileStatus(TileIndex) - check tile status with no side effects
+\item Update() - called once per frame, allow for internal updates
+\item Reset() - full reset of internal state. 
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/tileprovider/tileprovider_gettile.pdf}
+    \end{subfigure}
+    \caption{Tile provider interface for accessing tiles.}
+    \label{fig:tileprovider}
+\end{figure}
+
+The most important functionality is the GetTile ability, which is used by client code to access the tiles. As tile providers may provide tiles of any status, the users of the tile provider are responsible to always check the status of the requested tile before using the tile. 
+
+Several implementations of the tile provider interface were been developed and is described below.
 
 \subsection{Caching Tile Provider}
+Caching tile provider uses a Async tile dataset to read raw tiles as soon as client code tries to access a specific tile. It internally polls the Async tile dataset every frame for finished raw tiles. When there is a ready raw tile, the Caching tile provider converts the raw tile into a tile. This is done in the initialization step which is part of the update method that is illustrated in figure update. If no errors of the raw tile are reported, the tile gets the status ``OK'' and is uploaded texture data to the GPU and added to the in-memory cache.
+
+The uploading of texture data to the GPU needs to be done on the rendering thread since that is where the OpenGL context resides. However, there are alternatives to this approach as discussed in Discussion/Future Work. 
+
+Tiles with data uploaded to texture memory will enable it for use in rendering of a chunk. The functionality of accessing tiles is illustrated in Figure \ref{fig:cachingtileprovider_gettile}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_gettile.pdf}
+    \end{subfigure}
+    \caption{Tiles are either provided from cache or requested.}
+    \label{fig:cachingtileprovider_gettile}
+\end{figure}
+
+The functionality for internally updating the tile cache is illustrated in Figure \ref{fig:cachingtileprovider_update}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_update.pdf}
+    \end{subfigure}
+    \caption{The tile cache is updated once per frame.}
+    \label{fig:cachingtileprovider_update}
+\end{figure}
+
+Figure tile request demonstrates a typical scenario where a specific tile of index {3, 4, 2} is requested within a sequence of render calls. The first requesting call to that tile will spawn a worker thread in the AsynchTileDataset. As soon as the Tile is initialized (uploaded to the GPU) and inserted in the cache it will be accessible on the rendering thread. If the tile is not yet available the Caching Tile Provider will report that so that the calling function can continue without the use of that specific Tile.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_tilerequest.pdf}
+    \end{subfigure}
+    \caption{Tiles are fetched on demand}
+    \label{fig:cachingtileprovider_tilerequest}
+\end{figure}
+
+The caching policy implemented and used is LRU - ``Least Recently Used''. This means that Tiles that have not been accessed for a while are thrown out only when the cache limit is exceeded. For implementation details about LRU caching, see Theoretical Background : Caching. 
 
 \subsection{Temporal Tile Provider}
+In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented. The Temporal Tile Provider is instantiated with a template URI containing a time placeholder. Information about the supported time range, time resolution and expected timestamp format to be used in the template URI is also passed during instantiation. This config information is illustrated in figure Temp below. 
+
+\begin{verbatim}
+<OpenSpaceTemporalGDALDataset>
+    <OpenSpaceTimeStart>2015-11-24</OpenSpaceTimeStart>
+    <OpenSpaceTimeEnd></OpenSpaceTimeEnd>
+    <OpenSpaceTimeResolution>1d</OpenSpaceTimeResolution>
+    <OpenSpaceTimeIdFormat>YYYY-MM-DD</OpenSpaceTimeIdFormat>
+    <GDAL_WMS>
+        <Service name="TMS">
+            <ServerUrl>
+                http://datasetURL/${OpenSpaceTimeId}/${z}/${y}/${x}.jpg 
+            </ServerUrl>
+        </Service>
+    </GDAL_WMS>
+    ...
+</OpenSpaceTemporalGDALDataset>
+\end{verbatim}
+
+At runtime, the temporal tile provider checks the global simulation time, quantizes that time with respect to the provided time resolution and lazily instantiates new caching tile providers per timeframe within the temporal dataset. 
+
+A schematic illustration of the implementation of the temporal tile provider is illustrated in Figure \ref{fig:temporaltileprovider_gettile}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/tileprovider/temporaltileprovider_gettile.pdf}
+    \end{subfigure}
+    \caption{Each temporal snapshot is internally represented by a caching tile provider.}
+    \label{fig:temporaltileprovider_gettile}
+\end{figure}
+
 
 \subsection{Single Image Tile Provider}
+This is a very simple implementation of the tile provider interface which only serves the same tile for every tile index. This tile provider was used for testing and debugging alignment and padding between tiles.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.6\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/tileprovider/singleimagetileprovider_gettile.pdf}
+    \end{subfigure}
+    \caption{Serving single tiles can be useful for debugging chunk and texture alignment.}
+    \label{fig:singleimagetileprovider_gettile}
+\end{figure}
 
 \subsection{Text Tile Provider}
+The ability to serve tiles with text rendered on the fly was implemented as a general debugging utility. The tiles are generated on demand by rendering text to textures, using framebuffer binding, and cached using the same LRU caching mechanism as the Caching Tile Provider.
 
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[bt]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/tileprovider/texttileprovider_gettile.pdf}
+    \end{subfigure}
+    \caption{Serving single tiles can be useful for debugging chunk and texture alignment.}
+    \label{fig:texttileprovider_gettile}
+\end{figure}
+
+Two different text tile providers were implemented. Tile index tile provider serves tiles where each tile has its tile index rendered onto it, and \emph{Size reference tile provider} uses the globe's reference ellipsoid to render a size reference in meters or kilometers onto its tiles.
 
 \section{Mapping Tiles onto Chunks}
 
