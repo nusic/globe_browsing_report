@@ -464,7 +464,9 @@ Another key feature of HLOD as opposed to DLOD and CLOD is that it can naturally
 A number of different LOD algorithms has been introduced for the purpose of globe rendering. Two common algorithms used are Chunked LOD and Geometry Clipmaps, as pointed out by Cozzi and Ring\cite{cozzi11}.
 
 \subsection{Chunked LOD}
-The Chunked LOD method fits into the category of a HLOD system and works by breaking down the surface of the globe into a quadtree of chunks. There are several different tiling schemes that can be used for spatially organizing the chunks. Some tiling schemes are defined as the ellipsoidal tessellation methods described under ``Tessellating the Ellipsoid''. 
+The Chunked LOD method fits into the category of a HLOD system and works by breaking down the surface of the globe into a quadtree of chunks. There are several different ways of spatially organizing chunks and they depend on the tessellation of the globe. 
+
+Using a geographic grid tesselation, the chunks are in geographic space using latitude $\phi$ and longitude $\theta$ coordinates. Figure \ref{fig:chunkedlod} demonstrates the layout of chunks as they are mapped in geographic coordinates onto an ellipsoid representation of a globe.
 
 \begin{figure}[htbp]
     \centering
@@ -475,7 +477,18 @@ The Chunked LOD method fits into the category of a HLOD system and works by brea
     \label{fig:chunkedlod}
 \end{figure}
 
-Figure \ref{fig:chunkedlod} demonstrates the layout of chunks as they are mapped in geographic coordinates onto an ellipsoid representation of a globe.
+Finding the geographic coverage of a chunk with a given tile index can be done using equation \ref{eq:latlongindex}.
+
+\begin{equation}
+\label{eq:latlongindex}
+\begin{split}
+\theta_{NE} = 2\pi x / 2^{level} \\
+\phi_{NE} = 2\pi y / 2^{level} \\
+side = 2\pi / 2^{level},
+\end{split} 
+\end{equation}
+
+where $\theta_{NE}$ and $\phi_{NE}$ are the longitude and latitude of the north east corner of the chunk and $side$ is the side length of the chunk.
 
 \subsubsection{Chunks}
 Chunks should store the following data:
