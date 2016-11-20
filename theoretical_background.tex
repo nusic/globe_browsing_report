@@ -45,6 +45,32 @@ The structure of a WMS request using HTTP GET is of the form \\ \texttt{http://h
 
 Tile Map Service (TMS) was developed by the Open Source Geospatial Foundation (OSGeo) as a simpler solution to requesting maps from remote servers. The specification uses integer indexing for requesting specific precomputed tiles instead of letting the server side spend time on producing maps of arbitrary dimensions. The TMS interface is similar to WMS but simpler and it does not support all the features of WMS \cite{tms}.
 
+The information needed to locate a tile in a tiled map dataset is the $level$ and a $x-$ and $y$ coordinate within that level. The number of indices in the $x-$ and $y$ dimension will increase by a factor of two for each level.
+
+A parent tile index is calculated according to equation \ref{eq:tile1}.
+
+\begin{equation}
+\label{eq:tile1}
+\begin{split}
+level_{parent} = level - 1 \\
+x_{parent} = \left\lfloor x / 2 \right\rfloor \\
+y_{parent} = \left\lfloor y / 2 \right\rfloor \\
+\end{split}
+\end{equation}
+
+Correspondingly, the index of the a child can be calculated. Given that children are ordered (North-West, North-East, South-West, South-East), the tile index of the n:th child is calculated according to equation \ref{eq:tile2}.
+
+\begin{equation}
+\label{eq:tile2}
+\begin{split}
+level_{child_n} = level + 1 \\
+x_{child_n} = 2 x + ( n ~ mod ~ 2 ) \\
+y_{child_n} = 2 y + ( \left\lfloor n / 2 \right\rfloor ~ mod ~ 2 ) \\
+\end{split}
+\end{equation}
+
+
+
 \subsubsection{WMTS}
 
 Web Map Tile Service is the standard by OGS that requires tiled requests. It supports many of the features of WMS but, similar to TMS, removes the load of image processing from the server side and instead forces the client to handle combination and cutouts of patches if required. The standard specifies the \emph{GetCapabilities}, \emph{GetTile} and \emph{GetFeatureInfo} operations. These operations can be requested with different message encodings such as Key-Value Pairs, XML messages or XML messages embedded in SOAP envelopes \cite{wmts10}.
