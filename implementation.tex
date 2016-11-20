@@ -286,9 +286,90 @@ The Async tile dataset internally keeps track of what tile indices it has enqueu
 
 \section{Mapping Tiles onto Chunks}
 
+In the implementation of chunks suggested by Cozzi and Ring \cite{cozzi11}, chunks store the data they need for rendering by them selves. That means that as soon as a chunk has been fully initialized, it has everything it needs to be rendered. However, when dealing with multiple map datasets potentially residing on distant servers, there is no guarantee that all the tiles needed for a chunk to be rendered are available.
+
+When a requested tile does not have the status ``OK'', it can not be used for rendering, the second best thing to do is to check the Tile's parent. A parent tile always covers a larger geodetic map region that includes its children's subregions, but with lower number of pixels per geodetic degree. Figure \ref{fig:tiles} demonstrates this with a simple example.
+
+In figure \ref{fig:tiles}, it is realized that in order to use a parent tile for rendering, the texture coordinates used to sample the parent tile needs to be adjusted accordingly. This shows the need of a higher level concept than just tiles, which leads to the introduction of chunk tiles.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktile1.jpg}
+        \caption{Requested tile.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktile2.jpg}
+        \caption{Requested tile's region shown in its parent tile.}
+    \end{subfigure}
+    \caption{Only the highlighted subset of the parent tile is used for rendering the chunk.}
+    \label{fig:tiles}
+\end{figure}
+
 \subsection{Chunk Tiles}
 
+A chunk tile represents a tile that corresponds to a specific chunk. It stores a tile which is guaranteed to have the status ``OK'' along with a transform defined by a scaling and translation component. The transform is used to map texture coordinates of the chunk into its corresponding geodetic region within the tile. 
+
+The algorithm used for selecting the highest resolution chunk tile from a simple tile provider is described by the pseudo code in algorithm \ref{alg:tileselection}.
+
+\begin{algorithm}[htp]
+ \caption{Selecting optimal chunk tiles}
+ \KwResult{ Chunk tile: \{Tile, UvTransform\}  }
+  \SetKwProg{myalg}{GetChunkTile}{(tileProvider, tileIndex)}{}
+  \myalg{}{
+  \While {tileIndex.level > 0}{
+  	tile = tileProvider.getTile(tileIndex)
+  }
+  \eIf{(tile.status == OK)}{
+        Return \{ tile, tileUvTransform \}
+    }{
+        tileUvTransform = fromParent(tileUvTransform, tileIndex)
+	tileIndex = tileIndex.parent()
+    }
+  }
+  Return \{ tileProvider.defaultTile(), \{Translation: \{0,0\}, Scaling: \{1,1\} \} \}
+  {}
+  \label{alg:tileselection}
+\end{algorithm}
+ 
+The subroutine \texttt{fromParent} returns an updated transform which maps texture coordinates to the same geodetic region within the next parent tile. The routine is described in algorithm \ref{alg:fromparent}.
+
+\begin{algorithm}[htp]
+ \caption{Get the transform from the parents texture coordinates}
+ \KwResult{ UvTransform: \{Translation, Scaling\}  }
+  \SetKwProg{myalg}{fromParent}{(tileUvTransform, tileIndex)}{}
+  \myalg{}{
+ 	tileUvTransform.translation *= 0.5
+	tileUvTransform.scaling *= 0.5
+  \If{(tileIndex is an eastern child)}{
+        tileUvTransform.translation.x += 0.5
+    }
+    \If{(TileIndex is a northern child)}{
+        tileUvTransform.translation.y += 0.5
+    }
+  }
+  Return tileUvTransform
+  {}
+  \label{alg:fromparent}
+\end{algorithm}
+
+The subroutine \texttt{getParent} simply returns the parent of the provided tile index as described in Algorithm \ref{alg:parent}.
+
+\begin{algorithm}[htp]
+ \caption{Get the parent tile index}
+ \KwResult{ TileIndex: \{level, x, y\}  }
+  \SetKwProg{myalg}{TileIndex::Parent}{}{}
+  \myalg{}{
+  Return \{level-1, x/2, y/2\}
+  }{}
+  \label{alg:parent}
+\end{algorithm}
+
+As opposed to regular tiles, chunk tiles can always be used for rendering since they by definition always have the status ``OK''.
+
 \subsection{Chunk Tile Pile}
+
 
 
 \section{Managing Multiple Data Sources}
