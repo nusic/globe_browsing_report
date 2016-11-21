@@ -431,6 +431,30 @@ A chunk tile represents a tile that corresponds to a specific chunk. It stores a
 
 The algorithm used for selecting the highest resolution chunk tile from a simple tile provider is described by the pseudo code in algorithm \ref{alg:tileselection}.
 
+\begin{verbatim}
+ChunkTile getChunkTile(TileProvider* tileProvider, TileIndex tileIndex){
+  TileUvTransform uvTransform;
+  uvTransform.uvOffset = glm::vec2(0, 0);
+  uvTransform.uvScale = glm::vec2(1, 1);
+
+  while (tileIndex.level > 1) {
+      Tile tile = tileProvider->getTile(tileIndex);
+      if (tile.status == Tile::Status::OK) {
+          return { tile, uvTransform }
+      }
+      else {
+        ascendToParent(tileIndex, uvTransform);
+      }
+      
+  }
+
+  uvTransform.uvOffset = glm::vec2(0, 0);
+  uvTransform.uvScale = glm::vec2(1, 1);
+  return { Tile::TileUnavailable, uvTransform };
+}
+\end{verbatim}
+
+\iffalse
 \begin{algorithm}[htp]
  \caption{Selecting optimal chunk tiles}
  \KwResult{ Chunk tile: \{Tile, UvTransform\}  }
@@ -450,9 +474,55 @@ The algorithm used for selecting the highest resolution chunk tile from a simple
   {}
   \label{alg:tileselection}
 \end{algorithm}
+
+
+\begin{algorithm}[htp]
+\caption{Selecting optimal chunk tiles}
+\label{alg:tileselection}
+\KwResult{ A \class{ChunkTile} defined by a \class{Tile} and a \class{UvTransform}  }
+  \SetKwProg{myalg}{GetChunkTile}{(\class{TileProvider}, \class{TileIndex})}{}
+  \myalg{}{
+    Initialize \class{UvTransform} with no scaling and no translation\\
+    \While {level of \class{TileIndex} > 0}{
+      Use \class{TileProvider} to access \class{Tile} at \class{TileIndex}\\
+      \eIf{(\class{Tile} has status OK)}{
+        \Return \class{ChunkTile} defined by \class{Tile} and \class{UvTransform}\\
+      }{
+        Modify \class{UvTransform} and \class{TileIndex} to represent the same geographic region at a higher mip level
+      }
+    }
+    Use \class{TileProvider} to access the \class{Default Tile}\\
+    Let \class{UvTransform} have no scaling and no translation\\
+    \Return \class{ChunkTile} defined by \class{Default Tile} and \class{UvTransform}\\
+  }
+  {}
+\end{algorithm}
+\fi
+
  
 The subroutine \texttt{fromParent} returns an updated transform which maps texture coordinates to the same geodetic region within the next parent tile. The routine is described in algorithm \ref{alg:fromparent}.
 
+\begin{verbatim}
+void TileSelector::ascendToParent(TileIndex& tileIndex, TileUvTransform& uv) {
+    uv.uvOffset *= 0.5;
+    uv.uvScale *= 0.5;
+
+    if (tileIndex.isEastChild()) {
+        uv.uvOffset.x += 0.5;
+    }
+
+    // In OpenGL, positive y direction is up
+    if (tileIndex.isNorthChild()) {
+        uv.uvOffset.y += 0.5;
+    }
+
+    tileIndex.level--;
+    tileIndex.x /= 2;
+    tileIndex.y /= 2;
+}
+\end{verbatim}
+
+\iffalse
 \begin{algorithm}[htp]
  \caption{Get the transform from the parents texture coordinates}
  \KwResult{ UvTransform: \{Translation, Scaling\}  }
@@ -483,6 +553,7 @@ The subroutine \texttt{getParent} simply returns the parent of the provided tile
   }{}
   \label{alg:parent}
 \end{algorithm}
+\fi
 
 As opposed to regular tiles, chunk tiles can always be used for rendering since they by definition always have the status ``OK''.
 
