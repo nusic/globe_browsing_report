@@ -560,6 +560,7 @@ As opposed to regular tiles, chunk tiles can always be used for rendering since 
 
 
 \subsection{Chunk Tile Pile}
+\label{section:chunktilepile}
 
 A chunk tile pile represents multiple chunk tiles across multiple levels of detail and contains all the information needed to perform the LOD switching described under section \todo{ref Switching}.
 
@@ -588,16 +589,19 @@ Given that the texture data has already been locally cached, invoking the getChu
     \centering
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile3.png}
+        \caption{Tile.}
     \end{subfigure}
     \quad
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile2.png}
+        \caption{Parent 1.}
     \end{subfigure}
     \quad
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile1.png}
+        \caption{Parent 2.}
     \end{subfigure}
-    \caption{Only the highlighted subset of the parent tile is used for rendering the chunk.}
+    \caption{Only the highlighted subset of the parent tiles are used for rendering the chunk.}
     \label{fig:chunktilepile}
 \end{figure}
 
@@ -605,14 +609,95 @@ As chunk tiles are guaranteed to be good for rendering on the GPU (since their t
 
 \section{Managing Multiple Data Sources}
 
+The Layer Manager is a class that maintains and organizes different types of layers into groups. This is required as different types of texture datasets are used for different purposes and thus rendered in different ways. The Layer Manager owns seven Layer Groups. These are, but not necessarily bound to be:
+
+\begin{enumerate}
+\item \textbf{Heightmaps} - Used for displacing vertices along ellipsoidal geodetic normal and calculate bounding boxes for chunks. Also used for terrain following for camera interaction.
+\item \textbf{ColorLayers} - Used for setting fragment RGB from texture RGB
+\item \textbf{ColorOverlays} - Used for setting fragment RGB from texture RGBA using alpha blending
+\item \textbf{GrayScaleLayers} - Used for setting fragment RGB from texture R
+\item \textbf{GrayScaleOverlays} - Used for setting fragment V in HSV color space from texture R using alpha blending from texture G
+\item \textbf{NightLayers} - Used for setting fragment RGB from texture RGB in shaded regions of the globe
+\item \textbf{WaterMasks} - Used for adding fragment specularity from texture A
+\end{enumerate}
+
 \subsection{Layers}
+
+Much like in image editing softwares, a Layer in this globe rendering system represents an image which among other internally ordered images are used to produce a final result.
+
+A Layer consists of three things:
+
+\begin{enumerate}
+\item A TileProvider - an abstract interface used to query texture tiles, the most important property of a Layer. How these are implemented are described in the subsection TileProvider.
+\item A collection of render settings for real time image processing. The parameters implemented at this stage are \emph{gamma}, \emph{multiplier} and \emph{opacity}.
+\item A simple boolean property which specifies whether the layer is enabled or disabled. Disabled layers will not be used for rendering.
+\end{enumerate}
+
+Layers allow for retrieving ChunkTilePiles, as described in section \ref{section:chunktilepile}. The class hierarchy and data flow is illustrated in Figure \ref{fig:layermanager}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/implementation/layers/layermanager.pdf}
+    \caption{LayerManager.}
+    \label{fig:layermanager}
+\end{figure}
 
 \subsection{Layers on the GPU}
 
+In order to keep some of the data hierarchy built up on the CPU with the Layer Manager, a very similar near object-oriented approach was used to manage the data on the GPU as well. Therefore, a CPU representation for the GPU data was implemented. This allows for  updating the uniform variables and map uniform names to uniform locations.
+
 \subsubsection{CPU to GPU Data Mapping}
+
+There are some key differences between the Layer Manager data structure on the CPU and its corresponding GPU representation. These are:
+
+\begin{itemize}
+\item The GPU representation does not store any of the actual layer data - only the uniform locations within a shader program so that it knows where to upload the layer data to the GPU. 
+\item Render calls are done on a per chunk basis. This means that all texture data to be used within a single render call is contained in a single Chunk Tile Pile for each Layer. Thus, the \emph{provides}-relation between Layer and Chunk Tile Pile in Figure \ref{fig:layermanager} simply becomes a \emph{has a}-relation between a GPU Layer and a GPU Chunk Tile Pile.
+\item Layers that are disabled are not rendered, and consequently not uploaded to the GPU. This means that all layers on the GPU are enabled, thus they do not need to store that information.
+\end{itemize}
+
+Incorporating these few differences yields a similar class hierarchy, as illustrated in figure \ref{fig:gpulayermanager}. 
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/implementation/layers/gpulayermanager.pdf}
+    \caption{UML structure for corresponding GPU-mapped hierarchy. The class \texttt{GPUData<T>} maintains an OpenGL uniform location.}
+    \label{fig:gpulayermanager}
+\end{figure}
+
+The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with a range of conformly named fields, or plain GLSL arrays.
 
 \subsubsection{Updating the GPU Data}
 
+With this 1:1 data mapping between the CPU and GPU, all the GPU-prefixed classes were given two responsibilities.
+
+\begin{enumerate}
+\item Bind its uniform locations to GLSL variable names within a provided shader program.
+\item Set its uniform values within a provided shader program. That is; a GPUChunkTile should be able to set its uniform values from a regular ChunkTile.
+\end{enumerate}
+
+The leaf classes automatically takes care of both binding its uniform location to specific GLSL variables and  setting their uniform values. The compound GPU-prefixed classes (non leaf classes) more or less simply propagates the method calls to all its dependents. When binding an object to a variable name, the GLSL variable identifiers are built up successively during the propagation down to the leaf classes. GPU Layer is used as an example:
+
+\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
+void GPULayer::bind(programObject, Layer, nameBase, pileSize)
+	this->gpuChunkTilePile.bind(programObject, nameBase + "pile.", pileSize)
+	this->gpuRenderSettings.bind(programObject, nameBase + "settings.")
+\end{lstlisting}
+
+In the example above, the we can conclude that each layer in the GLSL code must have a member called ``pile'' and a member called ``setting''. An example of a fully resolved identifier is: 
+
+\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
+"ColorLayers[0].pile.chunkTile0.tileUvTransform.scaling"
+\end{lstlisting}
+
+When setting the values, the GPU representation of the data is updated based on the current available Layer data, and the update is propagated down to all the leaf classes. This is exemplified using code from the GPULayer class below:
+
+\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
+GPULayer::setValue(programObject, layer, tileIndex, pileSize)
+	ChunkTilePile chunkTilePile = layer.getChunkTilePile(tileIndex, pileSize)
+	this->gpuChunkTilePile.setValue(programObject, chunkTilePile)
+	this->gpuRenderSettings.setValue(programObject, layer.renderSettings()) 
+\end{lstlisting}
 
 \section{Chunk Rendering}
 
