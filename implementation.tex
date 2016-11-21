@@ -407,8 +407,8 @@ Two different types of \class{Text Tile Provider}s were implemented. \class{Tile
 \section{Mapping Tiles onto Chunks}
   
 In the implementation of chunks suggested by Cozzi and Ring \cite{cozzi11}, chunks store the data they need for rendering by them selves. That means that as soon as a chunk has been fully initialized, it has everything it needs to be rendered. However, when dealing with multiple map datasets potentially residing on distant servers, there is no guarantee that all the tiles needed for a chunk to be rendered are available.
-When a requested tile does not have the status ``OK'', it can not be used for rendering, the second best thing to do is to check the Tile's parent. A parent tile always covers a larger geodetic map region that includes its children's subregions, but with lower number of pixels per geodetic degree. Figure \ref{fig:tiles} demonstrates this with a simple example.
-In figure \ref{fig:tiles}, it is realized that in order to use a parent tile for rendering, the texture coordinates used to sample the parent tile needs to be adjusted accordingly. This shows the need of a higher level concept than just tiles, which leads to the introduction of chunk tiles.
+
+When an accessed \class{Tile} does not have the status ``OK'', it should not be used rendering. The second best thing to try is to check the parent of the same tile. A parent tile is guaranteed to always covers a larger geodetic map region that includes its children's subregions, but with lower number of pixels per geodetic degree. Figure \ref{fig:tiles} demonstrates this with a simple example.
 
 \begin{figure}[htbp]
     \centering
@@ -425,12 +425,40 @@ In figure \ref{fig:tiles}, it is realized that in order to use a parent tile for
     \label{fig:tiles}
 \end{figure}
 
+In figure \ref{fig:tiles}, it is realized that in order to use a parent tile for rendering, the texture coordinates used to sample the parent tile needs to be adjusted to represent the same geographic region. This shows the need of a higher level concept than just \class{Tile}s, which leads to the introduction of \class{Chunk Tile}s.
+
 \subsection{Chunk Tiles}
   
-A chunk tile represents a tile that corresponds to a specific chunk. It stores a tile which is guaranteed to have the status ``OK'' along with a transform defined by a scaling and translation component. The transform is used to map texture coordinates of the chunk into its corresponding geodetic region within the tile. 
+A \class{Chunk Tile} represents a \class{Tile} that corresponds to a specific \class{Chunk}. It stores a \class{Tile} which is guaranteed to have the status ``OK'' along with a transform defined by a scaling and translation component. The transform is used to map texture coordinates of the chunk into its corresponding geodetic region within the tile. 
 
-The algorithm used for selecting the highest resolution chunk tile from a simple tile provider is described by the pseudo code in algorithm \ref{alg:tileselection}.
+The algorithm used for selecting the highest resolution \class{Chunk Tile} from a tile provider is described by the pseudo code in Listing \ref{lst:getchunktile}.
 
+\begin{lstlisting}[
+  caption={Selecting optimal Chunk Tiles} 
+  \label{lst:getchunktile}
+]
+ChunkTile TileSelector::getChunkTile(TileProvider* tp, TileIndex ti){
+  TileUvTransform uvTransform;
+  uvTransform.uvOffset = glm::vec2(0, 0);
+  uvTransform.uvScale = glm::vec2(1, 1);
+
+  while (ti.level > 1) {
+      Tile tile = tp->getTile(ti);
+      if (tile.status == Tile::Status::OK) {
+          return { tile, uvTransform };
+      }
+      else {
+        ascendToParent(ti, uvTransform);
+      }
+  }
+
+  uvTransform.uvOffset = glm::vec2(0, 0);
+  uvTransform.uvScale = glm::vec2(1, 1);
+  return { Tile::TileUnavailable, uvTransform };
+}
+\end{lstlisting}
+
+\iffalse
 \begin{algorithm}[htp]
  \caption{Selecting optimal chunk tiles}
  \KwResult{ Chunk tile: \{Tile, UvTransform\}  }
@@ -442,17 +470,61 @@ The algorithm used for selecting the highest resolution chunk tile from a simple
   \eIf{(tile.status == OK)}{
         Return \{ tile, tileUvTransform \}
     }{
-        tileUvTransform = fromParent(tileUvTransform, tileIndex)
-      tileIndex = tileIndex.parent()
+      tileUvTransform = fromParent(tileUvTransform, tileIndex);
+      tileIndex.toParent();
     }
   }
   Return \{ tileProvider.defaultTile(), \{Translation: \{0,0\}, Scaling: \{1,1\} \} \}
   {}
   \label{alg:tileselection}
 \end{algorithm}
- 
-The subroutine \texttt{fromParent} returns an updated transform which maps texture coordinates to the same geodetic region within the next parent tile. The routine is described in algorithm \ref{alg:fromparent}.
 
+
+\begin{algorithm}[htp]
+\caption{Selecting optimal chunk tiles}
+\label{alg:tileselection}
+\KwResult{ A \class{ChunkTile} defined by a \class{Tile} and a \class{UvTransform}  }
+  \SetKwProg{myalg}{GetChunkTile}{(\class{TileProvider}, \class{TileIndex})}{}
+  \myalg{}{
+    Initialize \class{UvTransform} with no scaling and no translation\\
+    \While {level of \class{TileIndex} > 0}{
+      Use \class{TileProvider} to access \class{Tile} at \class{TileIndex}\\
+      \eIf{(\class{Tile} has status OK)}{
+        \Return \class{ChunkTile} defined by \class{Tile} and \class{UvTransform}\\
+      }{
+        Modify \class{UvTransform} and \class{TileIndex} to represent the same geographic region at a higher mip level
+      }
+    }
+    Use \class{TileProvider} to access the \class{Default Tile}\\
+    Let \class{UvTransform} have no scaling and no translation\\
+    \Return \class{ChunkTile} defined by \class{Default Tile} and \class{UvTransform}\\
+  }
+  {}
+\end{algorithm}
+\fi
+
+ 
+The subroutine \texttt{ascendToParent} returns an updated transform which maps texture coordinates to the same geodetic region within the next parent tile. The routine is described in algorithm \ref{alg:fromparent}.
+
+\begin{lstlisting}[caption={Ascend to parent} \label{lst:ascendtoparent}]
+void TileSelector::ascendToParent(TileIndex& tileIndex, TileUvTransform& uv) {
+    uv.uvOffset *= 0.5;
+    uv.uvScale *= 0.5;
+
+    if (tileIndex.isEastChild()) {
+        uv.uvOffset.x += 0.5;
+    }
+
+    // In OpenGL, positive y direction is up
+    if (tileIndex.isNorthChild()) {
+        uv.uvOffset.y += 0.5;
+    }
+
+    tileIndex.toParent();
+}
+\end{lstlisting}
+
+\iffalse
 \begin{algorithm}[htp]
  \caption{Get the transform from the parents texture coordinates}
  \KwResult{ UvTransform: \{Translation, Scaling\}  }
@@ -483,19 +555,16 @@ The subroutine \texttt{getParent} simply returns the parent of the provided tile
   }{}
   \label{alg:parent}
 \end{algorithm}
+\fi
 
 As opposed to regular tiles, chunk tiles can always be used for rendering since they by definition always have the status ``OK''.
-
-
 
 \subsection{Chunk Tile Pile}
 \label{section:chunktilepile}
 
-A chunk tile pile represents multiple chunk tiles across multiple levels of detail and contains all the information needed to perform the LOD switching described under section \todo{ref Switching}.
+A \class{Chunk Tile Pile} represents a range of \class{Chunk Tile}s across multiple mip levels. They contain the information needed to perform the LOD switching described under section \todo{ref Switching}. Retrieving a \class{Chunk Tile Pile} simply requires a tile index of the lowest desired mip level (highest LOD) and the number of desired \class{Chunk Tile}s in the pile as described in Listing \ref{lst:chunktilepile}.
 
-
-Retrieving a chunk tile pile for a specific chunk simply requires a chunk index of the most detailed chunk and the number of desired chunk tiles in the pile as described in Algorithm \ref{alg:getchunktilepile}.
-
+\iffalse
 \begin{algorithm}[htp]
  \caption{Get a chunk tile for a specific tile index}
  \KwResult{ ChunkTilePile }
@@ -510,9 +579,21 @@ Retrieving a chunk tile pile for a specific chunk simply requires a chunk index 
   }{}
   \label{alg:getchunktilepile}
 \end{algorithm}
+\fi
+
+\begin{lstlisting}[caption={Instantiating a Chunk Tile Pile} \label{lst:chunktilepile}]
+ChunkTilePile TileSelector::getChunkTilePile(TileProvider* tp, TileIndex ti, int n){
+  ChunkTilePile chunkTilePile;
+  for (int i = 0; i < n; ++i){
+    chunkTilePile.push_back(getChunkTile(tp, ti));
+    ti.toParent();
+  }
+  return chunkTilePile;
+}
+\end{lstlisting}
 
 As an example: 
-Given that the texture data has already been locally cached, invoking the getChunkTilePile method with index $\{x: 2240, y: 4824, level: 13 \}$ and a chunk tile pile of size 3, would return the \class{Chunk Tile Pile} represented in Figure \ref{fig:chunktilepile}. All the chunk tiles represent the same geodetic area, however at different LOD; which means that the image data might be different. One dataset can be a combination of multiple different sources such as satellite imagery and aerial photography which makes blending to avoid popping more important.
+Assuming that the texture data is available in local memory, invoking the getChunkTilePile method with index $\{x: 2240, y: 4824, level: 13 \}$ and a chunk tile pile size 3, would return the \class{Chunk Tile Pile} represented in Figure \ref{fig:chunktilepile}. 
 
 \begin{figure}[htbp]
     \centering
@@ -537,55 +618,51 @@ Given that the texture data has already been locally cached, invoking the getChu
 As chunk tiles are guaranteed to be good for rendering on the GPU (since their tiles are guaranteed to have the status ``OK''), all \class{Chunk Tile Pile}s are guaranteed to be good for rendering as well. 
 
 \section{Managing Multiple Data Sources}
-
-The Layer Manager is a class that maintains and organizes different types of layers into groups. This is required as different types of texture datasets are used for different purposes and thus rendered in different ways. The Layer Manager owns seven Layer Groups. These are, but not necessarily bound to be:
+The \class{Layer Manager} maintains and organizes different types of texture data sources into groups. This is required as different types of texture datasets are used for different purposes and thus rendered in different ways. The \class{Layer Manager} owns seven \class{Layer Groups}. These are are listed below with their respective purpose:
 
 \begin{enumerate}
-\item \textbf{Heightmaps} - Used for displacing vertices along ellipsoidal geodetic normal and calculate bounding boxes for chunks. Also used for terrain following for camera interaction.
-\item \textbf{ColorLayers} - Used for setting fragment RGB from texture RGB
-\item \textbf{ColorOverlays} - Used for setting fragment RGB from texture RGBA using alpha blending
-\item \textbf{GrayScaleLayers} - Used for setting fragment RGB from texture R
-\item \textbf{GrayScaleOverlays} - Used for setting fragment V in HSV color space from texture R using alpha blending from texture G
-\item \textbf{NightLayers} - Used for setting fragment RGB from texture RGB in shaded regions of the globe
-\item \textbf{WaterMasks} - Used for adding fragment specularity from texture A
+\item \textbf{Heightmaps} - Displacing vertices along ellipsoidal geodetic normal and calculate bounding boxes for chunks. Also used for terrain following for camera interaction.
+\item \textbf{ColorLayers} - Setting fragment RGB from texture RGB
+\item \textbf{ColorOverlays} - Setting fragment RGB from texture RGBA using alpha blending
+\item \textbf{GrayScaleLayers} - Setting fragment RGB from texture R
+\item \textbf{GrayScaleOverlays} - Setting fragment V in HSV color space from texture R using alpha blending from texture G
+\item \textbf{NightLayers} - Setting fragment RGB from texture RGB in shaded regions of the globe
+\item \textbf{WaterMasks} - Adding fragment specularity from texture A
 \end{enumerate}
 
 \subsection{Layers}
-
-Much like in image editing softwares, a Layer in this globe rendering system represents an image which among other internally ordered images are used to produce a final result.
-
-A Layer consists of three things:
+Much like in image editing softwares, a \class{Layer} in this context represents a raster of pixels, which among other internally ordered raster of pixels, are used to produce a final result. A \class{Layer} consists of three things:
 
 \begin{enumerate}
-\item A TileProvider - an abstract interface used to query texture tiles, the most important property of a Layer. How these are implemented are described in the subsection TileProvider.
+\item A \class{Tile Provider} - Used for accessing tiles of texture data.
 \item A collection of render settings for real time image processing. The parameters implemented at this stage are \emph{gamma}, \emph{multiplier} and \emph{opacity}.
-\item A simple boolean property which specifies whether the layer is enabled or disabled. Disabled layers will not be used for rendering.
+\item A simple boolean property which specifies whether the layer is enabled or disabled. Disabled layers are not used in rendering.
 \end{enumerate}
 
-Layers allow for retrieving ChunkTilePiles, as described in section \ref{section:chunktilepile}. The class hierarchy and data flow is illustrated in Figure \ref{fig:layermanager}.
+\class{Layer}s allow for retrieving of \class{Chunk Tile Pile}s, as described in section \ref{section:chunktilepile}. The class hierarchy and data flow is illustrated in Figure \ref{fig:layermanager}.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/implementation/layers/layermanager.pdf}
-    \caption{LayerManager.}
+    \caption{UML diagram of the \class{Layer Manager} and its related classes.}
     \label{fig:layermanager}
 \end{figure}
 
 \subsection{Layers on the GPU}
 
-In order to keep some of the data hierarchy built up on the CPU with the Layer Manager, a very similar near object-oriented approach was used to manage the data on the GPU as well. Therefore, a CPU representation for the GPU data was implemented. This allows for  updating the uniform variables and map uniform names to uniform locations.
+The data hierarchy defined by \class{Layer Manager} can almost be reproduced on the GPU by using GLSL in a near object-oriented approach. In order to handle the data mapping between the CPU and GPU, a CPU representation for the GPU data was implemented. This allows for updating the values of uniform variables and map uniform names to uniform locations.
 
 \subsubsection{CPU to GPU Data Mapping}
 
-There are some key differences between the Layer Manager data structure on the CPU and its corresponding GPU representation. These are:
+There are some key differences between the \class{Layer Manager} data structure on the CPU and its corresponding GPU  representation - \class{GPU Layer Manager}. These are:
 
 \begin{itemize}
-\item The GPU representation does not store any of the actual layer data - only the uniform locations within a shader program so that it knows where to upload the layer data to the GPU. 
-\item Render calls are done on a per chunk basis. This means that all texture data to be used within a single render call is contained in a single Chunk Tile Pile for each Layer. Thus, the \emph{provides}-relation between Layer and Chunk Tile Pile in Figure \ref{fig:layermanager} simply becomes a \emph{has a}-relation between a GPU Layer and a GPU Chunk Tile Pile.
+\item The GPU representation does not store any of the actual \class{Layer} data - only the uniform locations within a shader program so that it knows where to upload the layer data to the GPU. 
+\item Render calls are done on a per chunk basis. This means that all texture data to be used within a single render call is contained in a single \class{Chunk Tile Pile} for each \class{Layer}. Thus, the \emph{provides}-relation between \class{Layer} and \class{Chunk Tile Pile} in Figure \ref{fig:layermanager} simply becomes a \emph{has}-relation between a \class{GPU Layer} and a \class{GPU Chunk Tile Pile}.
 \item Layers that are disabled are not rendered, and consequently not uploaded to the GPU. This means that all layers on the GPU are enabled, thus they do not need to store that information.
 \end{itemize}
 
-Incorporating these few differences yields a similar class hierarchy, as illustrated in figure \ref{fig:gpulayermanager}. 
+Incorporating these few differences yields a similar class hierarchy, as illustrated in Figure \ref{fig:gpulayermanager}. 
 
 \begin{figure}[htbp]
     \centering
@@ -602,30 +679,38 @@ With this 1:1 data mapping between the CPU and GPU, all the GPU-prefixed classes
 
 \begin{enumerate}
 \item Bind its uniform locations to GLSL variable names within a provided shader program.
-\item Set its uniform values within a provided shader program. That is; a GPUChunkTile should be able to set its uniform values from a regular ChunkTile.
+\item Set its uniform values within a provided shader program. That is, a \class{GPU Chunk Tile} should be able to set its uniform values from a regular \class{ChunkTile}.
 \end{enumerate}
 
-The leaf classes automatically takes care of both binding its uniform location to specific GLSL variables and  setting their uniform values. The compound GPU-prefixed classes (non leaf classes) more or less simply propagates the method calls to all its dependents. When binding an object to a variable name, the GLSL variable identifiers are built up successively during the propagation down to the leaf classes. GPU Layer is used as an example:
+The leaf classes automatically takes care of both binding its uniform location to specific GLSL variables and  setting their uniform values. The compound GPU-prefixed classes (non leaf classes) more or less simply propagates the method calls to all its dependents. When binding an object to a variable name, the GLSL variable identifiers are built up successively during the propagation down to the leaf classes. \class{GPU Layer} is used as an example:\\
 
-\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
-void GPULayer::bind(programObject, Layer, nameBase, pileSize)
-	this->gpuChunkTilePile.bind(programObject, nameBase + "pile.", pileSize)
-	this->gpuRenderSettings.bind(programObject, nameBase + "settings.")
+\begin{lstlisting}[
+  caption={Bind a GPU Layer to a Layer on the CPU} 
+  \label{lst:bindgpulayer}
+]
+void GPULayer::bind(ProgramObject* p, std::string nameBase, int pileSize){
+	this->gpuChunkTilePile.bind(p, nameBase + "pile.", pileSize)
+	this->gpuRenderSettings.bind(p, nameBase + "settings.")
+}
 \end{lstlisting}
 
-In the example above, the we can conclude that each layer in the GLSL code must have a member called ``pile'' and a member called ``setting''. An example of a fully resolved identifier is: 
+In Listing \ref{bindgpulayer}, it can be concluded that each layer in the GLSL code must be a struct with a member called ``pile'' and a member called ``setting''. An example of a fully resolved identifier is: \\
 
-\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
+\begin{lstlisting}[]
 "ColorLayers[0].pile.chunkTile0.tileUvTransform.scaling"
 \end{lstlisting}
 
-When setting the values, the GPU representation of the data is updated based on the current available Layer data, and the update is propagated down to all the leaf classes. This is exemplified using code from the GPULayer class below:
+When setting the values, the GPU representation of the data is updated based on the currently available \class{Layer} data, and the update is propagated down to all the leaf classes. This is exemplified using code from the \class{GPULayer} class below:\\
 
-\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
-GPULayer::setValue(programObject, layer, tileIndex, pileSize)
-	ChunkTilePile chunkTilePile = layer.getChunkTilePile(tileIndex, pileSize)
-	this->gpuChunkTilePile.setValue(programObject, chunkTilePile)
-	this->gpuRenderSettings.setValue(programObject, layer.renderSettings()) 
+\begin{lstlisting}[
+  caption={Set all GPU Layer variables from a CPU Layer} 
+  \label{lst:gpulayersetvalue}
+]
+GPULayer::setValue(ProgramObject* p, Layer& l, TileIndex ti, int n){
+	ChunkTilePile chunkTilePile = l.getChunkTilePile(ti, n);
+	this->gpuChunkTilePile.setValue(p, chunkTilePile);
+	this->gpuRenderSettings.setValue(p, l.renderSettings());
+}
 \end{lstlisting}
 
 \section{Chunk Rendering}
