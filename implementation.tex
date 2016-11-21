@@ -730,7 +730,7 @@ A chunk grid is defined by a number of segments N in two dimensions, which is us
 
 \subsection{Vertex Pipeline}
 
-The grid can be rendered using different methods to weight precision against accuracy. In the vertex shader, the vertex positions are set so that the chunk geometry can be rasterized and rendered as a mesh on the screen. Height mapping is performed on the GPU which means that vertex texture fetching is needed in the rendering pipeline.
+The grid can be rendered using different methods to weight precision against accuracy. In the vertex shader, the vertex positions are set so that the chunk geometry can be rasterized and rendered as a mesh on the screen. Height mapping is performed by offsetting vertices in the direction of the geodetic normals on the GPU which means that vertex texture fetching is needed in the rendering pipeline.
 
 The mapping from geodetic coordinates to cartesian model space coordinates can be done on the GPU in single precision to position vertices on the globe. As discussed in section \ref{section:precision}, however, this is not sufficient to achieve sub meter precision on an Earth sized globe.
 
