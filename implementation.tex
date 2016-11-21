@@ -806,7 +806,108 @@ Figure \ref{fig:pipelinelocal} shows a flowchart of the local vertex rendering p
 
 \subsection{Fragment Pipeline}
 
+The purpose of layered texture rendering is to provide the user an ability to toggle different kinds of layers for rendering a chunk. For each fragment, the final color is calculated by using the active layer groups. This is done using the following step in the fragment shader which is the same for the camera space rendered chunks as it is for the model space rendered chunks:
+
+\begin{enumerate}
+\item Set color RGB to RGB sampled from all active \textbf{ColorLayers}. 
+\item Set color RGB to R sampled from all \textbf{GrayScaleLayers}.
+\item Add white specularity to color RGB sampled from all active \textbf{WaterMasks}.
+\item Set color RGB to RGB sampled from all active \textbf{NightTextures} only in shaded regions of the globe.
+\item Perform shading by darkening shaded regions.
+\item Add simple atmosphere color to RGB.
+\item Alpha blend color RGBA with sampled RGBA from all active \textbf{ColorOverlays}.
+\end{enumerate}
+
+All of these steps are optional and can be toggled by activating or deactivating layers or specifying whether or not to perform shading or use atmosphere for rendering. Sampling the color from a layer group is done by looping through all layers in that group, see Listing \ref{lst:loopthroughlayers}. Listing \ref{lst:gettexval1} and \ref{lst:gettexval2} shows how layer weights and texture transforms for chunk tile piles are used for sampling of the tile textures. Layer settings is performed for all raster bands within all layers. The application of layer settings is shown in listing \ref{lst:performsettings}.
+
+\begin{lstlisting}[
+  caption={Setting color for a given layer group. Example using ColorLayers.} 
+  \label{lst:loopthroughlayers}
+]
+#for i in 0..#{lastLayerIndexColorLayers} {
+		vec4 colorSample = getTexVal(ColorLayers[#{i}].pile,
+			levelWeights, uv);
+		colorSample = performLayerSettings(colorSample,
+			ColorLayers[#{i}].settings);
+		color = blendOver(color, colorSample);
+	}
+#endfor
+\end{lstlisting}
+
+\begin{lstlisting}[
+  caption={Getting texture value by blending a chunk tile pile.} 
+  \label{lst:gettexval1}
+]
+vec4 getTexVal(const ChunkTilePile chunkTilePile, const LevelWeights w, const vec2 uv){
+	return w.w1 * getTexVal(chunkTilePile.chunkTile0, uv) + 
+		w.w2 * getTexVal(chunkTilePile.chunkTile1, uv) + 
+		w.w3 * getTexVal(chunkTilePile.chunkTile2, uv);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+  caption={Using texture transform and sampling a texture.} 
+  \label{lst:gettexval2}
+]
+vec4 getTexVal(const ChunkTile chunkTile, vec2 tileUV){
+	vec2 samplePosition = TileUVToTextureSamplePosition(chunkTile, tileUV);
+	vec4 texVal = texture(chunkTile.textureSampler, samplePosition);
+	return texVal;
+}
+\end{lstlisting}
+
+
+\begin{lstlisting}[
+  caption={Perform layer settings.} 
+  \label{lst:performsettings}
+]
+float performLayerSettings(float currentValue, const LayerSettings settings) {
+	float newValue = currentValue;
+	newValue = sign(newValue) * pow(newValue, settings.gamma);
+	newValue = newValue * settings.multiplier;
+	newValue = newValue * settings.opacity;
+	return newValue;
+}
+\end{lstlisting}
+
 \subsection{Dynamic Shader Programs}
+
+The ability to dynamically toggle layers with dynamic blending requires multiple sampling of textures in the fragment shaders. To avoid unnecessary processing when not all layers are in use there is a need to dynamically recompile the shader programs as layers are toggled. We use the GLSL preprocessor in the General Helpful Open Utility Library (GHOUL) \todo{ref} to preprocess all shader programs when the number of layers in use change.
+
+We define a layer shader program to be a GLSL program object using vertex and fragment shading. Moreover, it fits the pipeline of rendering a chunk with a specific number of layer groups and a varying number of layers for each group.
+
+To decide whether or not a layer shader program needs to be preprocessed and re-compiled, the relevant Layer Shader Preprocessing Data is saved for the layer shader program and compared to the updated preprocessing data if it has been changed by the user. Table \ref{table:layergrouppreprocessingdata} shows what data is needed to preprocess layer shader programs. Key-value pairs can be used to set properties that are used on a per-globe basis. Examples are \textbf{performShading} : \emph{true} or \emph{false}, \textbf{useAtmosphere} : \emph{true} or \emph{false}. Letting the preprocessor handle these properties avoids the need of uniform variable uploading and GLSL if-statements. The preprocessor also handles unrolling of for-loops which go through all layers in a group.
+
+
+\begin{table}
+\centering 
+\caption[]{Data used for a layer group for preprocessing of layer shader programs.}
+\label{table:layergrouppreprocessingdata}
+\begin{tabular}{ c }    
+    	\hline
+        \textbf{Layer Group Preprocessing Data} \\ 
+    	\hline
+	Number of layers: integer \\
+    	Blending enabled: Boolean \\
+	\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption[]{Data used for a renderable globe for preprocessing of layer shader programs.}
+\label{table:layergrouppreprocessingdata}
+\begin{tabular}{ c }
+    
+    	\hline
+        \textbf{Layer Shader Preprocessing Data} \\ 
+    	\hline
+	0..* Preprocessing data: Layer Group Preprocessing Data \\
+    	0..* Key value pairs: pair of strings \\
+    	\hline
+    
+\end{tabular}
+\end{table}
 
 \subsection{Lod Switching}
 
