@@ -808,14 +808,17 @@ Figure \ref{fig:pipelinelocal} shows a flowchart of the local vertex rendering p
 
 The purpose of layered texture rendering is to provide the user an ability to toggle different kinds of layers for rendering a chunk. For each fragment, the final color is calculated by using the active layer groups. This is done using the following step in the fragment shader which is the same for the camera space rendered chunks as it is for the model space rendered chunks:
 
+
 \begin{enumerate}
-\item Set color RGB to RGB sampled from all active \textbf{ColorLayers}. 
-\item Set color RGB to R sampled from all \textbf{GrayScaleLayers}.
-\item Add white specularity to color RGB sampled from all active \textbf{WaterMasks}.
-\item Set color RGB to RGB sampled from all active \textbf{NightTextures} only in shaded regions of the globe.
+\item \textbf{For all ColorLayers}: Sample RGB, apply layer settings and update fragment RGBA using alpha blending.
+\item \textbf{For all GrayscaleLayers}: Sample the grayscale value R, apply layer settings and update fragment V in color space HSV using alpha blending.
+\item \textbf{For all GrayscaleOverlays}: Sample grayscale value R and A, apply layer settings and update fragment RGBA using alpha blending.
+\item \textbf{For all WaterMasks}: Sample R and A, apply layer settings and add R*A to specularity component of fragment.
+\item \textbf{For all NightTextures}: Sample RGB, apply layer settings and update fragment RGBA using alpha blending in shaded regions of the globe.
 \item Perform shading by darkening shaded regions.
 \item Add simple atmosphere color to RGB.
-\item Alpha blend color RGBA with sampled RGBA from all active \textbf{ColorOverlays}.
+\item \textbf{For all ColorOverlays}: Sample RGBA, apply layer settings and update fragment RGBA using alpha blending.
+
 \end{enumerate}
 
 All of these steps are optional and can be toggled by activating or deactivating layers or specifying whether or not to perform shading or use atmosphere for rendering. Sampling the color from a layer group is done by looping through all layers in that group, see Listing \ref{lst:loopthroughlayers}. Listing \ref{lst:gettexval1} and \ref{lst:gettexval2} shows how layer weights and texture transforms for chunk tile piles are used for sampling of the tile textures. Layer settings is performed for all raster bands within all layers. The application of layer settings is shown in listing \ref{lst:performsettings}.
