@@ -630,15 +630,94 @@ GPULayer::setValue(programObject, layer, tileIndex, pileSize)
 
 \section{Chunk Rendering}
 
+Given the ability to specify and use different layers to be used for rendering and the actual chunks that need to be visible, they are ready to be rendered. Rendering includes using vertex- and fragment shaders when invoking a rendering call on a given geometry; in this case, a grid.
+
 \subsection{Grid}
+
+A chunk grid is defined by a number of segments N in two dimensions, which is used to build up a two dimensional array of vertex coordinates. These vertex coordinates can be used both for texture fetching and as interpolation parameters in an inverse geographic projection function to place a each vertex in 3D space. Figure grid shows how a surrounding region have coordinate values less than 0 or greater than 1 in either the u or the v dimension. This region is referred to as the skirt of the grid and it is offset in the vertical direction in the vertex shaders to cover cracks between chunks.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/implementation/rendering/grid.pdf}
+    \caption{Grid with skirts.}
+    \label{fig:grid}
+\end{figure}
 
 \subsection{Vertex Pipeline}
 
+The grid can be rendered using different methods to weight precision against accuracy. In the vertex shader, the vertex positions are set so that the chunk geometry can be rasterized and rendered as a mesh on the screen. Height mapping is performed on the GPU which means that vertex texture fetching is needed in the rendering pipeline.
+
+The mapping from geodetic coordinates to cartesian model space coordinates can be done on the GPU in single precision to position vertices on the globe. As discussed in section \ref{section:precision}, however, this is not sufficient to achieve sub meter precision on an Earth sized globe.
+
 \subsubsection{High Precision Rendering}
+
+The first step in avoiding precision errors is what Cozzi and Ring refers to rendering relative to center \cite{cozzi11}. In short, it boils down to calculating the model-view matrix in double precision on the CPU side and then casting the matrix to a single precision representation before uploading it to the GPU. This method works well for small objects where the vertices positioned close to the origin (center) of the model \cite{cozzi11}. For planet sized objects, we need to go further than that.
+
+One method that works for all models but can be considered naive as the number of vertices increases is what Cozzi and Ring refers to as CPU relative to eye rendering. By using a dynamic vertex buffer, all vertex positions can be transformed to camera space in double precision before being cast to single precision and dynamically uploaded to the GPU. This method becomes very tedious if the number of vertices is big. However, since the mesh of a chunk is essentially an ellipsoid segment, the whole mesh can be interpolated using a limited number of control points.
+
+We have considered two different categories of rendering techniques: model space rendering and camera space rendering. The techniques can be implemented differently and used at different scales to accommodate for flexibility, accuracy and precision.
 
 \subsubsection{Model Space Rendering}
 
+The most straightforward method for rendering geodetic chunks is to transform the geodetic coordinates of each vertex to cartesian model space coordinates using the inverse geographic projection transform, $P^{-1}(\phi, \theta)$, in the vertex shader. An affine transform can be applied to the vertex coordinates by knowing the geodetic coverage of the chunk. It can be derived from the chunk's tile index. The inverse projection transform is performed with limited precision floating point operations on the GPU but the accuracy will be high as vertices will be positioned exactly on the globe in geodetic coordinates. Figure \ref{fig:global}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[tb]{0.3\textwidth}
+    	\includegraphics[width=\textwidth]{figures/implementation/rendering/gridmap.pdf}
+    \end{subfigure}
+    \begin{subfigure}[tb]{0.4\textwidth}
+    \begin{picture}(50,50)
+        \put(25,25){$\left( \begin{matrix} x \\ y \\ z \end{matrix} \right) =P^{ -1 }(\phi ,\theta )\rightarrow$}    
+    \end{picture}
+    \end{subfigure}
+    \begin{subfigure}[tb]{0.2\textwidth}
+    	\includegraphics[width=\textwidth]{figures/implementation/rendering/gridonglobe.png}
+    \end{subfigure}
+    \caption{Model space rendering of chunks is performed with a mapping of vertices from geodetic coordinates to cartesian coordinates.}
+    \label{fig:global}
+\end{figure}
+
+The model space rendering method essentially achieves the same precision as rendering a predefined chunk mesh relative to the center of mass of the globe. Figure \ref{fig:pipelineglobal} shows the pipeline for rendering a chunk using the model space method. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/implementation/rendering/pipeline_global.pdf}
+    \caption{Vertex pipeline for model space rendering.}
+    \label{fig:pipelineglobal}
+\end{figure}
+
 \subsubsection{Camera Space Rendering}
+
+Camera space rendering is performed by transforming only a limited number of control points for each chunk to camera space using double precision arithmetics. Once in camera space, the points can be cast to single precision and used for interpolation on the GPU to get all the final vertex positions of the chunk. Having the points in camera space solves the proposed precision issues since the precision will increase when the points are closer to the camera. This concept is illustrated in Figure \ref{fig:local} where the vertex position vector precision increases as vertices are closer to the camera.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/implementation/rendering/local.pdf}
+    \caption{Interpolating vertex positions in camera space leads to high precision in the representation of vertex positions close to the camera compared to positions refined in model space.}
+    \label{fig:local}
+\end{figure}
+
+\paragraph{Chunks as NURBS Surfaces}
+Non Uniform Rational B-Splines (NURBS) can represent all conic sections exactly which is important for modelling ellipses in the 1D case and ellipsoids in the 2D case. A geodetic chunk can be uniquely defined by nine control points which can be calculated using the tile index representing the chunk.
+
+The positive aspect about rendering geodetic chunks as NURBS surfaces is that it is a unified way of rendering chunks and that the precision works for all scales. Chunks will always be mapped exactly on the ellipsoid and the precision will increase when the camera gets closer. However, the negative aspect that makes NURBS insufficient for texture mapped globes is the fact that the texture coordinates of the vertices do not linearly map to the geodetic coordinates of the chunk. In other words, vertices are not evenly distributed along the surface of the chunk which leads to distorted textures. The reason for this is the fact that NURBS are rational parametric functions. For example, a circle segment can be represented exactly but a given parameter value will not yield the same position along a circle segment as a circle segment parameterized as $(x(t),y(t)) = (cos(t), sin(t))$. The $cos$ and $sin$ functions are irrational and can therefore not be represented with NURBS segments which by definition are rational.
+
+\paragraph{Chunks as Bilinear Surfaces}
+To avoid both the texture distortion of NURBS and the precision issues of model space rendering, we use a different method for rendering chunks that are closer to the camera and hence require higher precision. When the camera gets closer to the surface of the ellipsoid, the chunks will split and get smaller according to the chunk selection under section \todo{(ref section)}. Smaller patches will automatically be better approximated as flat surfaces so that at a certain level, before the precision errors of the global patches become predominant, the rendering of patches can be switched to the a camera space rendering method which uses bilinear interpolation of vertex positions.
+
+This method is performed by, just as in the case of NURBS surfaces, transforming control points from cartesian model space to camera space where they can be cast to single precision representations. Instead of NURBS interpolation, a simple bilinear interpolation is used to place all the vertices on the surface defined by the four corner points of the patch that covers the chunk.
+
+With bilinear interpolation, high precision is achieved for vertices placed close to the camera. Also, the vertices will be uniformly spaced which means that the textures will not be distorted. Worth noticing is that if bilinear interpolation rendering is performed on chunks with low level, the approximation will be less accurate. Switching to camera space rendering with bilinear interpolation at level 10 gives a reasonable balance between the ellipsoidal mapping of the model space rendering and the high precision of the camera space chunk rendering.
+
+Figure \ref{fig:pipelinelocal} shows a flowchart of the local vertex rendering pipeline. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/implementation/rendering/pipeline_local.pdf}
+    \caption{Vertex pipeline for camera space rendering.}
+    \label{fig:pipelinelocal}
+\end{figure}
 
 \subsection{Fragment Pipeline}
 

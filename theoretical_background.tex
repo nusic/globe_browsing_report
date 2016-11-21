@@ -775,7 +775,7 @@ The most generally used level of detail algorithms of today are chunked LOD and 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Precision Issues}
-
+\label{section:precision}
 Modern graphics cards work with floating point variables and single precision is the common standard \cite{segal10}. With OpenGL 4.0 came the introduction of double precision floating point numbers within the GLSL shader programming language \cite{segal10}. The double precision floating point operations are significantly slower than their single precision counterparts \cite{dimi15}; we choose to avoid double precision floating point operations on the GPU for this reason.
 
 In most computer graphics applications it is often sufficient to describe positional information in single precision floating point values. However, when simulating and visualizing the full scale of the universe and at the same time globes with sub meter resolution, the issues of low precision float operations easily become predominant unless handled right.
