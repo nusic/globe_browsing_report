@@ -913,17 +913,17 @@ To decide whether or not a layer shader program needs to be preprocessed and re-
 
 Instead of the time based switching routine proposed by Cozzi and Ring \cite{cozzi11}, we perform a distance based switching which works on a per fragment basis for textures and on a per vertex basis for height maps. The method is implemented in the vertex and fragment shaders and uses linear interpolation between levels. The blending technique introduces the concept of Chunk Tile Piles as seen in section \ref{section:chunktilepile}. A Chunk Tile Pile contains three chunk tiles of different level to achieve level blending which is used to avoid popping artefacts. 
 
-When rendering a specific fragment of a chunk, blending between up to three chunk levels can be used as a part of the switching in the chunked LOD algorithm. Assuming that the level of Tile 0 is equal to the level of the chunk to render and that Chunk Tile 1 and Chunk Tile 2 are 1 and 2 levels lower respectively, three level weights can be determined based on the distance to the fragment to achieve smooth transitions between levels. The three level weights are based on an interpolation parameter as in Listing \ref{lst:levelweights}.
+When rendering a specific fragment of a chunk, blending between up to three chunk levels can be used as a part of the switching in the chunked LOD algorithm. Assuming that the level of Tile 0 is equal to the level of the chunk to render and that Chunk Tile 1 and Chunk Tile 2 are 1 and 2 levels lower respectively, three level weights can be determined based on the distance to the fragment to achieve smooth transitions between levels. The three level weights are based on an interpolation parameter $t$ as in Listing \ref{lst:levelweights}.
 
 \begin{lstlisting}[
   caption={Calculate level weights.} 
   \label{lst:levelweights}
 ]
-LevelWeights getLevelWeights(float levelInterpolationParameter){
+LevelWeights getLevelWeights(float t){ // level interpolation parameter
 	LevelWeights levelWeights;
-	levelWeights.w1 = clamp(1 - levelInterpolationParameter, 0 , 1);
-	levelWeights.w2 = (clamp(levelInterpolationParameter, 0 , 1) - clamp(levelInterpolationParameter - 1, 0 , 1));
-	levelWeights.w3 = clamp(levelInterpolationParameter - 1, 0 , 1);
+	levelWeights.w1 = clamp(1 - t, 0 , 1);
+	levelWeights.w2 = (clamp(t, 0 , 1) - clamp(t - 1, 0 , 1));
+	levelWeights.w3 = clamp(t - 1, 0 , 1);
 	return levelWeights;
 }
 \end{lstlisting}
