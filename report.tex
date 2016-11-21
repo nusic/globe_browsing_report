@@ -34,6 +34,9 @@
 \usepackage{amsmath}
 \usepackage[]{algorithm2e}
 \usepackage{listings} % Code
+\usepackage{color}
+
+\definecolor{light-gray}{gray}{0.95}
 
 \usepackage[T1]{fontenc} % åäö
 \usepackage{lmodern} %åäö
@@ -42,7 +45,18 @@
 \begin{document}
 \renewcommand\bibname{References} %Renames "Bibliography" to "References" on ref page
 
+\lstset{ %
+  backgroundcolor=\color{light-gray},
+  basicstyle={\scriptsize\ttfamily},
+  breaklines=true, 
+  tabsize=2, 
+  language=C++,
+  xleftmargin=0.5cm,
+}
+
 \newcommand{\class}[1]{$#1$}
+
+
 
 %include other pages
 \input{./title.tex}

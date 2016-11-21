@@ -429,9 +429,12 @@ In figure \ref{fig:tiles}, it is realized that in order to use a parent tile for
   
 A chunk tile represents a tile that corresponds to a specific chunk. It stores a tile which is guaranteed to have the status ``OK'' along with a transform defined by a scaling and translation component. The transform is used to map texture coordinates of the chunk into its corresponding geodetic region within the tile. 
 
-The algorithm used for selecting the highest resolution chunk tile from a simple tile provider is described by the pseudo code in algorithm \ref{alg:tileselection}.
+The algorithm used for selecting the highest resolution chunk tile from a simple tile provider is described by the pseudo code in algorithm \ref{lst:getchunktile}.
 
-\begin{verbatim}
+\begin{lstlisting}[
+  caption={Selecting optimal Chunk Tiles} 
+  \label{lst:getchunktile}
+]
 ChunkTile getChunkTile(TileProvider* tileProvider, TileIndex tileIndex){
   TileUvTransform uvTransform;
   uvTransform.uvOffset = glm::vec2(0, 0);
@@ -452,7 +455,7 @@ ChunkTile getChunkTile(TileProvider* tileProvider, TileIndex tileIndex){
   uvTransform.uvScale = glm::vec2(1, 1);
   return { Tile::TileUnavailable, uvTransform };
 }
-\end{verbatim}
+\end{lstlisting}
 
 \iffalse
 \begin{algorithm}[htp]
@@ -502,7 +505,10 @@ ChunkTile getChunkTile(TileProvider* tileProvider, TileIndex tileIndex){
  
 The subroutine \texttt{fromParent} returns an updated transform which maps texture coordinates to the same geodetic region within the next parent tile. The routine is described in algorithm \ref{alg:fromparent}.
 
-\begin{verbatim}
+\begin{lstlisting}[
+  caption={Ascend to parent} 
+  \label{lst:ascendtoparent}
+]
 void TileSelector::ascendToParent(TileIndex& tileIndex, TileUvTransform& uv) {
     uv.uvOffset *= 0.5;
     uv.uvScale *= 0.5;
@@ -520,7 +526,7 @@ void TileSelector::ascendToParent(TileIndex& tileIndex, TileUvTransform& uv) {
     tileIndex.x /= 2;
     tileIndex.y /= 2;
 }
-\end{verbatim}
+\end{lstlisting}
 
 \iffalse
 \begin{algorithm}[htp]
@@ -676,27 +682,35 @@ With this 1:1 data mapping between the CPU and GPU, all the GPU-prefixed classes
 \item Set its uniform values within a provided shader program. That is; a GPUChunkTile should be able to set its uniform values from a regular ChunkTile.
 \end{enumerate}
 
-The leaf classes automatically takes care of both binding its uniform location to specific GLSL variables and  setting their uniform values. The compound GPU-prefixed classes (non leaf classes) more or less simply propagates the method calls to all its dependents. When binding an object to a variable name, the GLSL variable identifiers are built up successively during the propagation down to the leaf classes. GPU Layer is used as an example:
+The leaf classes automatically takes care of both binding its uniform location to specific GLSL variables and  setting their uniform values. The compound GPU-prefixed classes (non leaf classes) more or less simply propagates the method calls to all its dependents. When binding an object to a variable name, the GLSL variable identifiers are built up successively during the propagation down to the leaf classes. GPU Layer is used as an example:\\
 
-\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
-void GPULayer::bind(programObject, Layer, nameBase, pileSize)
+\begin{lstlisting}[
+  caption={Bind a GPU Layer to a Layer on the CPU} 
+  \label{lst:bindgpulayer}
+]
+void GPULayer::bind(programObject, Layer, nameBase, pileSize){
 	this->gpuChunkTilePile.bind(programObject, nameBase + "pile.", pileSize)
 	this->gpuRenderSettings.bind(programObject, nameBase + "settings.")
+}
 \end{lstlisting}
 
-In the example above, the we can conclude that each layer in the GLSL code must have a member called ``pile'' and a member called ``setting''. An example of a fully resolved identifier is: 
+In the example above, the we can conclude that each layer in the GLSL code must have a member called ``pile'' and a member called ``setting''. An example of a fully resolved identifier is: \\
 
-\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
+\begin{lstlisting}[]
 "ColorLayers[0].pile.chunkTile0.tileUvTransform.scaling"
 \end{lstlisting}
 
-When setting the values, the GPU representation of the data is updated based on the current available Layer data, and the update is propagated down to all the leaf classes. This is exemplified using code from the GPULayer class below:
+When setting the values, the GPU representation of the data is updated based on the current available Layer data, and the update is propagated down to all the leaf classes. This is exemplified using code from the GPULayer class below:\\
 
-\begin{lstlisting}[language=C++, basicstyle={\small\ttfamily}, breaklines=true, tabsize=2]
-GPULayer::setValue(programObject, layer, tileIndex, pileSize)
+\begin{lstlisting}[
+  caption={Set all GPU Layer variables from a CPU Layer} 
+  \label{lst:gpulayersetvalue}
+]
+GPULayer::setValue(programObject, layer, tileIndex, pileSize){
 	ChunkTilePile chunkTilePile = layer.getChunkTilePile(tileIndex, pileSize)
 	this->gpuChunkTilePile.setValue(programObject, chunkTilePile)
 	this->gpuRenderSettings.setValue(programObject, layer.renderSettings()) 
+}
 \end{lstlisting}
 
 \section{Chunk Rendering}
