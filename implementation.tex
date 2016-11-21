@@ -903,7 +903,7 @@ To decide whether or not a layer shader program needs to be preprocessed and re-
         \textbf{Layer Shader Preprocessing Data} \\ 
     	\hline
 	0..* Preprocessing data: Layer Group Preprocessing Data \\
-    	0..* Key value pairs: pair of strings \\
+    	0..* Key-value pairs: pair of strings \\
     	\hline
     
 \end{tabular}
@@ -911,11 +911,44 @@ To decide whether or not a layer shader program needs to be preprocessed and re-
 
 \subsection{Lod Switching}
 
+Instead of the time based switching routine proposed by Cozzi and Ring \cite{cozzi11}, we perform a distance based switching which works on a per fragment basis for textures and on a per vertex basis for height maps. The method is implemented in the vertex and fragment shaders and uses linear interpolation between levels. The blending technique introduces the concept of Chunk Tile Piles as seen in section \ref{section:chunktilepile}. A Chunk Tile Pile contains three chunk tiles of different level to achieve level blending which is used to avoid popping artefacts. 
 
+When rendering a specific fragment of a chunk, blending between up to three chunk levels can be used as a part of the switching in the chunked LOD algorithm. Assuming that the level of Tile 0 is equal to the level of the chunk to render and that Chunk Tile 1 and Chunk Tile 2 are 1 and 2 levels lower respectively, three level weights can be determined based on the distance to the fragment to achieve smooth transitions between levels. The three level weights are based on an interpolation parameter as in Listing \ref{lst:levelweights}.
 
-\begin{figure}[htb]
-\centering
-\caption{<Caption here>}
+\begin{lstlisting}[
+  caption={Calculate level weights.} 
+  \label{lst:levelweights}
+]
+LevelWeights getLevelWeights(float levelInterpolationParameter){
+	LevelWeights levelWeights;
+	levelWeights.w1 = clamp(1 - levelInterpolationParameter, 0 , 1);
+	levelWeights.w2 = (clamp(levelInterpolationParameter, 0 , 1) - clamp(levelInterpolationParameter - 1, 0 , 1));
+	levelWeights.w3 = clamp(levelInterpolationParameter - 1, 0 , 1);
+	return levelWeights;
+}
+\end{lstlisting}
+
+The interpolation parameter $t$ is calculated using the distance to the camera $d$ and the current level of the chunk $l$ as in equation \ref{eq:interpolation}.
+
+\begin{equation}
+\label{eq:interpolation}
+t = l-log_2(\frac{s}{d})
+\end{equation}
+
+where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough with two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor s is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[tb]{0.49\textwidth}
+    	\includegraphics[width=\textwidth]{figures/implementation/rendering/blending1.pdf}
+	\caption{Blending disabled.}
+    \end{subfigure}
+    \begin{subfigure}[tb]{0.49\textwidth}
+    	\includegraphics[width=\textwidth]{figures/implementation/rendering/blending2.pdf}
+	\caption{Blending enabled.}
+    \end{subfigure}
+    \caption{Blending on a per fragment basis.}
+    \label{fig:blending}
 \end{figure}
 
 \subsection{<Sub-section title>}
