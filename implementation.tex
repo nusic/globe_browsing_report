@@ -1,37 +1,25 @@
 \chapter{Implementation}
-The virtual globe rendering system was implemented as a separate module, programmed in C++ for OpenSpace which, if desired, can be opted out when building the software in CMake. The implementation defines a namespace with all the necessary data structures, classes and functionality specifically related to globe rendering. The basic structure of a renderable globe with its necessary components is illustrated as a UML diagram in figure \ref{fig:renderableglobe}.
+The virtual globe rendering system was implemented as a separate module, programmed in C++ for OpenSpace which, if desired, can be opted out when building the software in CMake. The implementation defines a namespace with all the necessary data structures, classes and functionality specifically related to globe rendering. The basic structure of a \class{Renderable Globe} with its necessary components is illustrated as a UML diagram in figure \ref{fig:renderableglobe}.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/renderable_globe.pdf}
     \end{subfigure}
-    \caption{Overviewing class diagram of RenderableGlobe and its related classes.}
+    \caption{Overviewing class diagram of \class{Renderable Globe} and its related classes.}
     \label{fig:renderableglobe}
 \end{figure}
 
 The base of the globe renderer uses a modified version of Cozzi and Rings Chunked LOD algorithm. The globe is tessellated as an ellipsoid with a geometrical grid using geodetic map projection.
 
-The full LOD rendering system required several components of different complexity to be implemented. These along with their puruposes are listed below.
-
-\begin{enumerate}
-	\item \textbf{Reference Ellipsoid}% - A small independent component for geometry calculations.
-	\item \textbf{Chunked LOD}% - Hierarchically arranges Chunks in a quadtree where each Chunk represents a geographical region and can be rendered individually.
-	\item \textbf{Reading and Tiling Image Data}% - A large component that takes care of concurrent texture fetching, georeferencing and tiling up textures to fit chunks. 
-	\item \textbf{Providing Tiles}% - How to access different types of tiles.
-	\item \textbf{Mapping Tiles onto Chunks}% - 
-	\item \textbf{Managing Multiple Data Sources}% - Organizes different texture layers into categories and makes the texture data accessible for rendering. 
-	\item \textbf{Chunk Rendering}% - 
-\end{enumerate}
-
-
+The full LOD rendering system required several components of different complexity to be implemented. All components will be described in detail in this chapter.
 
 \section{Reference Ellipsoid}
 The \class{Ellipsoid} class was implemented to handle all geographic related calculations.  These calculations include conversions between geodetic and cartesian coordinates and different kinds of projections onto the ellipsoid surface. These calculations are sped up by internal caching of a range of precalculated values. Cozzi and Ring provide a complete reference on the implementation \cite[p. 17]{cozzi11}.
 
 The \class{Ellipsoid} uses several geographically related classes, which were used in multiple places within the implementation. These are:
 \begin{enumerate}
-	\item \class{Angle} - Handles angle related arithmetics, normalizations and abstract away units (degrees and radians)
+	\item \class{Angle} - Handles angle related arithmetics, normalizations and unit abstractions (degrees and radians)
 	\item \class{Geodetic2} - Represents a 2D geodetic coordinate (latitude, longitude)
 	\item \class{Geodetic3} - Represents a 3D geodetic coordinate (latitude, longitude, altitude)
 	\item \class{GeodeticPatch} - Represents a rectangular region in geodetic space
@@ -46,7 +34,7 @@ As opposed to the definition of chunks in the background section \ref{section:ch
 The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. 
 
 \subsection{Chunk Selection}
-The chunk tree is automatically reshaped depending on the virtual camera. A chunk node splits, merges or remain the same depending on the chunk's error metric for the current LOD. Three different approaches for calculating the error metric were implemented.
+The chunk tree is automatically reshaped depending on the virtual camera. A chunk node splits, merges or remain the same depending on the chunk's error metric for the current LOD. Three different approaches for calculating the error metric were implemented. By letting the user dynamically adjust a LOD scale factor, performance can be weighted against detail level.
 
 \subsubsection{By Distance}
 By letting the error depend on the distance between the closest point on the chunk, an the camera $d$ as in Equation \ref{eq:loddistance}, the size of the chunks in screen space stays more or less constant.
@@ -59,16 +47,16 @@ Where $e$ is the error, $l$ is the current level of the chunk, $s$ is a LOD scal
 
 
 \subsubsection{By Projected Area}
-Another error metric is the area that the chunk take up on the screen. The bigger the area, the higher the error. 
+Another error metric is the area that the chunk takes up on the screen. The bigger the area, the bigger the error. 
 
-The error must not be dependent of the direction of the camera. This is because a chunk rendered on a multi screen display should not have different errors between two or more screens which might lead to different levels and tearing between screens. Therefore the chunk is projected on a unit sphere and not a view plane which would lead to view direction dependent error metrics.
+The error must not be dependent of the direction of the camera. This is because a chunk rendered on a multi screen display ,such as a dome, should not have different errors between two or more screens which might lead to different levels and tearing between screens. Therefore the chunk is projected on a unit sphere and not a view plane which would lead to view direction dependent error metrics.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunklod/projectedarea.png}
     \end{subfigure}
-    \caption{Chunk are projected onto a unit sphere}
+    \caption{Triangle with the area 1/8 of the chunk projected onto a unit sphere}
     \label{fig:chunkprojarea}
 \end{figure}
 
@@ -80,8 +68,8 @@ The actual approximated solid angle is the projected triangle area multiplied by
 Splitting a chunk will not result in higher level of detail unless the corresponding higher level of detail tile data is also currently available for rendering. Therefore, the growth of the chunk tree can be limited by checking if there is any tile data there in the first place. This is useful in two scenarios:
 
 \begin{enumerate}
-\item Rendering of sparse map datasets which contain geographical regions where there are no data
-\item Rendering of map datasets which are queried from remote servers - there will always be some delay where the queried map data is not yet available
+\item Rendering of sparse map datasets which contain geographical regions where there are no data.
+\item Rendering of map datasets which are queried from remote servers; there will always be some delay where the queried map data is not yet available.
 \end{enumerate}
 
 Being able to limit the chunk tree in these two scenarios, unnecessary chunk rendering calls can be avoided.
@@ -90,19 +78,19 @@ Being able to limit the chunk tree in these two scenarios, unnecessary chunk ren
 Given a chunk tree with chunks selected based on the camera position, each chunk can be tested using chunk cullers to determine if they are ``cullable'' and therefore can be set to invisible so that the chunk renderer will not bother in rendering them. The two implemented chunk cullers are the frustum culler and the horizon culler. They both rely on - and have access to - minimum and maximum values of the chunk's height maps. 
 
 \subsubsection{Frustum Culling}
-The frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC). Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view, and thus can be cullable. This is illustrated in Figure \ref{fig:frustumculling}.
+Frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC) using the view-projection matrix of the camera followed by perspective division. Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view, and thus can be cullable. This is illustrated in Figure \ref{fig:frustumculling}.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunklod/frustumculling.pdf}
     \end{subfigure}
-    \caption{Frustum culling algorithm. The chunk cannot be frustum culled.}
+    \caption{Frustum culling algorithm. This chunk cannot be frustum culled.}
     \label{fig:frustumculling}
 \end{figure}
 
 \subsubsection{Horizon Culling}
-Given an object in position $\vec{p}$ with a bounding radius $r$, it can be determined if it is completely behind the globe's horizon or not. The calculations are simplified by approximating the globe as a sphere using the minimum radius $r_g$ of its ellipsoid. Using the minimum radius and not a bigger number ensures that false occluding (chunks marked as invisible actually being visible) is not possible \cite[p. 393]{cozzi11}. The minimum allowed distance $l$ to the object can be calculated as the distance to the horizon $l_h$ added to the minimum allowed distance to the object from the horizon $l_m$. See figure \ref{fig:horizonculling}. Once the minimum allowed distance is calculated it can be compared to the actual distance to the object to determine if it is cullable or not.
+Given an object in position $\vec{p}$ with a bounding radius $r$ on the surface of the globe, it can be determined if it is completely behind the globe's horizon or not. The calculations are simplified by approximating the globe as a sphere using the minimum radius $r_g$ of its ellipsoid. Using the minimum radius and not a bigger number ensures that false occluding (chunks marked as invisible actually being visible) is not possible \cite[p. 393]{cozzi11}. The minimum allowed distance $l$ to the object can be calculated as the distance to the horizon $l_h$ added to the minimum allowed distance to the object from the horizon $l_m$. See figure \ref{fig:horizonculling}. Once the minimum allowed distance is calculated it can be compared to the actual distance to the object to determine if it is cullable or not.
 
 \begin{figure}[htbp]
     \centering
@@ -126,7 +114,7 @@ Fetching the right texture and preparing it for rendering onto chunks is a fairl
 
 \begin{enumerate}
 	\item \textbf{\class{Tile Index}} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe.
-	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with some meta data. Each \class{Raw Tile} is associated with a \class{Tile Index}. They can be instantiated concurrently.
+	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with meta data. Each \class{Raw Tile} is associated with a \class{Tile Index}. They can be instantiated concurrently.
 	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, tiles rely on an OpenGL context and must therefore be initialized on the rendering thread.
 \end{enumerate}
 
@@ -136,14 +124,16 @@ During the iterative process of developing the texture tile pipeline, three laye
 
 \begin{center}
   \begin{table}
-  \caption[]{Abstraction layers used in the texture data pipeline}
+  \caption[]{Abstraction layers used in the texture data pipeline.}
     \label{table:tilepipeline}
   \resizebox{\textwidth}{!}{\begin{tabular}{| c | c | c | c |}
     \hline
      Layer & \textbf{Component} 	& \textbf{Responsibility} & \textbf{Input --> Output} \\ \hline 
     3 & \class{Async Tile Dataset} 	& Async \class{Raw Tile} fetching  & \class{TileIndex} --> \class{Raw Tile} \\ \hline
-    2 & \class{Tile Dataset}        & Tiling, georeferencing, preprocessing & \class{TileIndex} --> \class{Raw Tile} \\ \hline
-    1 & GDAL         		& Image formats, I/O Operations & pixel region --> pixel data \\
+    2 & \class{Tile Dataset}        & Tiling, georeferencing,  & \class{TileIndex} --> \class{Raw Tile} \\ 
+     &         & preprocessing &  \\ \hline
+    1 & GDAL         		& Image formats, I/O Operations, & pixel region --> pixel data \\
+     &          		& georeferencing &  \\
     \hline
   \end{tabular}}
   \end{table}
@@ -155,13 +145,13 @@ The subsequent sections of this chapter will cover each abstraction layer in mor
 Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. GDAL is used as an abstraction layer between all the map formats and the representation of tile datasets. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. Reading pixel data using the GDAL RasterIO interface requires a set of parameters listed below and illustrated in Figure \ref{fig:gdalio}:
 
 \begin{enumerate}
-	\item A map overview to read pixel data from (if the dataset has overviews)
-	\item A pixel region within that map overview to read pixels from
-	\item The raster band(s) (e.g., color channels) to read
-	\item A pointer to sufficient user allocated memory where GDAL can write the output of the read operation. 
-	\item The pixel region to write the outputted pixel data. (The size of the pixel data to be written may differ from the pixel region to read from, in which case GDAL will resample and interpolate the pixel data automatically.)
-	\item The layout (i.e., pixel spacing, raster band spacing and line spacing)
-	\item The data type to retrieve the pixel data in
+	\item A map overview to read pixel data from (if the dataset has overviews).
+	\item A pixel region within that map overview to read pixels from.
+	\item The raster band(s) (e.g., color channels) to read.
+	\item A pointer to sufficient user allocated memory where GDAL can write the output of the read operation.
+	\item The pixel region to write the output pixel data. The size of the pixel data to be written may differ from the pixel region to read from, in which case GDAL will resample and interpolate the pixel data automatically.
+	\item The layout (i.e., pixel spacing, raster band spacing and line spacing).
+	\item The data type to retrieve the pixel data in.
 \end{enumerate}
 
 \begin{figure}[htbp]
@@ -169,7 +159,7 @@ Geospatial Data Abstraction Library (GDAL) is an open source library providing a
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalio.png}
     \end{subfigure}
-    \caption{The required GDAL raster IO parameters}
+    \caption{The required GDAL raster IO parameters.}
     \label{fig:gdalio}
 \end{figure}
 
@@ -184,12 +174,12 @@ With the given input parameters shown in Figure \ref{fig:gdalio}, the resulting 
     \label{fig:gdalioresult}
 \end{figure}
 
-Using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \todo{\textbf{add appendix}} goes through a detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches.
+Using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \todo{\textbf{add appendix}} goes through a detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches of high resolution.
 
-GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates.
+GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates. The geo-transform can be inverted to define a region within raster space based on a georeferenced region.
 
 \subsection{Tile Dataset}
-\class{Tile Dataset}s carves out \class{Raw Tile}s from GDAL datasets based on a \class{Tile Index}. Along with the pixel data, the served \class{Raw Tile}s also contain some metadata. The metadata includes an error code if something went wrong during the pixel reading process and some basic information about to read pixel data, such as minimum and maximum pixel values. Figure \ref{fig:tiledataset} illustrates how the process from \class{Tile Index} to \class{Raw Tile} is carried out. There are three gray subroutines; $Get IO description$, $Read image data$ and $Calculate metadata$. These subroutines are explained below.
+\class{Tile Dataset}s carves out \class{Raw Tile}s from GDAL datasets based on a \class{Tile Index}. Along with the pixel data, the served \class{Raw Tile}s also contain some metadata. The metadata includes an error code if something went wrong during the pixel reading process and some basic information about to read pixel data, such as minimum and maximum pixel values. Figure \ref{fig:tiledataset} illustrates how the process from \class{Tile Index} to \class{Raw Tile} is carried out. There are three gray subroutines; \emph{Get IO description}, \emph{Read image data} and \emph{Calculate metadata}. These subroutines are explained below.
 
 \begin{figure}[htbp]
     \centering
@@ -230,31 +220,31 @@ Calculating the corresponding GDAL overview is done according to
 Overview(level) = N - level - 1 - log_2(size_{tile} / size_{map})
 \end{equation}
 
-Where $level$ is given by the provided \class{Tile Index}, $N$ is the total number of overviews in the dataset, $size_{tile}$ is a configurable constant defining the preferred pixel size of a tile and $size_{map}$ is the size of the full map in pixels. The sizes can be either along the x or y axis, but does not matter when using square tiles and maps. In the implementation x is used.
+Where $level$ is given by the provided \class{Tile Index}, $N$ is the total number of overviews in the dataset, $size_{tile}$ is a configurable constant defining the preferred pixel size of a tile and $size_{map}$ is the size of the full map in pixels. The sizes can be either along the $x-$ or $y-$ axis. In the implementation the $x-$axis is used.
 
-Pixel coordinates can easily be transfomed across map levels:
+Pixel coordinates can easily be transformed across map overviews using equation \ref{eq:overview}.
 
 \begin{equation}
 \label{eq:overview}
-P_{n} = P_{m} * 2^{m-n}
+p_{n} = p_{m} \times 2^{m-n}
 \end{equation}
 
 Where $n$ is the destination map overview and $m$ is the source map overview. This is used for downscaling the pixel region in step 4, where $n$ is the calculated suitable overview and $m$ is zero (i.e. the full map). 
 
-Padding is added to the pixel region in order to do correct interpolation of pixel values across different tiles later during rendering. However, this may cause the pixel region to extend outside the map region. Therefor the last finalize step also handles wrapping of the pixel regions before return the final IO description. The wrapping used is a CPU implementation of $GL\_REPEAT$.
+Padding is added to the pixel region in order to perform correct interpolation of pixel values across different tiles later during rendering. However, this may cause the pixel region to extend outside the map region. Therefore the last finalize step also handles wrapping of the pixel region before returning the final IO description. The wrapping used is a CPU implementation of $GL\_REPEAT$.
 
 \subsubsection{Tile Meta Data}
-As mentioned, \class{Tile Dataset}s can be configured to calculate some metadata on the fly based on the pixel data that has been read. This information cannot be requested directly from GDAL, so this had to be implemented by explicitly looping through all the pixel values an extra time client side. In this case, \class{Raw Tile}s will be served with some additional information. The metadata includes minimum and maximum pixel values within the pixel data and whether or not the pixeldata contains missing-data values. Having access to minimum and maximum values for height layer tiles is required for the culling to be performed correctly since the cullers rely on having bounding boxes for the chunks.
+As mentioned, \class{Tile Dataset}s can be configured to calculate some metadata on the fly based on the pixel data that has been read. The metadata includes minimum and maximum pixel values within the pixel data and whether or not the pixel data contains missing-data values. Having access to minimum and maximum values for height layer tiles is required for the culling to be performed correctly since the cullers rely on having bounding boxes for the chunks. The meta data can not be requested directly from GDAL since the tiling can differ from the underlying image tiling abstracted away by GDAL. Calculating the meta data had to be performed by explicitly looping through all the pixel values on the client side. 
 
 \subsubsection{Summary}
-To summarize, the implementation of \class{Tile Dataset} allow reading pixel data from a GDAL dataset corresponding to a specific \class{Tile Index}, along with some metadata unless opted out. The \class{Raw Tile}s that are served are padded in order to do smooth pixel blending between different tiles. \class{Raw Tile}s are not available for rendering since the data is not yet on the GPU.
+To summarize, the implementation of \class{Tile Dataset} allow reading pixel data from a GDAL dataset corresponding to a specific \class{Tile Index}, along with some metadata unless opted out. The \class{Raw Tile}s that are served are padded in order to perform smooth pixel blending between different tiles. \class{Raw Tile}s are not available for rendering since the data is not yet on the GPU.
 
 \subsection{Async Tile Dataset}
-\class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It provides a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important funcionalities: 1) enqueueing tile read jobs and 2) collect finished tiles read jobs. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see Figure \ref{fig:asynctiledataset}.
+\class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It provides a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important funcionalities: 1) enqueueing tile read jobs and 2) collect finished tile read jobs. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see Figure \ref{fig:asynctiledataset}.
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.7\textwidth}
+    \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset.pdf}
     \end{subfigure}
     \caption{Asynchronious reading of Raw tiles.}
@@ -263,7 +253,7 @@ To summarize, the implementation of \class{Tile Dataset} allow reading pixel dat
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.7\textwidth}
+    \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset_gettiles.pdf}
     \end{subfigure}
     \caption{Retrieving finished Raw tiles.}
@@ -274,20 +264,19 @@ The \class{Async Tile Dataset} internally keeps track of what tile indices it ha
 
 
 \section{Providing Tiles}
-\class{Tiles} has a three properties: a texture, some texture metadata and a tile status. The status is used to report any type of problem with the tile. This includes IO errors, Out-of-range errors or simply Unavailable. Tiles that have the ``OK'' status however, are uploaded to the GPU and can used for rendering. 
+\class{Tile}s have three properties: a texture, some texture metadata and a status. The status is used to report any type of problem with the tile. This includes IO errors, Out-of-range errors or simply Unavailable. Tiles that have the ``OK'' status however, are uploaded to the GPU and can be used for rendering. 
 
-Tiles are provided for rendering through Tile providers - an interface that allow accessing tiles meta data about the tiles. There are different types of tile providers, but they must all implement the following functionality.
-
+Tiles are provided for rendering through \class{Tile Provider}s. They define an interface that allow accessing tiles and meta data about the tiles. There are different types of tile providers, but they must all implement the following functionality:
 
 \begin{itemize}
-\item GetTile(\class{TileIndex}) - access the tile at the provided tile index
-\item GetDefaultTile() - returns a default tile with status ``OK''
-\item GetDepthTransform() - pixel value scale factor, e.g. for converting heightmap values to meters
-\item GetMaxLevel() - the highest mip level defined for the dataset
-\item GetNoDataValue() - get value that should be interpreted as ``no data''
-\item CheckTileStatus(\class{TileIndex}) - check tile status with no side effects
-\item Update() - called once per frame, allow for internal updates
-\item Reset() - full reset of internal state. 
+\item GetTile(\class{TileIndex}) - access the tile at the provided tile index.
+\item GetDefaultTile() - returns a default tile with status ``OK''.
+\item GetDepthTransform() - pixel value scale factor, e.g. for converting height map values to meters.
+\item GetMaxLevel() - the highest mip level defined for the dataset.
+\item GetNoDataValue() - get value that should be interpreted as ``no data''.
+\item CheckTileStatus(\class{TileIndex}) - check tile status with no side effects.
+\item Update() - called once per frame, allow for internal updates.
+\item Reset() - full reset of internal state.
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -299,20 +288,18 @@ Tiles are provided for rendering through Tile providers - an interface that allo
     \label{fig:tileprovider}
 \end{figure}
 
-The most important functionality is the GetTile ability, which is used by client code to access the tiles. As tile providers may provide tiles of any status, the users of the tile provider are responsible to always check the status of the requested tile before using the tile. 
+The most important functionality is the GetTile ability, which is used by client code to access the tiles. As tile providers may provide tiles of any status, the user of the tile provider is responsible to always check the status of the requested tile before using the tile. 
 
-Several implementations of the tile provider interface were been developed and is described below.
+Several implementations of the tile provider interface were developed. They are all described below.
 
 \subsection{Caching Tile Provider}
-\class{Caching Tile Provider} uses a \class{Async Tile Dataset} to read \class{Raw Tile}s as soon as client code tries to access a specific tile. It internally polls the \class{Async Tile Dataset} every frame for finished raw tiles. When there are ready raw tiles, the \class{Caching Tile Provider} converts the raw tiles into a tiles. This is done in the initialization step which is part of the update method that is illustrated in figure update. If no errors of the raw tile are reported, the tile gets the status ``OK'' and is uploaded texture data to the GPU and added to the in-memory cache.
+\class{Caching Tile Provider} uses an \class{Async Tile Dataset} to read \class{Raw Tile}s as soon as client code tries to access a specific tile. It internally polls the \class{Async Tile Dataset} every frame for finished raw tiles. When there are ready raw tiles, the \class{Caching Tile Provider} converts the raw tiles into tiles. This is done in the initialization step which is part of the update method that is illustrated in figure \ref{fig:cachingtileprovider_update}. If no errors of the raw tile are reported, the tile gets the status ``OK'' and its texture data gets uploaded to the GPU. The tile also gets added to the in-memory cache. The functionality of accessing tiles is illustrated in Figure \ref{fig:cachingtileprovider_gettile}.
 
-The uploading of texture data to the GPU needs to be done on the rendering thread since that is where the OpenGL context resides. However, there are alternatives to this approach as discussed in Discussion/Future Work. 
-
-Tiles with data uploaded to texture memory will enable it for use in rendering of a chunk. The functionality of accessing tiles is illustrated in Figure \ref{fig:cachingtileprovider_gettile}.
+The uploading of texture data to the GPU needs to be done on the rendering thread since there is where the OpenGL context resides. Tiles with data uploaded to texture memory will enable it for use in rendering of a chunk.
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.8\textwidth}
+    \begin{subfigure}[bt]{0.7\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_gettile.pdf}
     \end{subfigure}
     \caption{Tiles are either provided from cache or requested.}
@@ -323,14 +310,14 @@ The functionality for internally updating the tile cache is illustrated in Figur
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.8\textwidth}
+    \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_update.pdf}
     \end{subfigure}
     \caption{The tile cache is updated once per frame.}
     \label{fig:cachingtileprovider_update}
 \end{figure}
 
-Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario where a specific tile of index ${3, 4, 2}$ is requested within a sequence of render calls. The first requesting call to that tile will spawn a worker thread in the \class{Asynch Tile Dataset}. As soon as the \class{Tile} is initialized (uploaded to the GPU) and inserted in the cache it will be accessible on the rendering thread. If the tile is not yet available the \class{Caching Tile Provider} will report that so that the calling function can continue without the use of that specific \class{Tile}.
+Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario where a specific tile of index $\{3, 4, 2\}$ is requested within a sequence of render calls. The first requesting call to that tile will spawn a worker thread in the \class{Asynch Tile Dataset}. As soon as the \class{Tile} is initialized (uploaded to the GPU) and inserted in the cache, it will be accessible on the rendering thread. If the tile is not yet available the \class{Caching Tile Provider} will report that so that the calling function can continue without the use of that specific \class{Tile}.
 
 \begin{figure}[htbp]
     \centering
@@ -341,11 +328,12 @@ Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario
     \label{fig:cachingtileprovider_tilerequest}
 \end{figure}
 
-The caching policy implemented and used is LRU - ``Least Recently Used''. This means that tiles that have not been accessed for a while are thrown out only when the cache limit is exceeded. For implementation details about LRU caching, see Theoretical Background : Caching. 
+The caching policy implemented and used is LRU - ``Least Recently Used''. This means that tiles that have not been accessed for a while are thrown out only when the cache limit is exceeded. For implementation details about LRU caching, see \todo{real ref Theoretical Background : Caching}. 
 
 \subsection{Temporal Tile Provider}
-In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented. The \class{Temporal Tile Provider} is instantiated with a template URI containing a time placeholder. Information about the supported time range, time resolution and expected timestamp format to be used in the template URI is also passed during instantiation. This config information is illustrated in figure Temp below. 
+In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented. The \class{Temporal Tile Provider} is instantiated with a template URI containing a time placeholder. Information about the supported time range, time resolution and expected timestamp format to be used in the template URI is also passed during instantiation. 
 
+\todo[inline]{Make this understandable. Use lslisting? Describe that all openspace tags are our own and that GDAL\_WMS specifies the gdal part.}
 \begin{verbatim}
 <OpenSpaceTemporalGDALDataset>
     <OpenSpaceTimeStart>2015-11-24</OpenSpaceTimeStart>
@@ -358,8 +346,8 @@ In order to incorporate time-resolved map datasets into the rendering scheme, a 
                 http://datasetURL/${OpenSpaceTimeId}/${z}/${y}/${x}.jpg 
             </ServerUrl>
         </Service>
+        ...
     </GDAL_WMS>
-    ...
 </OpenSpaceTemporalGDALDataset>
 \end{verbatim}
 
@@ -369,7 +357,7 @@ A schematic illustration of the implementation of the \class{Temporal Tile Provi
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.8\textwidth}
+    \begin{subfigure}[bt]{0.7\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/temporaltileprovider_gettile.pdf}
     \end{subfigure}
     \caption{Each temporal snapshot is internally represented by a caching tile provider.}
@@ -378,11 +366,11 @@ A schematic illustration of the implementation of the \class{Temporal Tile Provi
 
 
 \subsection{Single Image Tile Provider}
-This is a very simple implementation of the tile provider interface which only serves the same tile for every tile index. This tile provider was used for testing and debugging alignment and padding between tiles.
+This is a very simple implementation of the tile provider interface which only serves the same tile for every tile index. This tile provider was used for testing and debugging alignment and padding between tiles, see image \ref{fig:singleimagetileprovider_gettile}.
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.6\textwidth}
+    \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/singleimagetileprovider_gettile.pdf}
     \end{subfigure}
     \caption{Serving single tiles can be useful for debugging chunk and texture alignment.}
@@ -394,7 +382,7 @@ The ability to serve tiles with text rendered on the fly was implemented as a ge
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.8\textwidth}
+    \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/texttileprovider_gettile.pdf}
     \end{subfigure}
     \caption{Serving single tiles can be useful for debugging chunk and texture alignment.}
@@ -408,7 +396,7 @@ Two different types of \class{Text Tile Provider}s were implemented. \class{Tile
   
 In the implementation of chunks suggested by Cozzi and Ring \cite{cozzi11}, chunks store the data they need for rendering by them selves. That means that as soon as a chunk has been fully initialized, it has everything it needs to be rendered. However, when dealing with multiple map datasets potentially residing on distant servers, there is no guarantee that all the tiles needed for a chunk to be rendered are available.
 
-When an accessed \class{Tile} does not have the status ``OK'', it should not be used rendering. The second best thing to try is to check the parent of the same tile. A parent tile is guaranteed to always covers a larger geodetic map region that includes its children's subregions, but with lower number of pixels per geodetic degree. Figure \ref{fig:tiles} demonstrates this with a simple example.
+When an accessed \class{Tile} does not have the status ``OK'', it can not be used for rendering. The second best thing to try is to check the parent of the tile. A parent tile is guaranteed to always covers a larger geodetic map region that includes its children's subregions, but with lower number of pixels per geodetic degree. Figure \ref{fig:tiles} demonstrates this with a simple example.
 
 \begin{figure}[htbp]
     \centering
@@ -504,7 +492,7 @@ ChunkTile TileSelector::getChunkTile(TileProvider* tp, TileIndex ti){
 \fi
 
  
-The subroutine \texttt{ascendToParent} returns an updated transform which maps texture coordinates to the same geodetic region within the next parent tile. The routine is described in algorithm \ref{alg:fromparent}.
+The subroutine \texttt{ascendToParent} returns an updated transform which maps texture coordinates to the same geodetic region within the next parent tile. The routine is described in Listing \ref{lst:ascendtoparent}.
 
 \begin{lstlisting}[caption={Ascend to parent} \label{lst:ascendtoparent}]
 void TileSelector::ascendToParent(TileIndex& tileIndex, TileUvTransform& uv) {
@@ -562,7 +550,7 @@ As opposed to regular tiles, chunk tiles can always be used for rendering since 
 \subsection{Chunk Tile Pile}
 \label{section:chunktilepile}
 
-A \class{Chunk Tile Pile} represents a range of \class{Chunk Tile}s across multiple mip levels. They contain the information needed to perform the LOD switching described under section \todo{ref Switching}. Retrieving a \class{Chunk Tile Pile} simply requires a tile index of the lowest desired mip level (highest LOD) and the number of desired \class{Chunk Tile}s in the pile as described in Listing \ref{lst:chunktilepile}.
+A \class{Chunk Tile Pile} represents a range of \class{Chunk Tile}s across multiple mip levels. They contain the information needed to perform the LOD switching later described under section \ref{section:lodswitching}. Retrieving a \class{Chunk Tile Pile} simply requires a tile index of the lowest desired mip level (highest LOD) and the number of desired \class{Chunk Tile}s in the pile as described in Listing \ref{lst:chunktilepile}.
 
 \iffalse
 \begin{algorithm}[htp]
@@ -620,6 +608,8 @@ As chunk tiles are guaranteed to be good for rendering on the GPU (since their t
 \section{Managing Multiple Data Sources}
 The \class{Layer Manager} maintains and organizes different types of texture data sources into groups. This is required as different types of texture datasets are used for different purposes and thus rendered in different ways. The \class{Layer Manager} owns seven \class{Layer Groups}. These are are listed below with their respective purpose:
 
+\todo[inline]{Do not describe these here.}
+
 \begin{enumerate}
 \item \textbf{Heightmaps} - Displacing vertices along ellipsoidal geodetic normal and calculate bounding boxes for chunks. Also used for terrain following for camera interaction.
 \item \textbf{ColorLayers} - Setting fragment RGB from texture RGB
@@ -631,7 +621,7 @@ The \class{Layer Manager} maintains and organizes different types of texture dat
 \end{enumerate}
 
 \subsection{Layers}
-Much like in image editing softwares, a \class{Layer} in this context represents a raster of pixels, which among other internally ordered raster of pixels, are used to produce a final result. A \class{Layer} consists of three things:
+Much like in image editing softwares, a layer in this context represents a raster of pixels, which among other internally ordered raster of pixels, are used to produce a final result. A \class{Layer} consists of three things:
 
 \begin{enumerate}
 \item A \class{Tile Provider} - Used for accessing tiles of texture data.
@@ -654,7 +644,7 @@ The data hierarchy defined by \class{Layer Manager} can almost be reproduced on 
 
 \subsubsection{CPU to GPU Data Mapping}
 
-There are some key differences between the \class{Layer Manager} data structure on the CPU and its corresponding GPU  representation - \class{GPU Layer Manager}. These are:
+There are some key differences between the \class{Layer Manager} data structure on the CPU and its corresponding GPU-synchronized representation - \class{GPU Layer Manager}. These are:
 
 \begin{itemize}
 \item The GPU representation does not store any of the actual \class{Layer} data - only the uniform locations within a shader program so that it knows where to upload the layer data to the GPU. 
@@ -694,13 +684,13 @@ void GPULayer::bind(ProgramObject* p, std::string nameBase, int pileSize){
 }
 \end{lstlisting}
 
-In Listing \ref{bindgpulayer}, it can be concluded that each layer in the GLSL code must be a struct with a member called ``pile'' and a member called ``setting''. An example of a fully resolved identifier is: \\
+In Listing \ref{lst:bindgpulayer}, it can be concluded that each layer in the GLSL code must be a struct with a member called ``pile'' and a member called ``settings''. An example of a fully resolved identifier is: \\
 
 \begin{lstlisting}[]
 "ColorLayers[0].pile.chunkTile0.tileUvTransform.scaling"
 \end{lstlisting}
 
-When setting the values, the GPU representation of the data is updated based on the currently available \class{Layer} data, and the update is propagated down to all the leaf classes. This is exemplified using code from the \class{GPULayer} class below:\\
+When setting the values, the GPU representation of the data is updated based on the currently available \class{Layer} data, and the update is propagated down to all the leaf classes. This is exemplified using code from the \class{GPULayer} class defined in Listing \ref{lst:gpulayersetvalue}:\\
 
 \begin{lstlisting}[
   caption={Set all GPU Layer variables from a CPU Layer} 
@@ -779,7 +769,7 @@ Camera space rendering is performed by transforming only a limited number of con
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/implementation/rendering/local.pdf}
-    \caption{Interpolating vertex positions in camera space leads to high precision in the representation of vertex positions close to the camera compared to positions refined in model space.}
+    \caption{Interpolating vertex positions in camera space leads to high precision in the representation of vertex positions close to the camera compared to positions defined in model space.}
     \label{fig:local}
 \end{figure}
 
@@ -910,7 +900,7 @@ To decide whether or not a layer shader program needs to be preprocessed and re-
 \end{table}
 
 \subsection{Lod Switching}
-
+\label{section:lodswitching}
 Instead of the time based switching routine proposed by Cozzi and Ring \cite{cozzi11}, we perform a distance based switching which works on a per fragment basis for textures and on a per vertex basis for height maps. The method is implemented in the vertex and fragment shaders and uses linear interpolation between levels. The blending technique introduces the concept of Chunk Tile Piles as seen in section \ref{section:chunktilepile}. A Chunk Tile Pile contains three chunk tiles of different level to achieve level blending which is used to avoid popping artefacts. 
 
 When rendering a specific fragment of a chunk, blending between up to three chunk levels can be used as a part of the switching in the chunked LOD algorithm. Assuming that the level of Tile 0 is equal to the level of the chunk to render and that Chunk Tile 1 and Chunk Tile 2 are 1 and 2 levels lower respectively, three level weights can be determined based on the distance to the fragment to achieve smooth transitions between levels. The three level weights are based on an interpolation parameter $t$ as in Listing \ref{lst:levelweights}.
