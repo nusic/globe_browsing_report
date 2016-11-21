@@ -562,7 +562,7 @@ As opposed to regular tiles, chunk tiles can always be used for rendering since 
 \subsection{Chunk Tile Pile}
 \label{section:chunktilepile}
 
-A \class{Chunk Tile Pile} represents multiple \class{Chunk Tile}s across multiple mip levels. A \class{Chunk Tile Pile} contains all the information needed to perform the LOD switching described under section \todo{ref Switching}. Retrieving a \class{Chunk Tile Pile} simply requires a tile index of highest mip level and the number of desired \class{Chunk Tile}s in the pile as described in Listing \ref{lst:chunktilepile}.
+A \class{Chunk Tile Pile} represents a range of \class{Chunk Tile}s across multiple mip levels. They contain the information needed to perform the LOD switching described under section \todo{ref Switching}. Retrieving a \class{Chunk Tile Pile} simply requires a tile index of the lowest desired mip level (highest LOD) and the number of desired \class{Chunk Tile}s in the pile as described in Listing \ref{lst:chunktilepile}.
 
 \iffalse
 \begin{algorithm}[htp]
@@ -582,7 +582,7 @@ A \class{Chunk Tile Pile} represents multiple \class{Chunk Tile}s across multipl
 \fi
 
 \begin{lstlisting}[caption={Instantiating a Chunk Tile Pile} \label{lst:chunktilepile}]
-ChunkTilePile getChunkTilePile(TileProvider* tp, TileIndex ti, int n){
+ChunkTilePile TileSelector::getChunkTilePile(TileProvider* tp, TileIndex ti, int n){
   ChunkTilePile chunkTilePile;
   for (int i = 0; i < n; ++i){
     chunkTilePile.push_back(getChunkTile(tp, ti));
@@ -644,7 +644,7 @@ Much like in image editing softwares, a \class{Layer} in this context represents
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/implementation/layers/layermanager.pdf}
-    \caption{LayerManager.}
+    \caption{UML diagram of the \class{Layer Manager} and its related classes.}
     \label{fig:layermanager}
 \end{figure}
 
@@ -694,7 +694,7 @@ void GPULayer::bind(ProgramObject* p, std::string nameBase, int pileSize){
 }
 \end{lstlisting}
 
-In the example above, it can be concluded that each layer in the GLSL code must be a struct with a member called ``pile'' and a member called ``setting''. An example of a fully resolved identifier is: \\
+In Listing \ref{bindgpulayer}, it can be concluded that each layer in the GLSL code must be a struct with a member called ``pile'' and a member called ``setting''. An example of a fully resolved identifier is: \\
 
 \begin{lstlisting}[]
 "ColorLayers[0].pile.chunkTile0.tileUvTransform.scaling"
