@@ -472,24 +472,15 @@ Dimitrijevi\'{c} and Ran\v{c}i\'{c} uses another polar coordinate system to repr
 Dynamic level of detail (LOD) is an important part in handling the extensive amount of data used in an out of core rendering software. The goal is to maximize the visual information on screen while minimizing the workload. In their book Rendering virtual 3D globes, Cozzi and Ring describes LOD rendering algorithms by three typical steps. \cite[p. 367]{cozzi11}
 
 \begin{enumerate}
-    \item Generation - Create versions at different level of detail of a model
-    \item Selection - Choose a version based on some criteria or error metric (e.g., distance to object or the projected area it occupies on the screen)
-    \item Switching - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
+    \item \textbf{Generation} - Create versions at different level of detail of a model
+    \item \textbf{Selection} - Choose a version based on some criteria or error metric (e.g., distance to object or the projected area it occupies on the screen)
+    \item \textbf{Switching} - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
 \end{enumerate}
 
 There are different types of LOD approaches for terrain rendering, and a suitable approach should be chosen based on characteristics of the terrain. Terrains can for example be restricted to being represented as height maps - a characteristic that can be exploited by the rendering algorithm. Cozzi and Ring describe the following three categories of LOD approaches: Discrete Level of Detail, Continuous Level of Detail and Hierarchical Level of Detail \cite[p. 368-371]{cozzi11}.
 
 \subsection{Discrete Level of Detail}
-In the Discrete Level Of Detail (DLOD) approach, multiple different representations of the terrain are created at different resolutions. DLOD is arguably the most simple LOD algorithm. It works not only for digital terrain models, but for arbitrary meshes. The set of terrain representations can either be predefined or generated using mesh simplification algorithms.
-
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[bt]{0.9\textwidth}
-        \includegraphics[width=\textwidth]{figures/lod/lod_overview.pdf}
-    \end{subfigure}
-    \caption{DLOD. Generate offline, select and switch at runtime.}
-    \label{fig:lod}
-\end{figure}
+In the Discrete Level Of Detail (DLOD) approach, multiple different representations of the model are created at different resolutions. DLOD is arguably the most simple LOD algorithm. It works not only for digital terrain models, but for arbitrary meshes. The set of terrain representations can either be predefined or generated using mesh simplification algorithms.
 
 \begin{figure}
     \centering
@@ -546,14 +537,14 @@ Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLO
     \item Reduce the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can't be cached on the GPU. Being able to perform GPU caching allow HLOD to better minimize the traffic to the GPU.
 \end{enumerate}
 
-HLOD uses spatial hierarchical data structures such as quadtrees or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail a one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated in Figure \ref{fig:hlod}.
+HLOD uses spatial hierarchical data structures such as binary trees, quadtrees, or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail in one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated with a quad tree holding chunks representing a bunny model in Figure \ref{fig:hlod}.
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{figures/lod/hlod_tmp.png}
+    \begin{subfigure}[bt]{0.6\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/hlod.pdf}
     \end{subfigure}
-    \caption{HLOD using a quadtree.}
+    \caption{Bunny model chunked up using HLOD.}
     \label{fig:hlod}
 \end{figure}
 
@@ -635,28 +626,26 @@ Depending on the implementation of the chunked LOD algorithm, these properties c
 \subsubsection{Culling}
 An important thing to consider when dealing with chunks of a virtual globe is the fact that the chunks that are selected for rendering might not actually be visible on the screen. Needless to say, this is a waste of computational power and by eliminating these unnecessary draw calls, the performance of the globe renderer can be increased.
 
-\paragraph{Camera frustum culling} This is done by testing a bounding box of the chunk for intersection with the camera frustum. If the chunk is completely outside the frustum, the chunk can safely be culled as it will not be visible in the rendered image. See Figure \ref{fig:frustumculling}.
+\paragraph{Camera frustum culling} This is done by testing a bounding box of the chunk for intersection with the camera frustum. If the chunk is completely outside the frustum, the chunk can safely be culled as it will not be visible in the rendered image. See Figure \ref{fig:culling1}.
+
+\paragraph{Horizon culling} Even after camera frustum culling there are chunks that still do not contribute to the rendered image. Figure \ref{fig:culling2} illustrates that most of a globe is actually invisible to any observer. This can be used as a basis for culling some of the remaining chunks. 
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{figures/chunkedlod/frustumculling.pdf}
+    \begin{subfigure}[bt]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/culling_frustum.png}
+        \caption{Frustum culling.}
+        \label{fig:culling1}
     \end{subfigure}
-    \caption{Frustum culling}
-    \label{fig:frustumculling}
-\end{figure}
-
-\paragraph{Horizon culling} Even after camera frustum culling there are chunks that still do not contribute to the rendered image. Figure \ref{fig:horizonculling} illustrates that most of a globe is actually invisible to any observer. This can be used as a basis for culling some of the remaining chunks. 
-
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[bt]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{figures/chunkedlod/horizonculling.png}
+    \quad \quad \quad
+    \begin{subfigure}[bt]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/culling_horizon.png}
+        \caption{Horizon culling.}
+        \label{fig:culling2}
     \end{subfigure}
-    \caption{Horizon culling}
-    \label{fig:horizonculling}
+    \caption{Culling for chunked LOD.}
+    \label{fig:cullingchunkedlod}
 \end{figure}
-
 
 \subsubsection{Switching}
 Even when chunks can be selected in a way that guarantees a maximum pixel error per vertex, the fact that full areas of multiple triangles are replaced all at once causes a drastic change in the rendered view. Even when the updates are small per vertex, the update of whole chunk areas may be easily noticed. This is what is referred to as popping.
