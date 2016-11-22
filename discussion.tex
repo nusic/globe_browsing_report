@@ -1,1 +1,28 @@
 \chapter{Discussion}
+In this section, the resulted implementation and design decisions made through out the research phase and development phase will be discussed. 
+
+\section{Ellipsoids vs Spheres}
+Representing globes as ellipsoids and not as spheres was a decision settled early in the development process. 
+The accuracy that the ellipsoidal model gives is important to be able to show near Earth orbits and rocket launches where the space crafts need to be positioned accurately relative to the WGS84 reference frame which is used in the SPICE library. 
+Other globes such as the planet Saturn has a clearly visible ellipsoidal shape due to its angular momentum. This can now be shown in OpenSpace by configuring the planet to have the correct radii.
+
+\section{Tesselation and projection}
+The choice of using geographic tessellation for the ellipsoid was a direct result of using equirectangular geodetic map projections. 
+The equirectangular geodetic map projection is very common for many public map datasets. 
+The drawbacks with oversampling at the poles giving undesired visual artifacts was considered, but in end prioritized down due to time restrictions. 
+
+\section{Chunked LOD vs Ellipsoidal Clopmaps}
+Both Ellipsoidal clipmaps and chunked LOD were thoroghly considered as the overall LOD algorithm to used. 
+In fact, the first eight weeks of the project was spent implementing an Ellipsoidal Clipmap approach in parallel to the Chunked LOD approach. 
+The Clipmap implementation was aborted as the Chunked LOD was significantly more straight forward to implement and early on started yielding visible results. 
+Moreover, having decided on using a equirectangular map tiling scheme client side, the Ellipsoidal Clipmap approach would completely depend on an working implementation of polar caps, which would have extended the implementation time even further.
+
+Even though geometry clipmaps would pose some very different rendering challenges than Chunked LOD, many components developed for the Chunked LOD approach would be shared between the two approached. 
+The commonly used components would include the entire texture data pipeline and layer structure along with all the geometric related calculations, the interaction mode and various helper classes.
+
+\section{Mip level blending}
+All the chunk tiles represent the same geodetic area at different mip level. 
+The texture data within a single datasets does not have to be strictly downsampled versions from the original size. 
+The dataset may be combined from multiple different data sources such as satellite imagery and aerial photographys. 
+Thus, two adjacent mip levels within a map dataset may look completely different from one another. 
+One such example is the ESRI World 2D true color map over Naturpark Karwendel near Innsbruck, Austria; the dataset has a drastic transition between two mip levels where the mountains has been photographed both with and without snow.
