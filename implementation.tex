@@ -926,7 +926,7 @@ The interpolation parameter $t$ is calculated using the distance to the camera $
 t = l-log_2(\frac{s}{d})
 \end{equation}
 
-where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough with two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor s is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{fig:blending} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
+where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough with two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor $s$ is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{fig:blending} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
 
 \begin{figure}[htbp]
     \centering
