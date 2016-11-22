@@ -34,6 +34,7 @@ As opposed to the definition of chunks in the background section \ref{section:ch
 The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. 
 
 \subsection{Chunk Selection}
+\label{section:chunkselection}
 The chunk tree is automatically reshaped depending on the virtual camera. A chunk node splits, merges or remain the same depending on the chunk's error metric for the current LOD. Three different approaches for calculating the error metric were implemented. By letting the user dynamically adjust a LOD scale factor, performance can be weighted against detail level.
 
 \subsubsection{By Distance}
@@ -328,13 +329,12 @@ Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario
     \label{fig:cachingtileprovider_tilerequest}
 \end{figure}
 
-The caching policy implemented and used is LRU - ``Least Recently Used''. This means that tiles that have not been accessed for a while are thrown out only when the cache limit is exceeded. For implementation details about LRU caching, see \todo{real ref Theoretical Background : Caching}. 
+The caching policy implemented and used is LRU - ``Least Recently Used''. This means that tiles that have not been accessed for a while are thrown out only when the cache limit is exceeded, see section \ref{section:lrucaching} for details.
 
 \subsection{Temporal Tile Provider}
-In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented. The \class{Temporal Tile Provider} is instantiated with a template URI containing a time placeholder. Information about the supported time range, time resolution and expected timestamp format to be used in the template URI is also passed during instantiation. 
+In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented. The \class{Temporal Tile Provider} is instantiated with a template URI containing a time placeholder. Information about the supported time range, time resolution and expected timestamp format to be used in the template URI is also passed during instantiation. In Listing \ref{lst:temporal}, all tags starting with \texttt{OpenSpace} are used to configure information used to instantiate the temporal dataset. The tag \texttt{GDAL\_WMS} contains a functional GDAL WMS dataset specification. When requesting the URLs for the dataset, \texttt{\$\{OpenSpaceTimeId\}} will be replaced with the date and time in the specified format.
 
-\todo[inline]{Make this understandable. Use lslisting? Describe that all openspace tags are our own and that GDAL\_WMS specifies the gdal part.}
-\begin{verbatim}
+\begin{lstlisting}[language=XML,caption={Temporal WMS dataset specification.} \label{lst:temporal}]
 <OpenSpaceTemporalGDALDataset>
     <OpenSpaceTimeStart>2015-11-24</OpenSpaceTimeStart>
     <OpenSpaceTimeEnd></OpenSpaceTimeEnd>
@@ -349,9 +349,9 @@ In order to incorporate time-resolved map datasets into the rendering scheme, a 
         ...
     </GDAL_WMS>
 </OpenSpaceTemporalGDALDataset>
-\end{verbatim}
+\end{lstlisting}
 
-At runtime, the \class{Temporal Tile Provider} checks the global simulation time, quantizes that time with respect to the provided time resolution and lazily instantiates new \class{Caching Tile Providers} per timeframe within the temporal dataset. 
+At runtime, the \class{Temporal Tile Provider} checks the global simulation time, quantizes that time with respect to the provided time resolution and lazily instantiates new \class{Caching Tile Provider}s per timeframe within the temporal dataset. 
 
 A schematic illustration of the implementation of the \class{Temporal Tile Provider} is illustrated in Figure \ref{fig:temporaltileprovider_gettile}.
 
@@ -366,7 +366,7 @@ A schematic illustration of the implementation of the \class{Temporal Tile Provi
 
 
 \subsection{Single Image Tile Provider}
-This is a very simple implementation of the tile provider interface which only serves the same tile for every tile index. This tile provider was used for testing and debugging alignment and padding between tiles, see image \ref{fig:singleimagetileprovider_gettile}.
+This is a very simple implementation of the tile provider interface which only serves the same tile for every tile index. This tile provider was used for testing and debugging alignment and padding between tiles, see Figure \ref{fig:singleimagetileprovider_gettile}.
 
 \begin{figure}[htbp]
     \centering
@@ -606,18 +606,16 @@ Assuming that the texture data is available in local memory, invoking the getChu
 As chunk tiles are guaranteed to be good for rendering on the GPU (since their tiles are guaranteed to have the status ``OK''), all \class{Chunk Tile Pile}s are guaranteed to be good for rendering as well. 
 
 \section{Managing Multiple Data Sources}
-The \class{Layer Manager} maintains and organizes different types of texture data sources into groups. This is required as different types of texture datasets are used for different purposes and thus rendered in different ways. The \class{Layer Manager} owns seven \class{Layer Groups}. These are are listed below with their respective purpose:
-
-\todo[inline]{Do not describe these here.}
+The \class{Layer Manager} maintains and organizes different types of texture data sources into groups. This is required as different types of texture datasets are used for different purposes and thus rendered in different ways. The \class{Layer Manager} owns seven \class{Layer Groups}; these are:
 
 \begin{enumerate}
-\item \textbf{Heightmaps} - Displacing vertices along ellipsoidal geodetic normal and calculate bounding boxes for chunks. Also used for terrain following for camera interaction.
-\item \textbf{ColorLayers} - Setting fragment RGB from texture RGB
-\item \textbf{ColorOverlays} - Setting fragment RGB from texture RGBA using alpha blending
-\item \textbf{GrayScaleLayers} - Setting fragment RGB from texture R
-\item \textbf{GrayScaleOverlays} - Setting fragment V in HSV color space from texture R using alpha blending from texture G
-\item \textbf{NightLayers} - Setting fragment RGB from texture RGB in shaded regions of the globe
-\item \textbf{WaterMasks} - Adding fragment specularity from texture A
+\item Heightmaps
+\item ColorLayers
+\item ColorOverlays
+\item GrayScaleLayers
+\item GrayScaleOverlays
+\item NightLayers
+\item WaterMasks
 \end{enumerate}
 
 \subsection{Layers}
@@ -672,7 +670,7 @@ With this 1:1 data mapping between the CPU and GPU, all the GPU-prefixed classes
 \item Set its uniform values within a provided shader program. That is, a \class{GPU Chunk Tile} should be able to set its uniform values from a regular \class{ChunkTile}.
 \end{enumerate}
 
-The leaf classes automatically takes care of both binding its uniform location to specific GLSL variables and  setting their uniform values. The compound GPU-prefixed classes (non leaf classes) more or less simply propagates the method calls to all its dependents. When binding an object to a variable name, the GLSL variable identifiers are built up successively during the propagation down to the leaf classes. \class{GPU Layer} is used as an example:\\
+The leaf classes automatically takes care of both binding its uniform location to specific GLSL variables and  setting their uniform values. The compound GPU-prefixed classes (non leaf classes) more or less simply propagates the method calls to all its dependents. When binding an object to a variable name, the GLSL variable identifiers are built up successively during the propagation down to the leaf classes. \class{GPU Layer} is used as an example in Listing \ref{lst:bindgpulayer}.
 
 \begin{lstlisting}[
   caption={Bind a GPU Layer to a Layer on the CPU} 
@@ -684,13 +682,13 @@ void GPULayer::bind(ProgramObject* p, std::string nameBase, int pileSize){
 }
 \end{lstlisting}
 
-In Listing \ref{lst:bindgpulayer}, it can be concluded that each layer in the GLSL code must be a struct with a member called ``pile'' and a member called ``settings''. An example of a fully resolved identifier is: \\
+In Listing \ref{lst:bindgpulayer}, it can be concluded that each layer in the GLSL code must be a struct with a member called ``pile'' and a member called ``settings''. An example of a fully resolved identifier is: 
 
 \begin{lstlisting}[]
 "ColorLayers[0].pile.chunkTile0.tileUvTransform.scaling"
 \end{lstlisting}
 
-When setting the values, the GPU representation of the data is updated based on the currently available \class{Layer} data, and the update is propagated down to all the leaf classes. This is exemplified using code from the \class{GPULayer} class defined in Listing \ref{lst:gpulayersetvalue}:\\
+When setting the values, the GPU representation of the data is updated based on the currently available \class{Layer} data, and the update is propagated down to all the leaf classes. This is exemplified using code from the \class{GPULayer} class defined in Listing \ref{lst:gpulayersetvalue}.
 
 \begin{lstlisting}[
   caption={Set all GPU Layer variables from a CPU Layer} 
@@ -779,7 +777,7 @@ Non Uniform Rational B-Splines (NURBS) can represent all conic sections exactly 
 The positive aspect about rendering geodetic chunks as NURBS surfaces is that it is a unified way of rendering chunks and that the precision works for all scales. Chunks will always be mapped exactly on the ellipsoid and the precision will increase when the camera gets closer. However, the negative aspect that makes NURBS insufficient for texture mapped globes is the fact that the texture coordinates of the vertices do not linearly map to the geodetic coordinates of the chunk. In other words, vertices are not evenly distributed along the surface of the chunk which leads to distorted textures. The reason for this is the fact that NURBS are rational parametric functions. For example, a circle segment can be represented exactly but a given parameter value will not yield the same position along a circle segment as a circle segment parameterized as $(x(t),y(t)) = (cos(t), sin(t))$. The $cos$ and $sin$ functions are irrational and can therefore not be represented with NURBS segments which by definition are rational.
 
 \paragraph{Chunks as Bilinear Surfaces}
-To avoid both the texture distortion of NURBS and the precision issues of model space rendering, we use a different method for rendering chunks that are closer to the camera and hence require higher precision. When the camera gets closer to the surface of the ellipsoid, the chunks will split and get smaller according to the chunk selection under section \todo{(ref section)}. Smaller patches will automatically be better approximated as flat surfaces so that at a certain level, before the precision errors of the global patches become predominant, the rendering of patches can be switched to the a camera space rendering method which uses bilinear interpolation of vertex positions.
+To avoid both the texture distortion of NURBS and the precision issues of model space rendering, we use a different method for rendering chunks that are closer to the camera and hence require higher precision. When the camera gets closer to the surface of the ellipsoid, the chunks will split and get smaller according to the chunk selection under Section \ref{section:chunkselection}. Smaller patches will automatically be better approximated as flat surfaces so that at a certain level, before the precision errors of the global patches become predominant, the rendering of patches can be switched to the a camera space rendering method which uses bilinear interpolation of vertex positions.
 
 This method is performed by, just as in the case of NURBS surfaces, transforming control points from cartesian model space to camera space where they can be cast to single precision representations. Instead of NURBS interpolation, a simple bilinear interpolation is used to place all the vertices on the surface defined by the four corner points of the patch that covers the chunk.
 
@@ -902,7 +900,7 @@ To decide whether or not a layer shader program needs to be preprocessed and re-
 \end{tabular}
 \end{table}
 
-\subsection{Lod Switching}
+\subsection{LOD Switching}
 \label{section:lodswitching}
 Instead of the time based switching routine proposed by Cozzi and Ring \cite{cozzi11}, we perform a distance based switching which works on a per fragment basis for textures and on a per vertex basis for height maps. The method is implemented in the vertex and fragment shaders and uses linear interpolation between levels. The blending technique introduces the concept of Chunk Tile Piles as seen in section \ref{section:chunktilepile}. A Chunk Tile Pile contains three chunk tiles of different level to achieve level blending which is used to avoid popping artefacts. 
 
@@ -928,7 +926,7 @@ The interpolation parameter $t$ is calculated using the distance to the camera $
 t = l-log_2(\frac{s}{d})
 \end{equation}
 
-where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough with two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor s is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
+where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough with two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor s is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{fig:blending} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
 
 \begin{figure}[htbp]
     \centering

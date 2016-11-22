@@ -876,7 +876,7 @@ There are multiple different cache replacement policies, each used for different
 When it comes to caching of texture tiles used for globe rendering, the most reasonable policy gets rid of the tiles that have not been used after a significant amount of requests in favor of more recently used ones. Therefore the Least-Recently-Used (LRU) cache replacement policy is used.
 
 \subsubsection{LRU Caching}
-
+\label{section:lrucaching}
 The LRU cache is filled up as new entries are requested. When the cache is full, the least recently used entry will be thrown away when a new entry is to be added. This is implemented with a hash map and a doubly linked list. The hash map maps a unique resource identifier for an entry to a node in the list, which in turn stores the entry. Every time an entry is accessed from the cache, the list storing that entry is placed first in the list. This scheme ensures the least recently used entry will always be located in the back of the list so that it can be thrown out when the cache is full, see Figure asd.
 
 
