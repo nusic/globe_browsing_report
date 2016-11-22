@@ -591,12 +591,12 @@ Using a geographic grid tesselation, the chunks are in geographic space using la
         \includegraphics[width=\textwidth]{figures/chunkedlod/chunkedlodtree.pdf}
         \caption{Chunk tree.}
     \end{subfigure}
-    ~
+    \quad
     \begin{subfigure}[b]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/tiled.png}
         \caption{Geodetic chunks.}
     \end{subfigure}
-    ~
+    \quad
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/tiled_globe.png}
         \caption{Globe.}
@@ -665,10 +665,21 @@ Minimizing popping artefacts are typically done by smoothly transitioning betwee
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.7\textwidth}
-        \includegraphics[width=\textwidth]{figures/chunkedlod/switching.png}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/switching1.pdf}
+        \caption{An edge at chunk level i-1.}
     \end{subfigure}
-    \caption{a) An edge at chunk level i-1. b) The same edge after level i has been selected. c) The new vertex is interpolated into its true place.}
+    \quad
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/switching2.pdf}
+        \caption{The same edge after level i has been selected.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/switching3.pdf}
+        \caption{The new vertex is interpolated into its true place.}
+    \end{subfigure}
+    \caption{Vertex positions when switching between levels.}
     \label{fig:lodswitch}
 \end{figure}
 
