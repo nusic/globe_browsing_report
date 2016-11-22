@@ -506,7 +506,7 @@ In the Discrete Level Of Detail (DLOD) approach, multiple different representati
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/lod/decimation1.png}
     \end{subfigure}
-    \caption{A range of predefined meshes with increasing resolution}
+    \caption{A range of predefined meshes with increasing resolution.}
     \label{fig:dlod}
 \end{figure}
 
@@ -518,15 +518,18 @@ The continuous LOD (CLOD) approach represents a model in a way that allows the r
 
 \begin{figure}
     \centering
-    \begin{subfigure}[b]{0.2\textwidth}
+    \begin{subfigure}[tb]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/lod/vertex_split1.png}
     \end{subfigure}
-    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
-      %(or a blank line to force the subfigure onto a new line)
-    \begin{subfigure}[b]{0.2\textwidth}
+    \begin{subfigure}[tb]{0.3\textwidth}
+    \begin{picture}(35,40)
+        \put(7,20){$\begin{matrix}  Vertex~ Split \longrightarrow \\ \longleftarrow  Edge~ Collapse \end{matrix}$}    
+    \end{picture}
+    \end{subfigure}
+    \begin{subfigure}[tb]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/lod/vertex_split2.png}
     \end{subfigure}
-    \caption{Edge collapse in continous LOD}
+    \caption{Mesh operations in continous LOD.}
     \label{fig:clod}
 \end{figure}
 

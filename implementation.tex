@@ -803,7 +803,7 @@ The purpose of layered texture rendering is to provide the user an ability to to
 \item \textbf{For all ColorLayers}: Sample RGB, apply layer settings and update fragment RGBA using alpha blending.
 \item \textbf{For all GrayscaleLayers}: Sample the grayscale value R, apply layer settings and update fragment V in color space HSV using alpha blending.
 \item \textbf{For all GrayscaleOverlays}: Sample grayscale value R and A, apply layer settings and update fragment RGBA using alpha blending.
-\item \textbf{For all WaterMasks}: Sample R and A, apply layer settings and add R*A to specularity component of fragment.
+\item \textbf{For all WaterMasks}: Sample A, apply layer settings and add A as a specularity component for the fragment.
 \item \textbf{For all NightTextures}: Sample RGB, apply layer settings and update fragment RGBA using alpha blending in shaded regions of the globe.
 \item Perform shading by darkening shaded regions.
 \item Add simple atmosphere color to RGB.
@@ -811,7 +811,7 @@ The purpose of layered texture rendering is to provide the user an ability to to
 
 \end{enumerate}
 
-All of these steps are optional and can be toggled by activating or deactivating layers or specifying whether or not to perform shading or use atmosphere for rendering. Sampling the color from a layer group is done by looping through all layers in that group, see Listing \ref{lst:loopthroughlayers}. Listing \ref{lst:gettexval1} and \ref{lst:gettexval2} shows how layer weights and texture transforms for chunk tile piles are used for sampling of the tile textures. Layer settings is performed for all raster bands within all layers. The application of layer settings is shown in listing \ref{lst:performsettings}.
+All of these steps are optional and can be toggled by activating or deactivating layers or specifying whether or not to perform shading or use atmosphere for rendering. Sampling the color from a layer group is done by looping through all layers in that group, see Listing \ref{lst:loopthroughlayers}. Listing \ref{lst:gettexval1} and \ref{lst:gettexval2} shows how layer weights and texture transforms for chunk tile piles are used for sampling of the tile textures. Layer settings is performed for all raster bands within all layers. The application of layer settings is shown in Listing \ref{lst:performsettings}.
 
 \begin{lstlisting}[
   caption={Setting color for a given layer group. Example using ColorLayers.} 
@@ -822,7 +822,7 @@ All of these steps are optional and can be toggled by activating or deactivating
 			levelWeights, uv);
 		colorSample = performLayerSettings(colorSample,
 			ColorLayers[#{i}].settings);
-		color = blendOver(color, colorSample);
+		color = blendOver(color, colorSample); // Alpha blending
 	}
 #endfor
 \end{lstlisting}
@@ -831,7 +831,7 @@ All of these steps are optional and can be toggled by activating or deactivating
   caption={Getting texture value by blending a chunk tile pile.} 
   \label{lst:gettexval1}
 ]
-vec4 getTexVal(const ChunkTilePile chunkTilePile, const LevelWeights w, const vec2 uv){
+vec4 getTexVal(ChunkTilePile chunkTilePile, LevelWeights w, vec2 uv){
 	return w.w1 * getTexVal(chunkTilePile.chunkTile0, uv) + 
 		w.w2 * getTexVal(chunkTilePile.chunkTile1, uv) + 
 		w.w3 * getTexVal(chunkTilePile.chunkTile2, uv);
@@ -842,7 +842,7 @@ vec4 getTexVal(const ChunkTilePile chunkTilePile, const LevelWeights w, const ve
   caption={Using texture transform and sampling a texture.} 
   \label{lst:gettexval2}
 ]
-vec4 getTexVal(const ChunkTile chunkTile, vec2 tileUV){
+vec4 getTexVal(ChunkTile chunkTile, vec2 tileUV){
 	vec2 samplePosition = TileUVToTextureSamplePosition(chunkTile, tileUV);
 	vec4 texVal = texture(chunkTile.textureSampler, samplePosition);
 	return texVal;
@@ -869,7 +869,7 @@ The ability to dynamically toggle layers with dynamic blending requires multiple
 
 We define a layer shader program to be a GLSL program object using vertex and fragment shading. Moreover, it fits the pipeline of rendering a chunk with a specific number of layer groups and a varying number of layers for each group.
 
-To decide whether or not a layer shader program needs to be preprocessed and re-compiled, the relevant Layer Shader Preprocessing Data is saved for the layer shader program and compared to the updated preprocessing data if it has been changed by the user. Table \ref{table:layergrouppreprocessingdata} shows what data is needed to preprocess layer shader programs. Key-value pairs can be used to set properties that are used on a per-globe basis. Examples are \textbf{performShading} : \emph{true} or \emph{false}, \textbf{useAtmosphere} : \emph{true} or \emph{false}. Letting the preprocessor handle these properties avoids the need of uniform variable uploading and GLSL if-statements. The preprocessor also handles unrolling of for-loops which go through all layers in a group.
+To decide whether or not a layer shader program needs to be preprocessed and re-compiled, the relevant Layer Shader Preprocessing Data is saved for the layer shader program and compared to the updated preprocessing data if it has been changed by the user. Table \ref{table:layergrouppreprocessingdata} shows what data is needed to preprocess layer shader programs. Key-value pairs can be used to set properties that are used on a per-globe basis. Examples are \textbf{performShading} : \emph{true} or \emph{false}, \textbf{useAtmosphere} : \emph{true} or \emph{false}. Letting the preprocessor handle these properties avoids the need of uniform variable uploading and GLSL if-statements. The preprocessor also handles unrolling of for-loops which go through all layers in a group, see Listing \ref{lst:loopthroughlayers}.
 
 
 \begin{table}
@@ -881,7 +881,7 @@ To decide whether or not a layer shader program needs to be preprocessed and re-
         \textbf{Layer Group Preprocessing Data} \\ 
     	\hline
 	Number of layers: integer \\
-    	Blending enabled: Boolean \\
+    	Blending enabled: boolean \\
 	\hline
 \end{tabular}
 \end{table}
@@ -915,7 +915,7 @@ When rendering a specific fragment of a chunk, blending between up to three chun
 LevelWeights getLevelWeights(float t){ // level interpolation parameter
 	LevelWeights levelWeights;
 	levelWeights.w1 = clamp(1 - t, 0 , 1);
-	levelWeights.w2 = (clamp(t, 0 , 1) - clamp(t - 1, 0 , 1));
+	levelWeights.w2 = clamp(t, 0 , 1) - clamp(t - 1, 0 , 1);
 	levelWeights.w3 = clamp(t - 1, 0 , 1);
 	return levelWeights;
 }
