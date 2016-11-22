@@ -175,7 +175,7 @@ With the given input parameters shown in Figure \ref{fig:gdalio}, the resulting 
     \label{fig:gdalioresult}
 \end{figure}
 
-Using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \todo{\textbf{add appendix}} goes through a detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches of high resolution.
+Using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \ref{appendix:localpatches} goes through a detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches of high resolution.
 
 GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates. The geo-transform can be inverted to define a region within raster space based on a georeferenced region.
 
