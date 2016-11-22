@@ -852,3 +852,37 @@ The problem is already handled in OpenSpace with the use of a linear depth buffe
 A negative aspect about setting the value of \texttt{gl\_FragDepth} explicitly is that early depth testing is not possible. This is OpenGL's method of discarding fragments before the fragment shader has been invoked. Not performing early depth testing leads to lower frame rates if the fragment shader is heavy. Kemen discussed the implications of setting \texttt{gl\_FragDepth} explicitly and concluded that for regular fragment processing, the change in frame rate was not significant for the Outerra software \cite{kemen12}.
 
 Other previously proposed methods for handling depth buffer issues include logarithmic depth buffer and multiple view frustums and complementary depth buffering \cite{cozzi11}.
+
+\section{Caching}
+
+Efficient caching of data is crucial in out-of-core, real time data visualization applications. Since the data sets dealt with often can be measured in terabytes or petabytes, caching is most efficient if done in multiple stages.
+
+\subsection{Multi Stage Texture Caching}
+There are six levels of caching important to take into consideration for globe rendering softwares. These are:
+
+\begin{enumerate}
+\item Local GPU texture memory
+\item Local RAM
+\item Local drive memory
+\item Local server
+\item Remote server
+\end{enumerate}
+
+Caching for the purpose of an implementation of the client side rendering relies on stage 1-3 where local RAM memory caching is the most important one.
+
+\subsection{Cache Replacement Policies}
+There are multiple different cache replacement policies, each used for different purposes. Some common policies are: First-In-First-Out, Last-In-First-Out, Least-Recently-Used, Most-Recently-Used, Least-Frequently-Used, Most-Frequently-Used.
+
+When it comes to caching of texture tiles used for globe rendering, the most reasonable policy gets rid of the tiles that have not been used after a significant amount of requests in favor of more recently used ones. Therefore the Least-Recently-Used (LRU) cache replacement policy is used.
+
+\subsubsection{LRU Caching}
+
+The LRU cache is filled up as new entries are requested. When the cache is full, the least recently used entry will be thrown away when a new entry is to be added. This is implemented with a hash map and a doubly linked list. The hash map maps a unique resource identifier for an entry to a node in the list, which in turn stores the entry. Every time an entry is accessed from the cache, the list storing that entry is placed first in the list. This scheme ensures the least recently used entry will always be located in the back of the list so that it can be thrown out when the cache is full, see Figure asd.
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/lru_cache.pdf}
+    \caption{Inserting an entry in a LRU cache.}
+    \label{fig:jittering}
+\end{figure}
