@@ -158,7 +158,7 @@ Geospatial Data Abstraction Library (GDAL) is an open source library providing a
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{1.0\textwidth}
-        \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalio.png}
+        \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalio.pdf}
     \end{subfigure}
     \caption{The required GDAL raster IO parameters.}
     \label{fig:gdalio}
@@ -863,7 +863,7 @@ float performLayerSettings(float currentValue, const LayerSettings settings) {
 
 \subsection{Dynamic Shader Programs}
 
-The ability to dynamically toggle layers with dynamic blending requires multiple sampling of textures in the fragment shaders. To avoid unnecessary processing when not all layers are in use there is a need to dynamically recompile the shader programs as layers are toggled. We use the GLSL preprocessor in the General Helpful Open Utility Library (GHOUL) \todo{ref} to preprocess all shader programs when the number of layers in use change.
+The ability to dynamically toggle layers with dynamic blending requires multiple sampling of textures in the fragment shaders. To avoid unnecessary processing when not all layers are in use there is a need to dynamically recompile the shader programs as layers are toggled. We use the GLSL preprocessor in the General Helpful Open Utility Library (GHOUL) \cite{ghoul} to preprocess all shader programs when the number of layers in use change.
 
 We define a layer shader program to be a GLSL program object using vertex and fragment shading. Moreover, it fits the pipeline of rendering a chunk with a specific number of layer groups and a varying number of layers for each group.
 
@@ -942,7 +942,14 @@ where $s$ is a scale factor determining how much of the higher level tile to use
     \label{fig:blending}
 \end{figure}
 
-\subsection{<Sub-section title>}
+\section{Interaction}
 
-\section{<Section title>}
+An interaction mode specifically for globe browsing had to be implemented to deal with the vast scale differences and limitations of camera movements required for browsing globes. 
 
+Representing the camera state as a three dimensional cartesian vector for the position and a quaternion for the rotation made it possible to achieve interaction solving the proposed objectives. Basic linear algebra was used on vectors such as the geodetic normal of the globe in the camera position geodetically projected on the surface, camera position and direction as well as the height offset of the terrain.
+
+The horizontal movement interaction speed was set to be proportional to the distance from the camera to the terrain surface. That way the user can come in close and slowly hover across the detailed terrains as well as quickly moving from one continent to the other by increasing the height to the surface.
+
+The camera rotation quaternion can be decomposed in to two rotations; one directing the camera in the direction of the geodetic normal, and one directing it in the remaining view direction with a given roll. This way it is possible to both travel across the surface and keeping the horizon angle as well as looking around at the spot.
+
+The camera is always pushed up above the surface of the terrain to avoid penetrating it. The minimum height given in meters can be set together with other parameters such as sensitivity and friction.

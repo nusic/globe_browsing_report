@@ -1,8 +1,6 @@
 \chapter{Theoretical Background}
 
-A sophisticated globe rendering system needs to rely on some mathematical foundations. These foundations together with different theories and algorithms developed for globe rendering works as a base for the research of this thesis.
-
-
+A sophisticated globe rendering system needs to rely on some theoretical foundations and algorithms developed for globe rendering. These foundations work as a base for the research performed for the thesis and the implementation. The research is based on the proposed challenges.
 
 \section{Large Scale Map Datasets}
 
@@ -29,17 +27,17 @@ Global maps with high level of detail can easily become too large to be stored a
     \label{fig:overview}
 \end{figure}
 
-The physical disk space of large global map datasets is often measured in terabytes or even petabytes. In order to deal with such large datasets, web based services allow users to specify only parts of the map to download at a time. This is an important aspect in the out of core rendering required for globe visualization.
+The physical disk space of large global map datasets is often measured in terabytes or even petabytes. In order to deal with such large datasets, web based services allow clients to specify parts of the map to download at a time. This is an important aspect in the out of core rendering required for globe visualization.
 
 \subsection{Web Map Services}
 
-To standardize web requests for map data, the Open GIS Consortium (OGS) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some more specific examples of WMS-like services are WorldWind, VirtualEarth and AGS. The last three are not covered in this thesis.
+To standardize web requests for map data, the Open GIS Consortium (OGC) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some more specific examples of WMS-like services are WorldWind, VirtualEarth and AGS. The last three are not covered in this thesis.
 
 \subsubsection{WMS}
 
-The WMS interface produces maps as image files with well defined geographic and dimensional parameters. The image files can have different format and compression depending on the provider. A WMS server has the ability to dynamically produce map patches of arbitrary size which puts some load on the server side \cite{wms06}. The basic elements supported by all WMS providers are the \emph{GetCapabilities} and the \emph{GetMap} operations. \emph{GetCapabilities} gives information about the available maps on the server and their corresponding geo referenced metadata. The \emph{GetMap} operation returns the map or a part of the map as an image file.
+The WMS interface instructs the map server to produce maps as image files with well defined geographic and dimensional parameters. The image files can have different format and compression depending on the provider. A WMS server has the ability to dynamically produce map patches of arbitrary size which puts some load on the server side \cite{wms06}. The basic elements supported by all WMS providers are the \emph{GetCapabilities} and the \emph{GetMap} operations. \emph{GetCapabilities} gives information about the available maps on the server and their corresponding georeferenced metadata. The \emph{GetMap} operation returns the map or a part of the map as an image file.
 
-WMS requests are done using HTTP GET where the standardized request parameters are provided as query parameters in the URL\cite{wms06}. For example, setting the query parameter \texttt{BBOX=-180,-90,180,90} specifies the size of the map in geo referenced coordinates while the parameters \texttt{WIDTH} and \texttt{HEIGHT} specifies the requested image in raster coordinates. All name and value pairs for the \emph{GetMap} request are defined under the reference \cite{wms06}.
+WMS requests are done using HTTP GET where the standardized request parameters are provided as query parameters in the URL \cite{wms06}. For example, setting the query parameter \texttt{BBOX=-180,-90,180,90} specifies the size of the map in georeferenced coordinates while the parameters \texttt{WIDTH} and \texttt{HEIGHT} specify the size of the requested image in raster coordinates. All name and value pairs for the \emph{GetMap} request are defined under the reference \cite{wms06}.
 
 \subsubsection{TMS}
 
@@ -75,7 +73,7 @@ y_{child_n} = 2 y + ( \left\lfloor n / 2 \right\rfloor ~ mod ~ 2 ) \\
 
 \subsubsection{WMTS}
 
-Web Map Tile Service is another standard by OGS that requires tiled requests. It supports many of the features of WMS but, similar to TMS, removes the load of image processing from the server side and instead forces the client to handle combination and cutouts of patches if required. The standard specifies the \emph{GetCapabilities}, \emph{GetTile} and \emph{GetFeatureInfo} operations. These operations can be requested with different message encodings such as Key-Value Pairs, XML messages or XML messages embedded in SOAP envelopes \cite{wmts10}.
+Web Map Tile Service is another standard by OGC that requires tiled requests. It supports many of the features of WMS but, similar to TMS, removes the load of image processing from the server side and instead forces the client to handle combination and cutouts of patches if required. The standard specifies the \emph{GetCapabilities}, \emph{GetTile} and \emph{GetFeatureInfo} operations. These operations can be requested with different message encodings such as Key-Value Pairs, XML messages or XML messages embedded in SOAP envelopes \cite{wmts10}.
 
 \subsubsection{Tiled WMS}
 
@@ -83,13 +81,13 @@ Before the WMTS standard was developed, some servers had already embarked on the
 
 \subsection{Georeferenced Image Formats}
 
-There are several different standards for handling image data used in GIS softwares. Some common file formats with image data and/or geo referenced information that are used in the below mentioned imagery products are:
+There are several different standards for handling image data used in GIS softwares. Some common file formats with image data and/or georeferenced information that are used in the below mentioned imagery products are:
 
 \begin{itemize}  
-\item \emph{GeoTIFF}, TIFF image with the extension of containing geo referenced metadata. 
-\item \emph{IMG}, Image file format with geo referenced metadata. 
-\item \emph{JPEG2000}, Geo referenced image format with lossy or lossless compression.
-\item \emph{CUB}, Geo referenced image file standard created by ISIS (Integrated Software for Imagers and Spectrometers)
+\item \textbf{GeoTIFF} - TIFF image with the inclusion of georeferenced metadata. 
+\item \textbf{IMG} - Image file format with georeferenced metadata. 
+\item \textbf{JPEG2000} - Georeferenced image format with lossy or lossless compression.
+\item \textbf{CUB} - Georeferenced image file standard created by ISIS (Integrated Software for Imagers and Spectrometers)
 \end{itemize}
 
 \subsection{Available Imagery Products}
@@ -108,9 +106,9 @@ Open Street Map is a free global map of streets and roads created and editable b
 
 \subsubsection{Mars}
 
-The first global color images taken of Mars were by the two orbiters of the Viking missions that launched in late 1975. NASA Ames worked on creating the Mars Digital Image Models (MDIM) by blending a mosaic of images taken by the orbiters. United States Geological Survey (USGS) provides downloading of image files in CUB or JPEG2000 format. The maps are still the highest resolution global color maps of the planet.
+The first global color images taken of Mars were by the two orbiters of the Viking missions that launched in late 1975. NASA Ames worked on creating the Mars Digital Image Models (MDIM) by blending a mosaic of images taken by the orbiters. United States Geological Survey (USGS) provides downloading of image files in CUB or JPEG2000 format. The maps are still the highest resolution global color maps of the planet \cite{viking}.
 
-NASA's Mars Reconnaissance Orbiter (MRO) is a satellite that has been orbiting Mars since 2006, gathering map data by taking pictures of the surface. The satellite has three cameras; the Mars Color Imager (MARCI) for mapping out daily weather forecasts, the Context camera (CTX) for imaging terrain and the High Resolution Imaging Science Experiment (HiRISE) camera for mapping out smaller high resolution patches covering limited surface areas of interest. NASA enables downloading of local patches and digital elevation models (DEMs) and grayscale images taken by the CTX and the HiRISE cameras in IMG and GeoTIFF formats.
+NASA's Mars Reconnaissance Orbiter (MRO) is a satellite that has been orbiting Mars since 2006, gathering map data by taking pictures of the surface. The satellite has three cameras; the Mars Color Imager (MARCI) for mapping out daily weather forecasts, the Context camera (CTX) for imaging terrain and the High Resolution Imaging Science Experiment (HiRISE) camera for mapping out smaller high resolution patches covering limited surface areas of interest. NASA enables downloading of local patches and digital elevation models (DEMs) and grayscale images taken by the CTX \cite{ctx} and the HiRISE \cite{hirise} cameras in IMG and GeoTIFF formats.
 
 \subsubsection{Moon}
 
@@ -118,12 +116,11 @@ The Lunar Mapping Modeling Project (LMMP) is an initiative by NASA to gather and
 
 
 
-
-
-
 \section{Modelling Globes}
 
-We will discuss different proposed methods used for modelling and rendering of globes. The globe can be modelled either as a sphere or an ellipsoid and there are different tessellation schemes for meshing the globe. Different map projections can also be considered and it all ties together with a choice of level of detail algorithm.
+We will discuss different proposed methods used for modelling and rendering of globes. The globe can be modelled either as a sphere or an ellipsoid and there are different tessellation schemes for meshing the globe. Different map projections can also be considered and it all ties together with the use of a level of detail algorithm.
+
+\todo[inline]{Possibly rephrase}
 
 \subsection{Globes as Ellipsoids}
 
@@ -140,7 +137,7 @@ The World Geodetic System 1984 (WGS84) standard defined by National Geospatial-I
 
 \subsection{Tesselating the Ellipsoid}
 
-Triangle models are still the most common way of modeling renderable objects in 3D computer graphics softwares, even though other rendering techniques such as volumetric ray casting also can be considered for terrain rendering \cite{cozzi11}.
+Triangle models are still the most common way of modeling renderable objects in 3D computer graphics softwares, even though other rendering techniques such as volumetric ray casting also can be considered for terrain rendering \cite[p. 149]{cozzi11}.
 
 A triangle mesh, or more generally a polygon mesh, is defined by a limited number of surface elements. This means that ellipsoids need to be approximated by some sort of tessellation or subdivision surface when modeled as a polygon mesh. There are several techniques for tessellating an ellipsoid. Some of them are covered in this section.
 
@@ -229,7 +226,7 @@ The hierarchical triangular mesh (HTM) is a method of modeling the sky dome as a
 
 \subsubsection{Hierarchical Equal Area IsoLatitude Pixelation}
 
-Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is spherical tessellation scheme with corresponding map projection. The base level of the tessellation is built up of twelve quads, similar to a rhombic dodecahedron, which each can be subdivided further. The tessellation in figure \ref{fig:tesselation_healpix} shows how the vertices in the HEALPix tessellation leads to curvilinear quads.
+Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is a spherical tessellation scheme with corresponding map projection. The base level of the tessellation is built up of twelve quads, similar to a rhombic dodecahedron, which each can be subdivided further. The tessellation in figure \ref{fig:tesselation_healpix} shows how the vertices in the HEALPix tessellation leads to curvilinear quads.
 
 \begin{figure}
     \centering
@@ -287,13 +284,13 @@ A map projection $P$ defines a transformation from cartesian model space coordin
 \begin{pmatrix} x \\ y \\ z \end{pmatrix}_{ modelspace }=\vec { P }^{-1} (s ,t ),
 \end{equation}
 
-Where $(x,y,z)^T$ is the cartesian coordinates of a point on the ellipsoid surface. The parameters $s$ and $t$ are georeferenced coordinates defining all positions on the globe. The georeferenced coordinates can have different definition range depending on which projection is used.
+Where $(x,y,z)^T$ is the cartesian coordinates of a point on the ellipsoid surface. The parameters $s$ and $t$ are georeferenced coordinates defining all positions on the globe. The georeferenced coordinates can have different definition range depending on which projection is used. An example can be letting is $s = \phi \in [-90,90]$ and $t = \theta \in [-180,180]$ which are latitude and longitude respectively for geographic projections.
 
-The globally positive gaussian curvature of any ellipsoid makes it impossible to unproject it on a flat 2D surface without any distortions. Different projections are used for different purposes. Equal-area projections preserve the size of a projected area as $\partial s \partial t / \partial s_0 \partial t_0 = 1$, while conformal projections preserve the shape of projected objects as $\partial s / \partial t = 1$; $s_0$ and $t_0$ are coordinates at the center of the projection with no distortion. No global projection can be both area-preserving and conformal \cite{dimi15}.
+The globally positive gaussian curvature of any intrinsic ellipsoid surface makes it impossible to unproject it on a flat 2D surface without any distortions. Since it is embedded in a 3D space, some distortions must be introduced when unprojecting the surface. The distortion can differ depending on the projection used. Equal-area projections preserve the size of a projected area as $\partial s \partial t / \partial s_0 \partial t_0 = 1$, while conformal projections preserve the shape of projected objects as $\partial s / \partial t = 1$; $s_0$ and $t_0$ are coordinates at the center of the projection with no distortion. No global projection can be both area-preserving and conformal \cite{dimi15}.
 
 There are several possibilities for defining a coordinate transform for map projections. A common approach is to project the ellipsoid onto another shape that allows for being flattened out without distortion, such as a cube, a cylinder or a plane. These types of shapes are known as developable shapes and have zero gaussian curvature.
 
-The choice of map projection is tied together with the choice of ellipsoid tessellation. This is because the map often needs to be tiled up when rendering. Each tile has its local texture coordinate system which need to have a simple transform from the georeferenced coordinate system for texture sampling. If the tiles can be affinely transformed to the geo referenced coordinate system, texture sampling can be done on the fly; otherwise the geo referenced coordinates need to be reprojected which may be computationally heavy or impossible for real time applications.
+The choice of map projection is tied together with the choice of ellipsoid tessellation. This is because the map often needs to be tiled up when rendering. Each tile has its local texture coordinate system which need to have a simple transform from the georeferenced coordinate system for texture sampling. If the tiles can be affinely transformed to the georeferenced coordinate system, texture sampling can be done on the fly; otherwise the georeferenced coordinates need to be re-projected which may be computationally heavy or impossible for real time applications.
 
 The European Petroleum Survey Group (EPSG) has defined several standards for map projections of the Earth. Many of these are mentioned when discussing the different projections.
 
@@ -343,7 +340,7 @@ In the case of perfect spheres, geocentric and geodetic projections of any point
 
 Geodetic coordinates are among the most commonly used geo referenced coordinate systems when mapping ellipsoids to two dimensions. Latitudinal distances are preserved after the coordinate transform. This is important for a map projection standard that can be used for both spheres and for ellipsoids to avoid distortions that will appear if the map is defined for a specific ellipsoid and then projected on a slightly different one.
 
-Equirectangular projections does not require specific ellipsoids to avoid distorsions on the mapped globe. The result of the wide usage is that many map providers choose to provide 2D maps defined in this coordinate system.
+Equirectangular projections do not require specific ellipsoids to avoid distorsions on the mapped globe. The result of the wide usage is that many map providers choose to provide 2D maps defined in this coordinate system.
 
 Cozzi and Ring describes the transform from geodetic coordinates in the ellipsoid class \cite[p. 25]{cozzi11}. For the Earth, the most commonly used geodetic coordinate space is defined in the EPSG:4326 standard where the WGS84 ellipsoid is used.
 
@@ -400,13 +397,13 @@ Cube maps lack the polar singularities apparent in geographic parameterizations.
     \label{fig:proj_cube}
 \end{figure}
 
-Due to the traditions of map projections this is not a common format used for map services so reprojection from a more common format is often required.
+Due to the traditions of map projections this is not a common format used for map services so re-projection from a more common format is often required.
 
 There are different cube map projections with different amount of area- and aspect distortions. Dimitrijevi\'{c} and Ran\v{c}i\'{c} mention and compares spherical cube, adjusted spherical cube, Outerra spherical cube and quadrilateralized spherical cube \cite{dimi15}.
 
 \subsubsection{Tessellated Octahedral Adaptive Subdivision Transform}
 
-The Tessellated Octahedral Adaptive Subdivision Transform (TOAST) map format used in the globe browsing of Microsoft's World Wide Telescope works together with the HTM tessellation \cite{toast}. Each triangular segment of the TOAST map maps linearly to a triangle of a sphere that is tessellated as an octahedron and subdivided to form a sphere, see figure \ref{fig:proj_toast}.
+The Tessellated Octahedral Adaptive Subdivision Transform (TOAST) map format used in the globe browsing of Microsoft's World Wide Telescope works together with the HTM tessellation \cite{toast}. Each triangular segment of the TOAST map maps to a triangle of a sphere that is tessellated as an octahedron and subdivided to form a sphere, see figure \ref{fig:proj_toast}.
 
 \begin{figure}[htbp]
     \centering
@@ -425,7 +422,7 @@ The TOAST format is just as the cube maps not a very well supported format for m
 
 \subsubsection{Hierarchical Equal Area IsoLatitude Pixelation}
 
-The map projection that is used for the HEALPix tessellation is equal-area as the name suggests. Figure \ref{fig:proj_healpix} shows how the map wraps onto the sphere. The positive aspect about HEALPix compared to the TOAST format is that the map is tiled into quads and not triangles which means that it is better suitable for the chunked lod \cite{cozzi11} algorithm. The map format is used by the Sloan Digital Sky Survey for mapping the cosmic microwave background radiation but is otherwise an uncommon format when it comes to map services. That means that the maps need to be reprojected from the more common formats for wider support.
+The map projection that is used for the HEALPix tessellation is equal-area as the name suggests. Figure \ref{fig:proj_healpix} shows how the map wraps onto the sphere. The positive aspect about HEALPix compared to the TOAST format is that the map is tiled into quads and not triangles which means that it is better suitable for the chunked lod \cite{cozzi11} algorithm. The map format is used by NASA for mapping the cosmic microwave background radiation for the Microwave Anisotropy Probe (MAP) \cite{healpix}, but is otherwise an uncommon format when it comes to map services. That means that the maps need to be re-projected from the more common formats for wider support.
 
 \begin{figure}[htbp]
     \centering
@@ -446,7 +443,7 @@ For parameterization of limited parts of the globe, such as the isolated poles, 
 
 Stereographic projections are defined when the common intersection point is positioned on the surface of the globe on the opposite side of the pole to project. Polar stereographic projections are used to parameterize the surface of the poles of the Earth. The standards EPSG:3413 and EPSG:3031 define the stereographic projections for the North Pole and the South Pole respectively.
 
-Dimitrijevi\'{c} and Ran\v{c}i\'{c} uses another polar coordinate system to reproject from geodetic coordinates in runtime. The transformation is a rotation of 90 degrees around the global $x-$axis so that the resulting parametric coordinates of the pole are given in their own geographic space with the main meridian as equator. This projection is also known as a Cassini projection and it can be both defined for spheres as well as generalized to ellipsoids. Polar projections are shown in figure \ref{fig:proj_polar}.
+Dimitrijevi\'{c} and Ran\v{c}i\'{c} use another polar coordinate system to re-project from geodetic coordinates in runtime. The transformation is a rotation of 90 degrees around the global $x-$axis so that the resulting parametric coordinates of the pole are given in their own geographic space with the main meridian as equator. This projection is also known as the Cassini projection and it can be both defined for spheres as well as generalized to ellipsoids. Polar projections are shown in figure \ref{fig:proj_polar}.
 
 \begin{figure}[htbp]
     \centering
@@ -474,7 +471,7 @@ Dynamic level of detail (LOD) is an important part in handling the extensive amo
 \begin{enumerate}
     \item \textbf{Generation} - Create versions at different level of detail of a model
     \item \textbf{Selection} - Choose a version based on some criteria or error metric (e.g., distance to object or the projected area it occupies on the screen)
-    \item \textbf{Switching} - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
+    \item \textbf{Switching} - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artefacts.
 \end{enumerate}
 
 There are different types of LOD approaches for terrain rendering, and a suitable approach should be chosen based on characteristics of the terrain. Terrains can for example be restricted to being represented as height maps - a characteristic that can be exploited by the rendering algorithm. Cozzi and Ring describe the following three categories of LOD approaches: Discrete Level of Detail, Continuous Level of Detail and Hierarchical Level of Detail \cite[p. 368-371]{cozzi11}.
@@ -501,11 +498,11 @@ In the Discrete Level Of Detail (DLOD) approach, multiple different representati
     \label{fig:dlod}
 \end{figure}
 
-At run time, the main objective is to select one (or generate) a suitable representation. This approach does not provide any means of dealing with large scale datasets, which makes it unsuitable for globe rendering (ref virtual globes).
+At run time, the main objective is to select one (or generate) a suitable representation. This approach does not provide any means of dealing with large scale datasets, which makes it unsuitable for globe rendering \cite{cozzi11}.
 
 
 \subsection{Continuous Level of Detail}
-The continuous LOD (CLOD) approach represents a model in a way that allows the resolution to be selected arbitrary. This is usually implemented by a base mesh combined with a sequence of operations that successively changes the level of detail of the model. Two typical such operations are ``edge collapse'' (removes two triangles from the mesh) and its inverse, ``vertex split'' (adds two triangles to the mesh) are illustrated in Figure \ref{fig:clod}.
+The continuous LOD (CLOD) approach represents a model in a way that allows the resolution to be selected arbitrarily. This is usually implemented by a base mesh combined with a sequence of operations that successively changes the level of detail of the model. Two typical such operations are ``edge collapse'' (removes two triangles from the mesh) and its inverse, ``vertex split'' (adds two triangles to the mesh). These operations are illustrated in Figure \ref{fig:clod}.
 
 \begin{figure}
     \centering
@@ -533,8 +530,8 @@ A special branch of CLOD worth mentioning is the so called infinite LOD. In this
 Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLOD algorithms operates on hierarchically arranged, predefined chunks of the full model. Each chunk is processed, stored and rendered separately. By doing this, HLOD approaches tackles the weaknesses of CLOD, essentially by doing the following.
 
 \begin{enumerate}
-    \item Reduce processing time on CPU: The only CPU task that HLOD algorithms has to deal with during runtime is to select a suitable subset of the predefined chunks for rendering. This is a relatively fast procedure in contrast to iteratively applying changes to the raw geometry, as done in CLOD.
-    \item Reduce the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can't be cached on the GPU. Being able to perform GPU caching allow HLOD to better minimize the traffic to the GPU.
+    \item Reducing processing time on CPU: The only CPU task that HLOD algorithms has to deal with during runtime is to select a suitable subset of the predefined chunks for rendering. This is a relatively fast procedure in contrast to iteratively applying changes to the raw geometry, as done in CLOD.
+    \item Reducing the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can't be cached on the GPU. Being able to perform GPU caching allows HLOD to better minimize the traffic to the GPU.
 \end{enumerate}
 
 HLOD uses spatial hierarchical data structures such as binary trees, quadtrees, or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail in one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated with a quad tree holding chunks representing a bunny model in Figure \ref{fig:hlod}.
@@ -564,7 +561,7 @@ Generally, selecting all the chunks at a specific level in the tree yields a com
     }
   }{}
     \label{alg:chunkselection}
-  \caption{Selecting chunks to render}
+  \caption{Selecting chunks to render.}
 \end{algorithm} 
 
 This example uses a depth first approach for rendering of chunks. Other common schemes for traversing the hierarchy are breadth first and inverse breadth first.
@@ -577,7 +574,7 @@ Another key feature of HLOD as opposed to DLOD and CLOD is that it can naturally
 
 
 \section{Level of Detail Algorithms for Globes}
-A number of different LOD algorithms has been introduced for the purpose of globe rendering. Two common algorithms used are Chunked LOD and Geometry Clipmaps, as pointed out by Cozzi and Ring\cite{cozzi11}.
+A number of different LOD algorithms has been introduced for the purpose of globe rendering. Two common algorithms used are Chunked LOD and Geometry Clipmaps, as pointed out by Cozzi and Ring \cite{cozzi11}.
 
 \subsection{Chunked LOD}
 \label{section:chunkedlodbacground}
@@ -610,13 +607,13 @@ Finding the geographic coverage of a chunk with a given tile index can be done u
 \begin{equation}
 \label{eq:latlongindex}
 \begin{split}
-\theta_{NE} = 2\pi x / 2^{level} \\
 \phi_{NE} = 2\pi y / 2^{level} \\
+\theta_{NE} = 2\pi x / 2^{level} \\
 side = 2\pi / 2^{level},
 \end{split} 
 \end{equation}
 
-where $\theta_{NE}$ and $\phi_{NE}$ are the longitude and latitude of the north east corner of the chunk and $side$ is the side length of the chunk.
+where $\phi_{NE}$ and $\theta_{NE}$ are the latitude and the longitude of the north east corner of the chunk and $side$ is the side length of the chunk.
 
 \subsubsection{Chunks}
 Chunks should store the following data:
