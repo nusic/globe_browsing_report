@@ -3,7 +3,7 @@ This section goes through how the final implementation results in a software tha
 
 The benchmarks were done using an relatively old consumer laptop computer. Its specs are provided below.
 
-\begin{table}
+\begin{table}[h]
   \centering
   \caption[]{Benchmark host computer}
     \label{table:benchmark host}
@@ -17,9 +17,10 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
   \end{tabular}
 \end{table}
 
-
+\clearpage
 \section{Benchmark: Top-down view}
-\begin{table}
+\FloatBarrier
+\begin{table}[h]
   \centering
   \caption[]{Top down settings}
     \label{table:settingstopdown}
@@ -38,7 +39,7 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 \end{table}
 
 
-\begin{figure}[htbp]
+\begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.31\textwidth}
         \includegraphics[width=\textwidth]{figures/results/os_view_earth.png}
@@ -69,7 +70,7 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 \end{figure}
 
 
-\begin{table}
+\begin{table}[h]
 \centering
 \caption[]{Top down settings}
   \label{table:settingstopdown}
@@ -86,20 +87,22 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 
 
 
-\section{Culling evaluation}
-The culling algorithms Frustum Culling and Horizon Culling was evaluated. Two different LOD heuristics were used: LOD by distance to chunk and LOD by projected area of Chunk.
+\clearpage
+\section{Culling for distance based LOD}
+\FloatBarrier
+The culling algorithms Frustum culling and Horizon Culling were compared and evaluated. The settings used are provided in Table \ref{table:cullingd}. Note that LOD evaluation is done by distance. Figure \ref{fig:cullingdcam} shows the camera view evaluated. Figure \ref{fig:cullingd} shows and overview of the rendered chunks using the different culling and benchmarks are listed in Table \ref{table:cullingd}.
 
-\begin{table}
+\begin{table}[h]
   \centering
   \caption[]{Culling test}
-    \label{table:culling}
+    \label{table:cullingd}
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
       \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
                                   & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
-      \textbf{LOD Evaluation:}    & \textbf{Evaluated} \\
+      \textbf{LOD Evaluation:}    & By distance \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
       \textbf{Level blending:}    & Enabled \\
       \textbf{Camera View:}       & Looking towards western horizon\\
@@ -108,18 +111,17 @@ The culling algorithms Frustum Culling and Horizon Culling was evaluated. Two di
   \end{tabular}
 \end{table}
 
-\subsection{Culling for distance based LOD}
-
-\begin{figure}[htbp]
+\begin{figure}[h]
     \centering
-    \begin{subfigure}[bt]{0.9\textwidth}
+    \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/cam_d.png}
     \end{subfigure}
-    \caption{A view over Brooklyn, Manhattan and New Jersey was used in the culling test.}
-    \label{fig:culling}
+    \caption{Camera view.}
+    \label{fig:cullingdcam}
 \end{figure}
 
-\begin{figure}[htbp]
+\clearpage
+\begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.48\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/d.png}
@@ -144,7 +146,7 @@ The culling algorithms Frustum Culling and Horizon Culling was evaluated. Two di
     \label{fig:cullingd}
 \end{figure}
 
-\begin{table}
+\begin{table}[h]
 \centering
 \caption[]{Culling for projected area based LOD}
   \label{table:cullingd}
@@ -160,19 +162,41 @@ The culling algorithms Frustum Culling and Horizon Culling was evaluated. Two di
   \end{tabular}
 \end{table}
 
+\clearpage
+\section{Culling for Projected Area based LOD}
+\FloatBarrier
+The culling algorithms Frustum culling and Horizon Culling were compared and evaluated. The settings used are provided in Table \ref{table:cullinga}. Note that LOD evaluation is done by distance. Figure \ref{fig:cullingacam} shows the camera view evaluated. Figure \ref{fig:cullinga} shows and overview of the rendered chunks using the different culling and benchmarks are listed in Table \ref{table:cullinga}.
 
-\subsection{Culling for Projected Area based LOD}
+\begin{table}[h]
+  \centering
+  \caption[]{Culling test}
+    \label{table:cullingd}
+  \begin{tabular}{| r l |}
+    \hline
+      \textbf{Globe:}             & Earth \\
+      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
+                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{LOD Scale factor:}  & 7.8 \\
+      \textbf{LOD Evaluation:}    & By Projected Area \\
+      \textbf{Culling:}           & \textbf{Evaluated} \\
+      \textbf{Level blending:}    & Enabled \\
+      \textbf{Camera View:}       & Looking towards western horizon\\
+      \textbf{Location:}          & New York, New Jersey\\
+    \hline
+  \end{tabular}
+\end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[h]
     \centering
-    \begin{subfigure}[bt]{0.9\textwidth}
+    \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/cam_a.png}
     \end{subfigure}
-    \caption{A view over Brooklyn, Manhattan and New Jersey was used in the culling test.}
-    \label{fig:culling}
+    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey.}
+    \label{fig:cullingacam}
 \end{figure}
 
-\begin{figure}[htbp]
+\clearpage
+\begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.48\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/a.png}
@@ -197,7 +221,7 @@ The culling algorithms Frustum Culling and Horizon Culling was evaluated. Two di
     \label{fig:cullinga}
 \end{figure}
 
-\begin{table}
+\begin{table}[h]
 \centering
 \caption[]{Projcted area based}
   \label{table:cullinga}
@@ -213,12 +237,14 @@ The culling algorithms Frustum Culling and Horizon Culling was evaluated. Two di
   \end{tabular}
 \end{table}
 
+\clearpage
 \section{Benchmark: Interactive Globe Browsing}
+\FloatBarrier
 text here
 
 \section{Switching using level blending}
 The visual result of using the distance based level blending is shown in Figure \ref{fig:blending2}.
-\begin{figure}[htbp]
+\begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.48\textwidth}
         \includegraphics[width=\textwidth]{figures/results/blending/blending_bali2_disabled.jpg}
@@ -252,7 +278,7 @@ A performance benchmark of the blending algorithm is described below. Note that 
   \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.48\textwidth}
         \includegraphics[width=\textwidth]{figures/results/blending/blending_bali_disabled.jpg}
@@ -284,3 +310,4 @@ A performance benchmark of the blending algorithm is described below. Note that 
 
 
 \section{Screenshots}
+\FloatBarrier
