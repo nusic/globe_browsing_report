@@ -472,24 +472,15 @@ Dimitrijevi\'{c} and Ran\v{c}i\'{c} uses another polar coordinate system to repr
 Dynamic level of detail (LOD) is an important part in handling the extensive amount of data used in an out of core rendering software. The goal is to maximize the visual information on screen while minimizing the workload. In their book Rendering virtual 3D globes, Cozzi and Ring describes LOD rendering algorithms by three typical steps. \cite[p. 367]{cozzi11}
 
 \begin{enumerate}
-    \item Generation - Create versions at different level of detail of a model
-    \item Selection - Choose a version based on some criteria or error metric (e.g., distance to object or the projected area it occupies on the screen)
-    \item Switching - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
+    \item \textbf{Generation} - Create versions at different level of detail of a model
+    \item \textbf{Selection} - Choose a version based on some criteria or error metric (e.g., distance to object or the projected area it occupies on the screen)
+    \item \textbf{Switching} - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
 \end{enumerate}
 
 There are different types of LOD approaches for terrain rendering, and a suitable approach should be chosen based on characteristics of the terrain. Terrains can for example be restricted to being represented as height maps - a characteristic that can be exploited by the rendering algorithm. Cozzi and Ring describe the following three categories of LOD approaches: Discrete Level of Detail, Continuous Level of Detail and Hierarchical Level of Detail \cite[p. 368-371]{cozzi11}.
 
 \subsection{Discrete Level of Detail}
-In the Discrete Level Of Detail (DLOD) approach, multiple different representations of the terrain are created at different resolutions. DLOD is arguably the most simple LOD algorithm. It works not only for digital terrain models, but for arbitrary meshes. The set of terrain representations can either be predefined or generated using mesh simplification algorithms.
-
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[bt]{0.9\textwidth}
-        \includegraphics[width=\textwidth]{figures/lod/lod_overview.pdf}
-    \end{subfigure}
-    \caption{DLOD. Generate offline, select and switch at runtime.}
-    \label{fig:lod}
-\end{figure}
+In the Discrete Level Of Detail (DLOD) approach, multiple different representations of the model are created at different resolutions. DLOD is arguably the most simple LOD algorithm. It works not only for digital terrain models, but for arbitrary meshes. The set of terrain representations can either be predefined or generated using mesh simplification algorithms.
 
 \begin{figure}
     \centering
@@ -546,14 +537,14 @@ Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLO
     \item Reduce the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can't be cached on the GPU. Being able to perform GPU caching allow HLOD to better minimize the traffic to the GPU.
 \end{enumerate}
 
-HLOD uses spatial hierarchical data structures such as quadtrees or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail a one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated in Figure \ref{fig:hlod}.
+HLOD uses spatial hierarchical data structures such as binary trees, quadtrees, or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail in one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated with a quad tree holding chunks representing a bunny model in Figure \ref{fig:hlod}.
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{figures/lod/hlod_tmp.png}
+    \begin{subfigure}[bt]{0.6\textwidth}
+        \includegraphics[width=\textwidth]{figures/lod/hlod.pdf}
     \end{subfigure}
-    \caption{HLOD using a quadtree.}
+    \caption{Bunny model chunked up using HLOD.}
     \label{fig:hlod}
 \end{figure}
 
@@ -596,10 +587,21 @@ Using a geographic grid tesselation, the chunks are in geographic space using la
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{figures/chunkedlod/chunkedlodglobe.png}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/chunkedlodtree.pdf}
+        \caption{Chunk tree.}
     \end{subfigure}
-    \caption{Chunk LOD for a globe}
+    \quad
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/tiled.png}
+        \caption{Geodetic chunks.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/tiled_globe.png}
+        \caption{Globe.}
+    \end{subfigure}
+    \caption{Chunked LOD for a globe.}
     \label{fig:chunkedlod}
 \end{figure}
 
@@ -635,28 +637,26 @@ Depending on the implementation of the chunked LOD algorithm, these properties c
 \subsubsection{Culling}
 An important thing to consider when dealing with chunks of a virtual globe is the fact that the chunks that are selected for rendering might not actually be visible on the screen. Needless to say, this is a waste of computational power and by eliminating these unnecessary draw calls, the performance of the globe renderer can be increased.
 
-\paragraph{Camera frustum culling} This is done by testing a bounding box of the chunk for intersection with the camera frustum. If the chunk is completely outside the frustum, the chunk can safely be culled as it will not be visible in the rendered image. See Figure \ref{fig:frustumculling}.
+\paragraph{Camera frustum culling} This is done by testing a bounding box of the chunk for intersection with the camera frustum. If the chunk is completely outside the frustum, the chunk can safely be culled as it will not be visible in the rendered image. See Figure \ref{fig:culling1}.
+
+\paragraph{Horizon culling} Even after camera frustum culling there are chunks that still do not contribute to the rendered image. Figure \ref{fig:culling2} illustrates that most of a globe is actually invisible to any observer. This can be used as a basis for culling some of the remaining chunks. 
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{figures/chunkedlod/frustumculling.pdf}
+    \begin{subfigure}[bt]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/culling_frustum.png}
+        \caption{Frustum culling.}
+        \label{fig:culling1}
     \end{subfigure}
-    \caption{Frustum culling}
-    \label{fig:frustumculling}
-\end{figure}
-
-\paragraph{Horizon culling} Even after camera frustum culling there are chunks that still do not contribute to the rendered image. Figure \ref{fig:horizonculling} illustrates that most of a globe is actually invisible to any observer. This can be used as a basis for culling some of the remaining chunks. 
-
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[bt]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{figures/chunkedlod/horizonculling.png}
+    \quad \quad \quad
+    \begin{subfigure}[bt]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/culling_horizon.png}
+        \caption{Horizon culling.}
+        \label{fig:culling2}
     \end{subfigure}
-    \caption{Horizon culling}
-    \label{fig:horizonculling}
+    \caption{Culling for chunked LOD.}
+    \label{fig:cullingchunkedlod}
 \end{figure}
-
 
 \subsubsection{Switching}
 Even when chunks can be selected in a way that guarantees a maximum pixel error per vertex, the fact that full areas of multiple triangles are replaced all at once causes a drastic change in the rendered view. Even when the updates are small per vertex, the update of whole chunk areas may be easily noticed. This is what is referred to as popping.
@@ -665,10 +665,21 @@ Minimizing popping artefacts are typically done by smoothly transitioning betwee
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.7\textwidth}
-        \includegraphics[width=\textwidth]{figures/chunkedlod/switching.png}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/switching1.pdf}
+        \caption{An edge at chunk level i-1.}
     \end{subfigure}
-    \caption{a) An edge at chunk level i-1. b) The same edge after level i has been selected. c) The new vertex is interpolated into its true place.}
+    \quad
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/switching2.pdf}
+        \caption{The same edge after level i has been selected.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/chunkedlod/switching3.pdf}
+        \caption{The new vertex is interpolated into its true place.}
+    \end{subfigure}
+    \caption{Vertex positions when switching between levels.}
     \label{fig:lodswitch}
 \end{figure}
 
@@ -841,3 +852,37 @@ The problem is already handled in OpenSpace with the use of a linear depth buffe
 A negative aspect about setting the value of \texttt{gl\_FragDepth} explicitly is that early depth testing is not possible. This is OpenGL's method of discarding fragments before the fragment shader has been invoked. Not performing early depth testing leads to lower frame rates if the fragment shader is heavy. Kemen discussed the implications of setting \texttt{gl\_FragDepth} explicitly and concluded that for regular fragment processing, the change in frame rate was not significant for the Outerra software \cite{kemen12}.
 
 Other previously proposed methods for handling depth buffer issues include logarithmic depth buffer and multiple view frustums and complementary depth buffering \cite{cozzi11}.
+
+\section{Caching}
+
+Efficient caching of data is crucial in out-of-core, real time data visualization applications. Since the data sets dealt with often can be measured in terabytes or petabytes, caching is most efficient if done in multiple stages.
+
+\subsection{Multi Stage Texture Caching}
+There are six levels of caching important to take into consideration for globe rendering softwares. These are:
+
+\begin{enumerate}
+\item Local GPU texture memory
+\item Local RAM
+\item Local drive memory
+\item Local server
+\item Remote server
+\end{enumerate}
+
+Caching for the purpose of an implementation of the client side rendering relies on stage 1-3 where local RAM memory caching is the most important one.
+
+\subsection{Cache Replacement Policies}
+There are multiple different cache replacement policies, each used for different purposes. Some common policies are: First-In-First-Out, Last-In-First-Out, Least-Recently-Used, Most-Recently-Used, Least-Frequently-Used, Most-Frequently-Used.
+
+When it comes to caching of texture tiles used for globe rendering, the most reasonable policy gets rid of the tiles that have not been used after a significant amount of requests in favor of more recently used ones. Therefore the Least-Recently-Used (LRU) cache replacement policy is used.
+
+\subsubsection{LRU Caching}
+\label{section:lrucaching}
+The LRU cache is filled up as new entries are requested. When the cache is full, the least recently used entry will be thrown away when a new entry is to be added. This is implemented with a hash map and a doubly linked list. The hash map maps a unique resource identifier for an entry to a node in the list, which in turn stores the entry. Every time an entry is accessed from the cache, the list storing that entry is placed first in the list. This scheme ensures the least recently used entry will always be located in the back of the list so that it can be thrown out when the cache is full, see Figure asd.
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/lru_cache.pdf}
+    \caption{Inserting an entry in a LRU cache.}
+    \label{fig:jittering}
+\end{figure}
