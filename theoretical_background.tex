@@ -636,7 +636,7 @@ An important thing to consider when dealing with chunks of a virtual globe is th
 
 \paragraph{Camera frustum culling} This is done by testing a bounding box of the chunk for intersection with the camera frustum. If the chunk is completely outside the frustum, the chunk can safely be culled as it will not be visible in the rendered image. See Figure \ref{fig:culling1}.
 
-\paragraph{Horizon culling} Even after camera frustum culling there are chunks that still do not contribute to the rendered image. Figure \ref{fig:culling2} illustrates that most of a globe is actually invisible to any observer. This can be used as a basis for culling some of the remaining chunks. 
+\paragraph{Horizon culling} Even after camera frustum culling there are chunks that still do not contribute to the rendered image because they are positioned behind the horizon. Figure \ref{fig:culling2} illustrates that most of a globe is actually invisible to any observer. This can be used as a basis for culling some of the remaining chunks. 
 
 \begin{figure}[htbp]
     \centering
@@ -658,7 +658,7 @@ An important thing to consider when dealing with chunks of a virtual globe is th
 \subsubsection{Switching}
 Even when chunks can be selected in a way that guarantees a maximum pixel error per vertex, the fact that full areas of multiple triangles are replaced all at once causes a drastic change in the rendered view. Even when the updates are small per vertex, the update of whole chunk areas may be easily noticed. This is what is referred to as popping.
 
-Minimizing popping artefacts are typically done by smoothly transitioning between levels over time. Cozzi and Ring suggest an approach, where along with each vertex, a delta offset is also stored \cite[p. 451]{cozzi11}. This delta offset stores the difference between the chunk itself and the same region within the parent chunk. Using this difference, new vertices can be placed on already defined edges, and then interpolated into their actual positions. Figure \ref{fig:lodswitch} illustrates the idea.
+Minimizing popping artefacts is typically done by smoothly transitioning between levels over time. Cozzi and Ring suggest an approach, where along with each vertex, a delta offset is also stored \cite[p. 451]{cozzi11}. This delta offset stores the difference between the chunk itself and the same region within the parent chunk. Using this difference, new vertices can be placed on already defined edges, and then interpolated into their actual positions. Figure \ref{fig:lodswitch} illustrates the idea.
 
 \begin{figure}[htbp]
     \centering
@@ -680,13 +680,13 @@ Minimizing popping artefacts are typically done by smoothly transitioning betwee
     \label{fig:lodswitch}
 \end{figure}
 
-The interpolation parameter can be based on the distance to the camera or time based animation.
+The interpolation parameter can be based on the distance to the camera or changed over time for each chunk.
 
 \subsubsection{Cracks and skirts}
 \label{section:cracksandskirts}
-As chunks are tiled and rendered next to each other, it is desireable to make the borders between chunks as unnoticeable as possible. Even though the chunk meshes are generated according to the requirements mentioned in the Chunk subsection above, it is not possible to guarantee a watertight edge between two adjacent chunks of different LOD. Where adjacent chunks have different detail level, so called T-junctions till emerge. These T-junctions cause cracks between the chunks as an unwanted visual artifact.
+As chunks are tiled and rendered next to each other, it is desireable to make the borders between chunks as unnoticeable as possible. Even though the chunk meshes are generated according to the requirements mentioned in the Chunk subsection above, it is not possible to guarantee a watertight edge between two adjacent chunks of different LOD. Where adjacent chunks have different detail level, so called T-junctions till emerge. These T-junctions cause cracks between the chunks as an unwanted visual artefact.
 
-The easiest way to tackle this issue is not to try to remove the cracks, but instead try to hide them. The most common approach hides the cracks by simply adding an extra layer of vertices to the sides of sides of the mesh. This extra layer of vertices, which are also known a skirt, is offset down vertically, as illustrated in figure \ref{fig:skirts}. 
+The easiest way to tackle this issue is not to try to remove the cracks, but instead try to hide them. The most common approach hides the cracks by simply adding an extra layer of vertices to the sides of sides of the mesh. This extra layer of vertices, which is also known as a skirt, is offset down vertically, as illustrated in figure \ref{fig:skirts}. 
 
 By adding skirts to the chunk meshes, the model will not be rendered with visible holes in it. Instead, the holes will be filled up with textured triangles.
 
@@ -706,7 +706,7 @@ By adding skirts to the chunk meshes, the model will not be rendered with visibl
 
 
 \subsection{Geometry Clipmaps}
-A clipmap texture is a dynamic mip map where each image in the so called clipmap stack is clipped down to a constant size. This reduces the amount of memory of the whole texture to increase linearly instead of exponentially with the number of overlays for LOD textures. Figure \ref{fig:clipmapmipmap} a shows the difference between the amount of texture data stored in a regular mip map compared to a clip map.
+A clipmap texture is a dynamic mip map where each image in the so called clipmap stack is clipped down to a constant size. This reduces the amount of memory of the whole texture to increase linearly instead of exponentially with the number of overlays for LOD textures \cite{tanner98}. Figure \ref{fig:clipmapmipmap} a shows the difference between the amount of texture data stored in a regular mip map compared to a clip map.
 
 \begin{figure}[htbp]
     \centering
@@ -717,7 +717,7 @@ A clipmap texture is a dynamic mip map where each image in the so called clipmap
     \label{fig:clipmapmipmap}
 \end{figure}
 
-The idea of clipmaps can be applied not only to textures but also to geometries. By representing a terrain by a stack of clipmap geometries of different size, the resolution increases closer to the virtual camera, as illustrated in Figure \ref{fig:clipmapgeometry}. As the view point moves around, the grids updates their vertex positions accordingly to keep the grid centered in the geometry clipmap stack. The position of each of the levels of the clip map geometries snaps to a discrete coordinate grid with cell sizes equal to the distance between two adjacent vertices. Due to the different grid resolution of different levels, the relative position of each sub grid must change so that they can snap on a grid with higher level. This is illustrated with the dynamic interior part of the grid in figure \ref{fig:clipmapgeometry}.
+The idea of clipmaps can be applied not only to textures but also to geometries \cite{tanner98}. By representing a terrain by a stack of clipmap geometries of different sizes, the resolution increases closer to the virtual camera, as illustrated in Figure \ref{fig:clipmapgeometry}. As the view point moves around, the grids updates their vertex positions accordingly to keep the grid centered in the geometry clipmap stack. The position of each of the levels of the clip map geometries snaps to a discrete coordinate grid with cell sizes equal to the distance between two adjacent vertices. Due to the different grid resolution of different levels, the relative position of each sub grid must change so that they can snap on a grid with higher level. This is illustrated with the dynamic interior part of the grid in figure \ref{fig:clipmapgeometry}.
 
 \begin{figure}[htbp]
     \centering
@@ -730,7 +730,7 @@ The idea of clipmaps can be applied not only to textures but also to geometries.
 
 Geometry clipmaps limits the terrain representation to be in the form of height maps. This is because the clipmap geometry moves around when the focus point changes and since the underlying terrain should not follow the camera position, the clipmap geometries requires vertex shader texture fetching. The texture coordinates are offset as the geometry clipmap moves to follow the focus point.
 
-One of the main selling points for geometry clipmaps is the decrease in CPU workload and the increase in GPU triangle throughput. There is no need to traverse a hierarchical structure such a quadtree. The number of draw calls will remain equal the number of clip maps instead of the number of chunks which is often larger. The framerate will also be relatively consistent if the number of layers in the clipmap stack remains constant.
+One of the main selling points for geometry clipmaps is the decrease in CPU workload and the increase in GPU triangle throughput \cite{cozzi11}. There is no need to traverse a hierarchical structure such a quadtree. The number of draw calls will remain equal the number of clip maps instead of the number of chunks which is often larger. The framerate will also be relatively consistent if the number of layers in the clipmap stack remains constant.
 
 \subsubsection{2D Grid Geometry Clipmaps}
 Using geometry clipmaps to achieve dynamic level of detail for a height mapped grid was proposed by Losasso and Hoppe \cite{losasso04}. The method is limited to rendering of equirectangular grids. When considering the ellipsoidal shape of a globe, the clipmap grid can be represented in geographic coordinates mapped on an ellipsoid where the map texture coordinates in the longitudinal direction wraps around the anti meridian. Rendering the clipmap close to the poles however will lead to polar pinching which breaks the globe as illustrated in Figure \ref{fig:mipclip}.
@@ -753,7 +753,7 @@ Using geometry clipmaps to achieve dynamic level of detail for a height mapped g
 Clipmap grids can also be used to model a spherical cube representation of a globe to avoid polar issues. This requires six clipmap partitions; one for each side of the cube.
 
 \subsubsection{Spherical Clipmaps}
-Spherical clipmaps takes advantage of the fact that no observer will ever see more than half a globe at any time. The vertices of the clipmap are described in polar coordinates with the center of the grid always following the camera position. The coordinates of the vertices will therefore not have any correspondence to texture coordinates which is why the algorithm is not widely adopted \cite{dimi15}. 
+Spherical clipmaps takes advantage of the fact that no observer will ever see more than half a globe at any time. The vertices of the clipmap are described in polar coordinates with the center of the grid always following the camera position \cite{clasen06}. The coordinates of the vertices will therefore not have any correspondence to texture coordinates which is why the algorithm is not widely adopted \cite{dimi15}. 
 
 \subsubsection{Ellipsoidal Clipmaps}
 Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces ellipsoidal clipmaps as a level of detail rendering method for globes \cite{dimi15}. It uses a geographic grid for the polar regions of the globe and solves the polar issues with the use of polar caps. The advantages compared to spherical cube clipmaps is that it uses the well known geographic map projection and reduces the number of geometry clipmap partitions from six to two. The globe is divided into one equatorial region and two polar regions. If the distance is close enough to the globe (3,000 km above the surface for the Earth), a maximum of two partitions is needed at any time \cite{dimi15}.
@@ -813,9 +813,9 @@ Considering an Earth sized globe with the origin in the center and a radius of $
 
 A double precision floating point number is able to accurately represent 16 decimal figures \cite{cozzi11}. Consider the Voyager 1 spacecraft, which left the solar system and entered interstellar space in August 25, 2012, and currently is at a distance in the order of magnitude of $10^{13}$ meters. This spacecraft is the farthest any human made object has gone; farther away than all the planets, and can still be accurately positioned with sub meter resolution using double precision floating point variables (of course assuming that the positional data is correct).
 
-NASA's Navigation and Ancillary Information Facility (NAIF) is the producer of the SPICE interface. In SPICE, ephemeri (positional information) of celestial bodies within our solar system are defined in double precision floating point numbers. Utilizing this precision makes it possible to accurately visualize space crafts in relation to globes.
+NASA's Navigation and Ancillary Information Facility (NAIF) is the producer of the SPICE interface \cite{spice}. In SPICE, ephemeri (positional information) of celestial bodies within our solar system are defined in double precision floating point numbers. Utilizing this precision makes it possible to accurately visualize space crafts in relation to globes.
 
-\subsection{Rendering Artifacts}
+\subsection{Rendering Artefacts}
 \subsubsection{Vertex Position Jittering}
 
 One noticeable artefact related to the 32 bit floating point limitation of graphics cards is the discrete positioning of vertices when the origin is far away from the rendered object. A clear example of this is shown in figure \ref{fig:jittering} where Jupiter's moon Europa is rendered with single precision floating point operations and the origin is placed at the barycenter of the solar system.
@@ -829,7 +829,7 @@ The artefact is shown as discrete positioning of vertices which causes jagged ed
     \label{fig:jittering}
 \end{figure}
 
-Cozzi and Ring propose several different solutions to this problem which include ''rendering relative to center'', ''CPU - relative to eye'', ''GPU - relative to eye'', and ''GPU - relative to eye - FUN90'' \cite{cozzi11}. 
+Cozzi and Ring propose several different solutions to this problem which include rendering ``relative to center'', ``CPU - relative to eye'', ``GPU - relative to eye'', and ``GPU - relative to eye - FUN90'' \cite{cozzi11}. 
 
 \subsubsection{Z-Fighting}
 
@@ -874,12 +874,11 @@ When it comes to caching of texture tiles used for globe rendering, the most rea
 
 \subsubsection{LRU Caching}
 \label{section:lrucaching}
-The LRU cache is filled up as new entries are requested. When the cache is full, the least recently used entry will be thrown away when a new entry is to be added. This is implemented with a hash map and a doubly linked list. The hash map maps a unique resource identifier for an entry to a node in the list, which in turn stores the entry. Every time an entry is accessed from the cache, the list storing that entry is placed first in the list. This scheme ensures the least recently used entry will always be located in the back of the list so that it can be thrown out when the cache is full, see Figure asd.
-
+The LRU cache is filled up as new entries are requested. When the cache is full, the least recently used entry will be thrown away when a new entry is to be added. This is implemented with a hash map and a doubly linked list. The hash map maps a unique resource identifier for an entry to a node in the list, which in turn stores the entry. Every time an entry is accessed from the cache, the node storing that entry is placed first in the list. This scheme ensures the least recently used entry will always be located in the back of the list so that it can be thrown out when the cache is full, see Figure \ref{fig:lrucache}.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/lru_cache.pdf}
     \caption{Inserting an entry in a LRU cache.}
-    \label{fig:jittering}
+    \label{fig:lrucache}
 \end{figure}
