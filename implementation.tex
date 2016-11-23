@@ -29,7 +29,7 @@ The \class{Ellipsoid} uses several geographically related classes, which were us
 The base of the chunked LOD algorithm revolves around the self updating chunk tree. The chunk tree is a data structure built up of \class{Chunk Node}s which have the ability to split or merge dynamically. Besides storing four \class{Chunk Node} children, each \class{Chunk Node} stores a \class{Chunk}.
 
 \subsection{Chunks}
-As opposed to the definition of chunks in the background section \ref{section:chunkedlodbacground}, this implementation of chunks is very lightweight - it does not store any texture or triangle mesh data. Instead, it stores the information needed to query texture tiles from local in-memory caches. In the implementation suggested by Cozzi and Ring, terrain triangle meshes are stored in each chunk. In the case of this implementation however, all terrain is rendered using height mapped vertex grids. Thus there is no need for each chunk to store their own vertex arrays. Instead they can simply share one single instance of a vertex grid within a whole chunk tree. This means that vertices need to be offset by height mapping on the GPU.
+As opposed to the definition of chunks in the background section \ref{section:chunkedlodbacground}, this implementation of chunks is very lightweight - it does not store any texture or triangle mesh data. Instead, it stores the information needed to query texture tiles from local in-memory caches. In the implementation suggested by Cozzi and Ring, terrain triangle meshes are stored in each chunk. In the case of this implementation however, all terrain is rendered using height mapped vertex grids. Thus there is no need for each chunk to store their own vertex arrays. Instead they can simply share one single instance of a vertex grid within a whole chunk tree. This means that vertices need to be offset by height mapping on the GPU which makes it possibly to dynamically change height datasets that does not require pre processing before they can be used for rendering.
 
 The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. 
 
@@ -38,19 +38,19 @@ The most important part of the chunked LOD algorithm is the ability to dynamical
 The chunk tree is automatically reshaped depending on the virtual camera. A chunk node splits, merges or remain the same depending on the chunk's error metric for the current LOD. Three different approaches for calculating the error metric were implemented. By letting the user dynamically adjust a LOD scale factor, performance can be weighted against detail level.
 
 \subsubsection{By Distance}
-By letting the error depend on the distance between the closest point on the chunk, an the camera $d$ as in Equation \ref{eq:loddistance}, the size of the chunks in screen space stays more or less constant.
+By letting the error depend on the distance between the closest point on the chunk, and the camera $d$ as in Equation \ref{eq:loddistance}, the size of the chunks in screen space stays more or less constant.
 
 \begin{equation}
 	\label{eq:loddistance}
-	e = l - log_2(\frac{s}{d})
+	e = l - log_2(\frac{s}{d}),
 \end{equation}
-Where $e$ is the error, $l$ is the current level of the chunk, $s$ is a LOD scaling factor and $d$ is the distance between the closest point of the chunk and the camera. The closest point of the chunk can be either a corner or a point along one of the chunk edges. Using this distance as an error metric leads to bigger chunks farther from the camera where less detail is needed.
+where $e$ is the error, $l$ is the current level of the chunk, $s$ is a LOD scaling factor and $d$ is the distance between the closest point of the chunk and the camera. The closest point of the chunk can be either a corner or a point along one of the chunk edges. Using this distance as an error metric leads to bigger chunks farther from the camera where less detail is needed.
 
 
 \subsubsection{By Projected Area}
 Another error metric is the area that the chunk takes up on the screen. The bigger the area, the bigger the error. 
 
-The error must not be dependent of the direction of the camera. This is because a chunk rendered on a multi screen display ,such as a dome, should not have different errors between two or more screens which might lead to different levels and tearing between screens. Therefore the chunk is projected on a unit sphere and not a view plane which would lead to view direction dependent error metrics.
+The error must not be dependent of the direction of the camera. This is because a chunk rendered on a multi screen display, such as a dome, should not have different errors between two or more screens which might lead to different levels and tearing between screens. Therefore the chunk is projected on a unit sphere and not a view plane which would lead to view direction dependent error metrics.
 
 \begin{figure}[htbp]
     \centering
@@ -79,7 +79,7 @@ Being able to limit the chunk tree in these two scenarios, unnecessary chunk ren
 Given a chunk tree with chunks selected based on the camera position, each chunk can be tested using chunk cullers to determine if they are ``cullable'' and therefore can be set to invisible so that the chunk renderer will not bother in rendering them. The two implemented chunk cullers are the frustum culler and the horizon culler. They both rely on - and have access to - minimum and maximum values of the chunk's height maps. 
 
 \subsubsection{Frustum Culling}
-Frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC) using the view-projection matrix of the camera followed by perspective division. Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view, and thus can be cullable. This is illustrated in Figure \ref{fig:frustumculling}.
+Frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC) using the view-projection matrix of the camera followed by perspective division. Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view, and thus is cullable. This is illustrated in Figure \ref{fig:frustumculling}.
 
 \begin{figure}[htbp]
     \centering
