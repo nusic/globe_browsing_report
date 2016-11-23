@@ -863,7 +863,7 @@ float performLayerSettings(float currentValue, const LayerSettings settings) {
 
 \subsection{Dynamic Shader Programs}
 
-The ability to dynamically toggle layers with dynamic blending requires multiple sampling of textures in the fragment shaders. To avoid unnecessary processing when not all layers are in use there is a need to dynamically recompile the shader programs as layers are toggled. We use the GLSL preprocessor in the General Helpful Open Utility Library (GHOUL) \todo{ref} to preprocess all shader programs when the number of layers in use change.
+The ability to dynamically toggle layers with dynamic blending requires multiple sampling of textures in the fragment shaders. To avoid unnecessary processing when not all layers are in use there is a need to dynamically recompile the shader programs as layers are toggled. We use the GLSL preprocessor in the General Helpful Open Utility Library (GHOUL) \cite{ghoul} to preprocess all shader programs when the number of layers in use change.
 
 We define a layer shader program to be a GLSL program object using vertex and fragment shading. Moreover, it fits the pipeline of rendering a chunk with a specific number of layer groups and a varying number of layers for each group.
 
