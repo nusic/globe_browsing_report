@@ -43,6 +43,7 @@ WMS requests are done using HTTP GET where the standardized request parameters a
 
 Tile Map Service (TMS) was developed by the Open Source Geospatial Foundation (OSGeo) as a simpler solution to requesting maps from remote servers. The specification uses integer indexing for requesting specific precomputed map tiles instead of letting the server spend time on producing maps of arbitrary dimensions. The TMS interface is similar to WMS but simpler and it does not support all the features of WMS \cite{tms}.
 
+\iffalse
 
 
 The information needed to locate a tile in a tiled map dataset is the $level$ and a $x$ and $y$ tile coordinate within that level. The number of tiles in the $x$ and $y$ dimension will increase by a factor of two for each level.
@@ -69,7 +70,7 @@ y_{child_n} = 2 y + ( \left\lfloor n / 2 \right\rfloor ~ mod ~ 2 ) \\
 \end{split}
 \end{equation}
 
-
+\fi
 
 \subsubsection{WMTS}
 
@@ -602,6 +603,8 @@ Using a geographic grid tesselation, the chunks are in geographic space using la
     \label{fig:chunkedlod}
 \end{figure}
 
+\iffalse
+
 Finding the geographic coverage of a chunk with a given tile index can be done using equation \ref{eq:latlongindex}.
 
 \begin{equation}
@@ -614,6 +617,8 @@ side = 2\pi / 2^{level},
 \end{equation}
 
 where $\phi_{NE}$ and $\theta_{NE}$ are the latitude and the longitude of the north east corner of the chunk and $side$ is the side length of the chunk.
+
+\fi
 
 \subsubsection{Chunks}
 Chunks should store the following data:

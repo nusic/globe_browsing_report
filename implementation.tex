@@ -194,15 +194,6 @@ GDAL also provides the coefficients of a geo-transform which defines the mapping
 \subsubsection{Get IO Description}
 The IO description contains all tile specific information needed to perform a map read request using GDAL. This includes the pixel region to read, and where to store the result. The derivation of this information is summarized in the following steps, and illustrated in Figure \ref{fig:getiodescription}.
 
-\begin{enumerate}
-\item Calculate a \class{Geodetic Patch} from \class{Tile Index}
-\item Calculate the pixel coordinates for the patch in raster coordinate space
-\item Calculate a suitable map overview
-\item Transform pixel region to map overview
-\item Add padding to the down scaled pixel region
-\item Finalize the gathered data to an IO description object.
-\end{enumerate}
-
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{0.9\textwidth}
@@ -212,16 +203,36 @@ The IO description contains all tile specific information needed to perform a ma
     \label{fig:getiodescription}
 \end{figure}
 
-% @TODO
-In the scheme in Figure \ref{fig:getiodescription}, step one is performed as described in \todo{theoretical background}, equation wat is defined under section hej. 
-Calculating the corresponding GDAL overview is done according to
+\begin{enumerate}
+\item Calculate a \class{Geodetic Patch} from \class{Tile Index}
+\item Calculate the pixel coordinates for the patch in raster coordinate space
+\item Calculate a suitable map overview
+\item Transform pixel region to map overview
+\item Add padding to the down scaled pixel region
+\item Finalize the gathered data to an IO description object.
+\end{enumerate}
+
+In the scheme in Figure \ref{fig:getiodescription}, step one is performed using equation \ref{eq:latlongindex},
+
+\begin{equation}
+\label{eq:latlongindex}
+\begin{split}
+\phi_{NE} = 2\pi y / 2^{level} \\
+\theta_{NE} = 2\pi x / 2^{level} \\
+side = 2\pi / 2^{level},
+\end{split} 
+\end{equation}
+
+where $\phi_{NE}$ and $\theta_{NE}$ are the latitude and the longitude of the north east corner of the tile and $side$ is the side length of the tile.
+
+Calculating the corresponding GDAL overview is done according to equation \ref{eq:overview},
 
 \begin{equation}
 \label{eq:overview}
-Overview(level) = N - level - 1 - log_2(size_{tile} / size_{map})
+Overview(level) = N - level - 1 - log_2(size_{tile} / size_{map}),
 \end{equation}
 
-Where $level$ is given by the provided \class{Tile Index}, $N$ is the total number of overviews in the dataset, $size_{tile}$ is a configurable constant defining the preferred pixel size of a tile and $size_{map}$ is the size of the full map in pixels. The sizes can be either along the $x-$ or $y-$ axis. In the implementation the $x-$axis is used.
+where $level$ is given by the provided \class{Tile Index}, $N$ is the total number of overviews in the dataset, $size_{tile}$ is a configurable constant defining the preferred pixel size of a tile and $size_{map}$ is the size of the full map in pixels. The sizes can be either along the $x-$ or $y-$ axis. In the implementation the $x-$axis is used.
 
 Pixel coordinates can easily be transformed across map overviews using equation \ref{eq:overview}.
 
@@ -238,7 +249,7 @@ Padding is added to the pixel region in order to perform correct interpolation o
 As mentioned, \class{Tile Dataset}s can be configured to calculate some metadata on the fly based on the pixel data that has been read. The metadata includes minimum and maximum pixel values within the pixel data and whether or not the pixel data contains missing-data values. Having access to minimum and maximum values for height layer tiles is required for the culling to be performed correctly since the cullers rely on having bounding boxes for the chunks. The meta data can not be requested directly from GDAL since the tiling can differ from the underlying image tiling abstracted away by GDAL. Calculating the meta data had to be performed by explicitly looping through all the pixel values on the client side. 
 
 \subsubsection{Summary}
-To summarize, the implementation of \class{Tile Dataset} allow reading pixel data from a GDAL dataset corresponding to a specific \class{Tile Index}, along with some metadata unless opted out. The \class{Raw Tile}s that are served are padded in order to perform smooth pixel blending between different tiles. \class{Raw Tile}s are not available for rendering since the data is not yet on the GPU.
+To summarize, the implementation of \class{Tile Dataset} allow reading pixel data from a GDAL dataset corresponding to a specific \class{Tile Index}, along with metadata unless opted out. The \class{Raw Tile}s that are served are padded in order to perform smooth pixel blending between different tiles. \class{Raw Tile}s are not available for rendering since the data is not yet on the GPU.
 
 \subsection{Async Tile Dataset}
 \class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It provides a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important funcionalities: 1) enqueueing tile read jobs and 2) collect finished tile read jobs. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see Figure \ref{fig:asynctiledataset}.
@@ -265,7 +276,7 @@ The \class{Async Tile Dataset} internally keeps track of what tile indices it ha
 
 
 \section{Providing Tiles}
-\class{Tile}s have three properties: a texture, some texture metadata and a status. The status is used to report any type of problem with the tile. This includes IO errors, Out-of-range errors or simply Unavailable. Tiles that have the ``OK'' status however, are uploaded to the GPU and can be used for rendering. 
+\class{Tile}s have three properties: a texture, metadata and a status. The status is used to report any type of problem with the tile. This includes IO errors, Out-of-range errors or simply Unavailable. Tiles that have the ``OK'' status however, are uploaded to the GPU and can be used for rendering. 
 
 Tiles are provided for rendering through \class{Tile Provider}s. They define an interface that allow accessing tiles and meta data about the tiles. There are different types of tile providers, but they must all implement the following functionality:
 
@@ -550,7 +561,7 @@ As opposed to regular tiles, chunk tiles can always be used for rendering since 
 \subsection{Chunk Tile Pile}
 \label{section:chunktilepile}
 
-A \class{Chunk Tile Pile} represents a range of \class{Chunk Tile}s across multiple mip levels. They contain the information needed to perform the LOD switching later described under section \ref{section:lodswitching}. Retrieving a \class{Chunk Tile Pile} simply requires a tile index of the lowest desired mip level (highest LOD) and the number of desired \class{Chunk Tile}s in the pile as described in Listing \ref{lst:chunktilepile}.
+A \class{Chunk Tile Pile} represents a range of \class{Chunk Tile}s across multiple mip levels. They contain the information needed to perform the LOD switching later described under section \ref{section:lodswitching}. Retrieving a \class{Chunk Tile Pile} simply requires a tile index of the highest desired mip level (highest LOD) and the number of desired \class{Chunk Tile}s in the pile as described in Listing \ref{lst:chunktilepile}.
 
 \iffalse
 \begin{algorithm}[htp]
