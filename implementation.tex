@@ -119,7 +119,7 @@ Fetching the right texture and preparing it for rendering onto chunks is a fairl
 	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, tiles rely on an OpenGL context and must therefore be initialized on the rendering thread.
 \end{enumerate}
 
-All chunk height and texture data are represented using \class{Tiles}. \class{Tiles} are created on the client side (i.e. in OpenSpace) on the fly when they are needed. As the pixel data may need to be read from disk or even requested from remote servers, the whole tile preparation pipeline was implemented to be executed on separate threads in order to avoid blocking the rendering thread with image data reads. 
+All chunk height and texture data are represented using \class{Tiles}. \class{Tiles} are created on the client side (i.e. in OpenSpace) on the fly when they are needed. As the pixel data may need to be read from disk or even requested from remote servers, the whole tile preparation pipeline was implemented to be executed on separate threads in order to avoid blocking of the rendering thread with image data reads. 
 
 During the iterative process of developing the texture tile pipeline, three layers of abstraction were introduced in order to deal with the fairly high complexity. These are listed in Table \ref{table:tilepipeline}.
 
@@ -143,7 +143,7 @@ During the iterative process of developing the texture tile pipeline, three laye
 The subsequent sections of this chapter will cover each abstraction layer in more detail, starting from the bottom and going up the stack.
 
 \subsection{GDAL}
-Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. GDAL is used as an abstraction layer between all the map formats and the representation of tile datasets. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. Reading pixel data using the GDAL RasterIO interface requires a set of parameters listed below and illustrated in Figure \ref{fig:gdalio}:
+Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. GDAL is used as an abstraction layer between all the map formats and the representation of tile datasets. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. GDAL can also be used for disk based caching of data from remote servers. Reading pixel data using the GDAL RasterIO interface requires a set of parameters listed below and illustrated in Figure \ref{fig:gdalio}:
 
 \begin{enumerate}
 	\item A map overview to read pixel data from (if the dataset has overviews).
@@ -177,7 +177,7 @@ With the given input parameters shown in Figure \ref{fig:gdalio}, the resulting 
 
 Using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \ref{appendix:localpatches} goes through a detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches of high resolution.
 
-GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates. The geo-transform can be inverted to define a region within raster space based on a georeferenced region.
+GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates. The geo-transform can be inverted to transform a georeferenced region to raster space when specifying the area of an image tile to read.
 
 \subsection{Tile Dataset}
 \class{Tile Dataset}s carves out \class{Raw Tile}s from GDAL datasets based on a \class{Tile Index}. Along with the pixel data, the served \class{Raw Tile}s also contain some metadata. The metadata includes an error code if something went wrong during the pixel reading process and some basic information about to read pixel data, such as minimum and maximum pixel values. Figure \ref{fig:tiledataset} illustrates how the process from \class{Tile Index} to \class{Raw Tile} is carried out. There are three gray subroutines; \emph{Get IO description}, \emph{Read image data} and \emph{Calculate metadata}. These subroutines are explained below.
