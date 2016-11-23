@@ -4,7 +4,7 @@ Scientific visualization of space research, also known as astro-visualization, b
 
 Researching and mapping out celestial bodies other than the Earth is an important part of expanding the space frontier and virtually rendering these globes using real gathered map and terrain data is a natural part of any scientifically accurate space visualization software.
 
-Two important parts of a software for visualizing celestial bodies are terrain and atmosphere. The focus of this thesis is put on terrain rendering on globes using high fidelity geographical data such as texture maps and digital terrain models. The globe rendering feature with the research involved was implemented for the software OpenSpace. The implementation was separated enough from the main program to avoid dependencies and make the thesis independent of specific implementation details. 
+Two important parts of a software for visualizing celestial bodies are terrain and atmosphere. The focus of this thesis is put on terrain rendering on globes using high fidelity geographical data such as texture maps, maps of scientific parameters, and digital terrain models. The globe rendering feature with the research involved was implemented for the software OpenSpace. The implementation was separated enough from the main program to avoid dependencies and make the thesis independent of specific implementation details. 
 
 \section{Background}
 
@@ -62,12 +62,18 @@ In table \ref{table:softwares}, features relevant to globe browsing in public pr
 The goal of this thesis is not only to provide OpenSpace with a globe browsing feature. There are some specific demands that play a significant role in the focus of this work. These features are listed below:
 
 \begin{enumerate}
-    \item Ability to retrieve map data from the most common standardized web map data interfaces: WMS, TMS, WMTS
-    \item Ability to render height maps and color textures with up to 25 cm per pixel resolution
-    \item Ability to layer multiple map datasets on top of each other. This makes it possible to visualize a range of scientific data about the atmosphere and the ocean on top of a textured globe
-    \item Globe browsing should be done at interactive framerates: at least 60 frames per second on a modern consumer gaming graphics cards
-    \item Correct positional mapping of objects rendered near the globe surface
-    \item Support animation of map datasets with time resolution
+    \item Ability to retrieve map data from the most common standardized web map data interfaces: WMS, TMS, WMTS.
+    \item Ability to render height maps and color textures with up to 25 cm per pixel resolution.
+    \item Ability to layer multiple map datasets on top of each other. This makes it possible to visualize a range of scientific parameters on top of a textured globe.
+    \item Globe browsing should be done at interactive frame rates: at least 60 frames per second on a modern consumer gaming graphics cards.
+    \item Correct positional mapping of objects rendered near the globe surface.
+    \item Support animation of map datasets with time resolution.
+    \item An intuitive interaction mode is also required to get the most out of globe browsing. It must support:
+	\begin{enumerate}
+    		\item Horizontal following of reference ellipsoid.
+		\item Decrease in sensitivity when closer to the surface of the globe.
+		\item Terrain following to avoid popping down under the surface.
+	\end{enumerate}
 \end{enumerate}
 
 \section{Delimitations}

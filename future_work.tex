@@ -1,3 +1,18 @@
 \chapter{Future Work}
 
-<Future work here>
+\todo[inline]{Intro to future work}
+
+\section{Parallelization Per Overview}
+Given the discussion about parallelization of GDAL WMS requests \ref{asdasda}, testing parallelization on a per overview level would be reasonable to maximize efficiency in tile requests. The best thing, of course, would be if the developers of GDAL made sure that WMS requests would be thread safe. \todo{vetefan asså}
+
+\section{Browsing WMS Datasets Upon Request}
+The focus was not put on user interfacing, but instead the techniques required for rendering. A given future feature however would be to provide the users of the software the ability to specify datasets to read upon request instead of needing to specify them before initialization. This could be done using the GetCapabilities method for WMS or WMTS providers to be able to list all available datasets behind a service. Then the user could choose a specific dataset to load on demand.
+
+\section{Integrating Atmosphere Rendering}
+Integrating a sophisticated atmosphere rendering technique for globe browsing would make the experience given in public presentations more rewarding. Using atmospheric parameters defining phenomena such as Rayleigh scattering and Mie scattering estimated for globes around our solar system, the representations of other worlds would be more accurate. Atmospheres also works great for generating depth cues which enhances the illusion of true scale within the visualization of globes.
+
+\section{Local Patches and Rover Terrains}
+The ability to read and render local patches will be developed further to ensure easy integration of geographically smaller datasets. A goal in the future is to be able to read and render even higher resolution imagery than demonstrated in this thesis. Rendering Mars rover terrain models, on top of HiRISE patches, on top of CTX patches, on top of a global terrain datasets would transport audiences and users of the software even closer to the real surface of Mars with all the detail in imagery currently available through research of the planet's geology.
+
+\section{Other Uses of Chunked LOD Ellipsoids}
+Rendering of ellipsoidal or spherical models is not only useful for globes. Being able to for example browse the night sky using an inverted sphere also requires a LOD approach to be able to visualize the most distant objects. World Wide Telescope uses such a  technique to render photographs of distant galaxies when pointing the camera to the sky. The edge of our observable Universe could also be rendered as a sphere textured with the WMAP mapping of the cosmic microwave background radiation.

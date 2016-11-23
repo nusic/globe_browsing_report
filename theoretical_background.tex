@@ -33,7 +33,7 @@ The physical disk space of large global map datasets is often measured in teraby
 
 \subsection{Web Map Services}
 
-To standardize web requests for map data, the Open GIS Consortium (OGS) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some more specific examples of WMS-like services are WorldWind, VirtualEarth and AGS. The last three are not covered in this thesis.
+To standardize web requests for map data, the Open GIS Consortium (OGC) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some more specific examples of WMS-like services are WorldWind, VirtualEarth and AGS. The last three are not covered in this thesis.
 
 \subsubsection{WMS}
 
@@ -75,7 +75,7 @@ y_{child_n} = 2 y + ( \left\lfloor n / 2 \right\rfloor ~ mod ~ 2 ) \\
 
 \subsubsection{WMTS}
 
-Web Map Tile Service is another standard by OGS that requires tiled requests. It supports many of the features of WMS but, similar to TMS, removes the load of image processing from the server side and instead forces the client to handle combination and cutouts of patches if required. The standard specifies the \emph{GetCapabilities}, \emph{GetTile} and \emph{GetFeatureInfo} operations. These operations can be requested with different message encodings such as Key-Value Pairs, XML messages or XML messages embedded in SOAP envelopes \cite{wmts10}.
+Web Map Tile Service is another standard by OGC that requires tiled requests. It supports many of the features of WMS but, similar to TMS, removes the load of image processing from the server side and instead forces the client to handle combination and cutouts of patches if required. The standard specifies the \emph{GetCapabilities}, \emph{GetTile} and \emph{GetFeatureInfo} operations. These operations can be requested with different message encodings such as Key-Value Pairs, XML messages or XML messages embedded in SOAP envelopes \cite{wmts10}.
 
 \subsubsection{Tiled WMS}
 
@@ -123,7 +123,7 @@ The Lunar Mapping Modeling Project (LMMP) is an initiative by NASA to gather and
 
 \section{Modelling Globes}
 
-We will discuss different proposed methods used for modelling and rendering of globes. The globe can be modelled either as a sphere or an ellipsoid and there are different tessellation schemes for meshing the globe. Different map projections can also be considered and it all ties together with a choice of level of detail algorithm.
+We will discuss different proposed methods used for modelling and rendering of globes. The globe can be modelled either as a sphere or an ellipsoid and there are different tessellation schemes for meshing the globe. Different map projections can also be considered and it all ties together with the use of a level of detail algorithm.
 
 \subsection{Globes as Ellipsoids}
 
