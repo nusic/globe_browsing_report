@@ -300,6 +300,43 @@ A performance benchmark of the blending algorithm is described below. Note that 
   \end{tabular}
 \end{table}
 
+\clearpage
+\section{Polar Pinching}
+\FloatBarrier
+The issues of polar pinching was evaluated by comparing the size of the  
+
+\begin{table}[h]
+\centering
+\caption[]{Evaluation of polar pinching with Distance based LOD}
+  \label{table:polarpinching}
+  \begin{tabular}{| r | c c |}
+    \hline
+      \textbf{Distance based LOD} & \textbf{Equator} & \textbf{North Pole} \\ \hline
+      \textbf{Chunk nodes}        & 78           & 506               \\ 
+      \textbf{Leaf chunk nodes}   & 59           & 380                \\ 
+      \textbf{Rendered chunks}    & 6            & 151                \\
+      \textbf{Frame Time}         & ? ms         & ? ms              \\
+      \textbf{Globe render time}  & 2,7 ms       & 31 ms              \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption[]{Evaluation of polar pinching with Area based LOD}
+  \label{table:polarpinching}
+  \begin{tabular}{| r | c c |}
+    \hline
+      \textbf{Area based LOD}     & \textbf{Equator} & \textbf{North Pole} \\ \hline
+      \textbf{Chunk nodes}        & 94           & 250               \\ 
+      \textbf{Leaf chunk nodes}   & 71           & 188                \\ 
+      \textbf{Rendered chunks}    & 17           & 64                \\
+      \textbf{Frame Time}         & ? ms         & ? ms              \\
+      \textbf{Globe render time}  & 4,3 ms       & 14 ms              \\
+    \hline
+  \end{tabular}
+\end{table}
+
 
 \clearpage
 \section{Benchmark: Interactive Globe Browsing}
