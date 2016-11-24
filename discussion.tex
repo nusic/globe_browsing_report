@@ -1,6 +1,10 @@
 \chapter{Discussion}
 In this chapter, the resulting implementation and design decisions made through out the research phase and development phase will be discussed. 
 
+\section{Chunked LOD}
+From Figure \ref{fig:topdown} and \ref{fig:interaction} it is noted that the chunk tree grows as the camera comes closer to the surface, but the number of rendered chunks remain relativelty constant.
+From Figure \ref{fig:interaction} we can see that the chunk tree grows as the camera views the horizon, as do the number of rendered chunks. When turning the the camera 180 degrees, the chunk tree shrinks temporarily. This is a result of the chunk tree being limited by available data. As the new texture tiles are downloaded, the chunk tree grows accordingly.
+
 \section{Ellipsoids vs Spheres}
 Representing globes as ellipsoids and not as spheres was a decision settled early in the development process. 
 The accuracy that the ellipsoidal model gives is important to be able to show near Earth orbits and rocket launches where the space crafts need to be positioned accurately relative to the WGS84 reference frame which is used in the SPICE library. 
