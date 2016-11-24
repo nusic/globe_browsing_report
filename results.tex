@@ -303,8 +303,28 @@ A performance benchmark of the blending algorithm is described below. Note that 
 \clearpage
 \section{Polar Pinching}
 \FloatBarrier
-The issues of polar pinching was evaluated by comparing the size of the  
+The impact of polar pinching on the chunk tree was evaluated using both Distance based LOD and Area based LOD. The results are presented in Figure \ref{fig:pincheval}.
 
+
+\begin{table}[h]
+  \centering
+  \caption[]{Evaluating pinching}
+    \label{table:pinchingstart}
+  \begin{tabular}{| r l |}
+    \hline
+      \textbf{Globe:}             & Earth \\
+      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
+                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{LOD Scale factor:}  & 10.0 \\
+      \textbf{LOD Evaluation:}    & Evaluated \\
+      \textbf{Culling:}           & Frustum culling, Horizon culling \\
+      \textbf{Camera View:}       & Facing down\\
+      \textbf{Location:}          & Quito, Ecuador and North Pole\\
+    \hline
+  \end{tabular}
+\end{table}
+
+\iffalse
 \begin{table}[h]
 \centering
 \caption[]{Evaluation of polar pinching with Distance based LOD}
@@ -320,7 +340,76 @@ The issues of polar pinching was evaluated by comparing the size of the
     \hline
   \end{tabular}
 \end{table}
+\fi
 
+\definecolor{a_eq_color}{HTML}{DFC9DC}
+\definecolor{a_np_color}{HTML}{BCD6DD}
+\definecolor{d_eq_color}{HTML}{85517D}
+\definecolor{d_np_color}{HTML}{4A7382}
+
+\definecolor{chunks_color}{HTML}{DFC9DC}
+\definecolor{leafs_color}{HTML}{BCD6DD}
+\definecolor{rendered_color}{HTML}{E6C3C3}
+\definecolor{globe_render_time}{HTML}{8E4747}
+
+\begin{figure}[h]
+\begin{tikzpicture}
+    \begin{axis}[
+        width  = 1.0*\textwidth,
+        height = 8cm,
+        major x tick style = transparent,
+        ybar=2*\pgflinewidth,
+        bar width=14pt,
+        ymajorgrids = true,
+        %ylabel = {Number of},
+        symbolic x coords={D: Equator, D: Pole, A: Equator, A: Pole},
+        xtick = data,
+        scaled y ticks = false,
+        enlarge x limits=0.25,
+        ymin=0,
+        legend cell align=left,
+        legend style={
+                at={(0.98, 0.60)},
+                anchor=south east,
+                column sep=1ex
+        }
+    ]
+
+      \addplot[style={chunks_color,fill=chunks_color,mark=none}]
+        coordinates { (D: Equator, 78) (D: Pole, 506) (A: Equator, 94) (A: Pole, 250) };
+
+      \addplot[style={leafs_color,fill=leafs_color,mark=none}]
+        coordinates { (D: Equator, 59) (D: Pole, 380) (A: Equator, 94) (A: Pole, 188) };
+      
+      \addplot[style={rendered_color,fill=rendered_color,mark=none}]
+        coordinates { (D: Equator, 6) (D: Pole, 151) (A: Equator, 17) (A: Pole, 64) };
+
+      \addplot[style={globe_render_time,fill=globe_render_time,mark=none}]
+        coordinates { (D: Equator, 27) (D: Pole, 310) (A: Equator, 43) (A: Pole, 140) };
+
+      \legend{Chunks, Leaf chunks, Rendered chunks, Render time [$10^{-4}$ s]}
+
+\iffalse
+        \addplot[style={d_np_color,fill=d_np_color,mark=none}]
+             coordinates {(Chunk nodes,506) (Leaf chunk nodes, 380) (Rendered nodes,151)};
+        \addplot[style={a_np_color,fill=a_np_color,mark=none}]
+             coordinates {(Chunk nodes,250) (Leaf chunk nodes, 188) (Rendered nodes, 64)};
+        \addplot[style={d_eq_color,fill=d_eq_color,mark=none}]
+             coordinates {(Chunk nodes,78) (Leaf chunk nodes, 59) (Rendered nodes,6)};          
+        \addplot[style={a_eq_color,fill=a_eq_color,mark=none}]
+            coordinates {(Chunk nodes, 94) (Leaf chunk nodes, 71) (Rendered nodes, 17)};
+
+        \legend{Area based at equator, Area based at pole, Distance based at equator, Distance based at pole}
+      \fi
+
+
+    \end{axis}
+\end{tikzpicture}
+\caption{Comparison of Distance based and Area based LOD at the Equator and the North Pole. \textbf{D} = Distance based LOD, \textbf{A} = Area based LOD.}
+\label{fig:pincheval}
+\end{figure}
+
+\iffalse
 \begin{table}[h]
 \centering
 \caption[]{Evaluation of polar pinching with Area based LOD}
@@ -336,7 +425,7 @@ The issues of polar pinching was evaluated by comparing the size of the
     \hline
   \end{tabular}
 \end{table}
-
+\fi
 
 \clearpage
 \section{Benchmark: Interactive Globe Browsing}
