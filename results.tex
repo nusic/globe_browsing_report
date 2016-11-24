@@ -18,8 +18,9 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 \end{table}
 
 \clearpage
-\section{Benchmark: Top-down view}
+\section{Zooming In}
 \FloatBarrier
+The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph}.
 \begin{table}[h]
   \centering
   \caption[]{Top down settings}
@@ -37,6 +38,7 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
     \hline
   \end{tabular}
 \end{table}
+
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.31\textwidth}
@@ -66,23 +68,6 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
     \caption{Top-down views of Earth at different zoom levels}
     \label{fig:topdown}
 \end{figure}
-
-\iffalse
-\begin{table}[h]
-\centering
-  \label{table:settingstopdown}
-  \begin{tabular}{| r | c c c c c |}
-    \hline
-      \textbf{Figure \ref{fig:topdown}}  & \textbf{a)} & \textbf{b)} & \textbf{c)} & \textbf{d)}  & \textbf{e)}  \\ \hline
-      \textbf{Chunk Nodes}          & 10      & 70      & 70      & 110     & 142   \\ 
-      \textbf{Leaf Chunk nodes}     & 8       & 53      & 53      & 83      & 107   \\ 
-      \textbf{Rendered Chunks}      & 7       & 14      & 13      & 17      & 11   \\
-      \textbf{Globe render time}    & 1.1 ms  & 3.4 ms  & 3.5 ms  & 5.0 ms  & 5.6 ms   \\
-      \textbf{Frame time}           & 17 ms   & 20 ms   & 20 ms   & 21 ms   & 21 ms  \\
-    \hline
-  \end{tabular}
-\end{table}
-\fi
 
 \begin{figure}[h]
 \begin{tikzpicture}
@@ -127,7 +112,7 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
     \end{axis}
 \end{tikzpicture}
 \caption{}
-\label{fig:pincheval}
+\label{fig:topdowngraph}
 \end{figure}
 
 
@@ -306,7 +291,7 @@ A performance benchmark of the blending algorithm is described below. Note that 
 \begin{table}
   \centering
   \caption[]{Benchmark: Level blending}
-    \label{table:settingstopdown}
+    \label{table:levelblending}
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
@@ -337,7 +322,7 @@ A performance benchmark of the blending algorithm is described below. Note that 
 \begin{table}
 \centering
 \caption[]{Top down settings}
-  \label{table:settingstopdown}
+  \label{table:resultblending}
   \begin{tabular}{| r | c c |}
     \hline
       \textbf{Figure \ref{fig:blending}}  & \textbf{No blending} & \textbf{Level blending} \\ \hline
