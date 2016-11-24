@@ -23,7 +23,7 @@ Global maps with high level of detail can easily become too large to be stored a
 
         \label{fig:proj_equirectangular}
     \end{picture}
-    \caption{The size of the map is decreasing exponentially with the overview.}
+    \caption{The size of the map is decreasing exponentially with the overview}
     \label{fig:overview}
 \end{figure}
 
@@ -85,9 +85,9 @@ Before the WMTS standard was developed, some servers had already embarked on the
 There are several different standards for handling image data used in GIS softwares. Some common file formats with image data and/or georeferenced information that are used in the below mentioned imagery products are:
 
 \begin{itemize}  
-\item \textbf{GeoTIFF} - TIFF image with the inclusion of georeferenced metadata. 
-\item \textbf{IMG} - Image file format with georeferenced metadata. 
-\item \textbf{JPEG2000} - Georeferenced image format with lossy or lossless compression.
+\item \textbf{GeoTIFF} - TIFF image with the inclusion of georeferenced metadata
+\item \textbf{IMG} - Image file format with georeferenced metadata
+\item \textbf{JPEG2000} - Georeferenced image format with lossy or lossless compression
 \item \textbf{CUB} - Georeferenced image file standard created by ISIS (Integrated Software for Imagers and Spectrometers)
 \end{itemize}
 
@@ -146,7 +146,7 @@ A triangle mesh, or more generally a polygon mesh, is defined by a limited numbe
 
 \subsubsection{Geographic Grid Tessellation}
 \label{sec:geogrid}
-Tessellating the ellipsoid using a geographic grid is a very straightforward approach. Ellipsoid vertex positions can be calculated using a transform from geographic coordinates to Cartesian model space coordinates \cite[p. 25]{cozzi11}. Figure \ref{fig:tesselation_geo} shows three geographic grid tessellations of ellipsoids with constant number of latitudinal segments of 4, 8 and 16 respectively.
+Tessellating the ellipsoid using a geographic grid is a very straightforward approach. Ellipsoid vertex positions can be calculated using a transform from geographic coordinates to Cartesian model space coordinates \cite[p. 25]{cozzi11}. Figure \ref{fig:tesselation_geo} shows three geographic grid tessellations of a sphere with constant number of latitudinal segments of 4, 8 and 16 respectively.
 
 A common issue with geographic grids is something referred to as polar pinching. At both of the poles, segments will be pinched to one point which leads to an increasing amount of segments per area. This in turn results in oversampling in textures as well as possible visual artifacts in shading due to the very thin quads at the poles as well as possible performance penalties for highly tessellated globes.
 
@@ -165,7 +165,7 @@ A common issue with geographic grids is something referred to as polar pinching.
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_geo3.png}
     \end{subfigure}
-    \caption{Geographic grid tesselation.}
+    \caption{Geographic grid tesselation of a sphere with constant number of latitudinal segments of 4, 8 and 16 respectively}
     \label{fig:tesselation_geo}
 \end{figure}
 
@@ -195,7 +195,7 @@ To model an ellipsoid from a sphere, the vertices can be linearly transformed wi
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_cube4.png}
     \end{subfigure}
-    \caption{Quadrilateralized spherical cube tessellation.}
+    \caption{Quadrilateralized spherical cube tessellation with 0, 1, 2 and 3 subdivisions respectively}
     \label{fig:tesselation_cube}
 \end{figure}
 
@@ -223,7 +223,7 @@ The hierarchical triangular mesh (HTM) is a method of modeling the sky dome as a
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_htm4.png}
     \end{subfigure}
-    \caption{Hierarchical triangular mesh tesselation.}
+    \caption{Hierarchical triangular mesh tesselation of a sphere with 0, 1, 2 and 3 subdivisions respectively}
     \label{fig:tesselation_htm}
 \end{figure}
 
@@ -246,7 +246,7 @@ Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is a spherical tessella
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_healpix3.png}
     \end{subfigure}
-    \caption{HEALPix tesselation.}
+    \caption{HEALPix tesselation of three different levels of detail.}
     \label{fig:tesselation_healpix}
 \end{figure}
 
@@ -269,7 +269,7 @@ In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ra
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_caps_proj3.png}
     \end{subfigure}
-    \caption{Geographic tessellation of an ellipsoid with polar caps.}
+    \caption{Geographic tessellation of a sphere with polar caps}
     \label{fig:tesselation_caps}
 \end{figure}
 
@@ -322,7 +322,7 @@ The simplest geographic parameterization uses geocentric coordinates. Here the l
 \paragraph{Geodetic projection}
 The equirectangular cylindrical projection, using geodetic coordinates, is another variety of the geographic coordinate systems where the distance differential along the latitude $\partial \phi$ maps linearly to the latitude differential of the projected coordinates of the map.
 
-Figure \ref{fig:geodetic} shows the difference between geocentric latitudes, $\phi_c$ and geodetic latitudes, $\phi_d$ for a point $\vec{p}$ on the surface of an ellipsoid. The figure also shows the difference between geocentric and geodetic surface normals, $\hat{n_c}$ and $\hat{n_d}$, respectively. 
+Figure \ref{fig:geodetic} shows the difference between geocentric latitudes along with difference in surface normals.
 
 \begin{figure}[htbp]
 \centering
@@ -335,7 +335,7 @@ Figure \ref{fig:geodetic} shows the difference between geocentric latitudes, $\p
     \put(82, 75){$\phi_c$}
     \label{fig:proj_equirectangular}
 \end{picture}
-\caption{Difference between geocentric and geodetic latitudes.}
+\caption{Difference between geocentric latitudes, $\phi_c$ and geodetic latitudes, $\phi_d$ for a point $\vec{p}$ on the surface of an ellipsoid. The figure also shows the difference between geocentric and geodetic surface normals, $\hat{n_c}$ and $\hat{n_d}$, respectively. }
 \label{fig:geodetic}
 \end{figure}
 
@@ -362,7 +362,7 @@ The mercator projection is a cylindrical projection widely used for presenting g
         \includegraphics[width=\textwidth]{figures/central_park_mercator.png}
         \caption{The mercator projection is conformal and preserves aspect ratio.}
     \end{subfigure}
-    \caption{Unwrapped equirectangular and mercator projections.}
+    \caption{Unwrapped equirectangular and mercator projections. The mercator projection works when it is unwrapped due to it being conformal (preserving aspect ratio)}
     \label{fig:mercator}
 \end{figure}
 
@@ -497,7 +497,7 @@ In the Discrete Level Of Detail (DLOD) approach, multiple different representati
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/lod/decimation1.png}
     \end{subfigure}
-    \caption{A range of predefined meshes with increasing resolution.}
+    \caption{A range of predefined meshes with increasing resolution. Dynamic level of detail algorithms are used to choose the most suitable mesh for rendering.}
     \label{fig:dlod}
 \end{figure}
 
@@ -533,8 +533,8 @@ A special branch of CLOD worth mentioning is the so called infinite LOD. In this
 Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLOD algorithms operates on hierarchically arranged, predefined chunks of the full model. Each chunk is processed, stored and rendered separately. By doing this, HLOD approaches tackles the weaknesses of CLOD, essentially by doing the following.
 
 \begin{enumerate}
-    \item Reducing processing time on CPU: The only CPU task that HLOD algorithms has to deal with during runtime is to select a suitable subset of the predefined chunks for rendering. This is a relatively fast procedure in contrast to iteratively applying changes to the raw geometry, as done in CLOD.
-    \item Reducing the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can not be cached on the GPU. Being able to perform GPU caching allows HLOD to better minimize the traffic to the GPU.
+    \item Reducing processing time on CPU: The only CPU task that HLOD algorithms has to deal with during runtime is to select a suitable subset of the predefined chunks for rendering. This is a relatively fast procedure in contrast to iteratively applying changes to the raw geometry, as done in CLOD
+    \item Reducing the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can not be cached on the GPU. Being able to perform GPU caching allows HLOD to better minimize the traffic to the GPU
 \end{enumerate}
 
 HLOD uses spatial hierarchical data structures such as binary trees, quadtrees, or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail in one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated with a quad tree holding chunks representing a bunny model in figure \ref{fig:hlod}.
@@ -544,7 +544,7 @@ HLOD uses spatial hierarchical data structures such as binary trees, quadtrees, 
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/lod/hlod.pdf}
     \end{subfigure}
-    \caption{Bunny model chunked up using HLOD.}
+    \caption{Bunny model chunked up using HLOD. Child nodes represent higher resolution representations of the parent models}
     \label{fig:hlod}
 \end{figure}
 
@@ -564,7 +564,7 @@ Generally, selecting all the chunks at a specific level in the tree yields a com
     }
   }{}
     \label{alg:chunkselection}
-  \caption{Selecting chunks to render. The error metric depends on the camera and the chunk to render. A given chunk always has a smaller error metric than its parent.}
+  \caption{Selecting chunks to render. The error metric depends on the camera and the chunk to render. A given chunk always has a smaller error metric than its parent}
 \end{algorithm} 
 
 This example uses a depth first approach for rendering of chunks. Other common schemes for traversing the hierarchy are breadth first and inverse breadth first.
@@ -626,16 +626,16 @@ where $\phi_{NE}$ and $\theta_{NE}$ are the latitude and the longitude of the no
 Chunks should store the following data:
 
 \begin{enumerate}
-    \item A mesh defining the terrain geometry (positions, normals, texture coordinates). 
-    \item A monotonic geometric error, based on the vertices distances to the fully detailed mesh. The children of a chunk always have a smaller geometric error as they can better fit the highest level of detail model.
-    \item A known bounding volume encapsulating the mesh and all the chunk's children. This is used along with the geometric error metric when selecting suitable chunks for rendering.
+    \item A mesh defining the terrain geometry (positions, normals, texture coordinates) 
+    \item A monotonic geometric error, based on the vertices distances to the fully detailed mesh. The children of a chunk always have a smaller geometric error as they can better fit the highest level of detail model
+    \item A known bounding volume encapsulating the mesh and all the chunk's children. This is used along with the geometric error metric when selecting suitable chunks for rendering
 \end{enumerate}
 
 Depending on the implementation of the chunked LOD algorithm, these properties can be either calculated on the fly or preprocessed as suggested by Cozzi and Ring \cite[p. 447]{cozzi11}. Furthermore, the chunk mesh must fulfill two important requirements: 
 
 \begin{enumerate}
     \item Vertices defined in each corner of the mesh
-    \item Defined edges along its sides such that when two adjacent chunks are rendered next to each other, there is no gap in between them.
+    \item Defined edges along its sides such that when two adjacent chunks are rendered next to each other, there is no gap in between them
 \end{enumerate}
 
 \subsubsection{Culling}
@@ -649,16 +649,16 @@ An important thing to consider when dealing with chunks of a virtual globe is th
     \centering
     \begin{subfigure}[bt]{0.35\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/culling_frustum.png}
-        \caption{Frustum culling.}
+        \caption{Frustum culling}
         \label{fig:culling1}
     \end{subfigure}
     \quad \quad \quad
     \begin{subfigure}[bt]{0.35\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/culling_horizon.png}
-        \caption{Horizon culling.}
+        \caption{Horizon culling}
         \label{fig:culling2}
     \end{subfigure}
-    \caption{Culling for chunked LOD.}
+    \caption{Culling for chunked LOD. Red chunks can be culled due to them being invisible to the camera}
     \label{fig:cullingchunkedlod}
 \end{figure}
 
@@ -674,19 +674,19 @@ Minimizing popping artifacts is typically done by smoothly transitioning between
     \centering
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/switching1.pdf}
-        \caption{An edge at chunk level i-1.}
+        \caption{An edge at a given chunk level}
     \end{subfigure}
     \quad
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/switching2.pdf}
-        \caption{The same edge after level i has been selected.}
+        \caption{The same edge at the next level}
     \end{subfigure}
     \quad
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/switching3.pdf}
-        \caption{The new vertex is interpolated into its true place.}
+        \caption{The new vertex is interpolated into its true place}
     \end{subfigure}
-    \caption{Vertex positions when switching between levels.}
+    \caption{Vertex positions when switching between levels}
     \label{fig:lodswitch}
 \end{figure}
 
@@ -704,13 +704,13 @@ By adding skirts to the chunk meshes, the model will not be rendered with visibl
     \centering
     \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/skirts_without.png}
-        \caption{No skirts.}
+        \caption{No skirts}
     \end{subfigure}
     \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/skirts_with.png}
         \caption{Skirts}
     \end{subfigure}
-    \caption{Chunks with skirts hide the undesired cracks between them.}
+    \caption{Chunks with skirts hide the undesired cracks between them}
     \label{fig:skirts}
 \end{figure}
 
@@ -723,7 +723,7 @@ A clipmap texture is a dynamic mip map where each image in the so called clipmap
     \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap_mipmap.pdf}
     \end{subfigure}
-    \caption{Comparison of mip maps and clip maps}
+    \caption{Clip maps are smaller than mip maps as only parts of the complete map need to be stored}
     \label{fig:clipmapmipmap}
 \end{figure}
 
@@ -734,7 +734,7 @@ The idea of clipmaps can be applied not only to textures but also to geometries 
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap_geo.pdf}
     \end{subfigure}
-    \caption{The Geometry Clipmaps follow the view point.}
+    \caption{The Geometry Clipmaps follow the view point. Higher levels have coarser grids but covers a smaller area. The interior part of the grid can collapse so that higher level geometries can snap to their grid}
     \label{fig:clipmapgeometry}
 \end{figure}
 
@@ -835,7 +835,7 @@ The artifact is shown as discrete positioning of vertices which causes jagged ed
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.3\textwidth]{figures/europa.png}
-    \caption{Jupiter's moon Europa rendered with single precision floating point operations. The precision errors in the placement of the vertices is apparent even at a distance far from the globe.}
+    \caption{Jupiter's moon Europa rendered with single precision floating point operations. The precision errors in the placement of the vertices is apparent as jagged edges even at a distance far from the globe.}
     \label{fig:jittering}
 \end{figure}
 
@@ -848,7 +848,7 @@ Another well known issue related to precision in rendering of highly detailed ob
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/zfighting.png}
-    \caption{Z-fighting.}
+    \caption{Z-fighting as fragments flip between being behind or in front of each other}
     \label{fig:zfighting}
 \end{figure}
 

@@ -63,16 +63,16 @@ The goal of this thesis is not only to provide OpenSpace with a globe browsing f
 
 \begin{enumerate}
     \item Ability to retrieve map data from the most common standardized web map data interfaces: WMS, TMS, WMTS.
-    \item Ability to render height maps and color textures with up to 25 cm per pixel resolution.
-    \item Ability to layer multiple map datasets on top of each other. This makes it possible to visualize a range of scientific parameters on top of a textured globe.
-    \item Globe browsing should be done at interactive frame rates: at least 60 frames per second on modern consumer gaming graphics cards.
-    \item Correct positional mapping of objects rendered near the globe surface.
-    \item Support animation of map datasets with time resolution.
+    \item Ability to render height maps and color textures with up to 25 cm per pixel resolution \todo{Something to fix here?}
+    \item Ability to layer multiple map datasets on top of each other. This makes it possible to visualize a range of scientific parameters on top of a textured globe
+    \item Globe browsing should be done at interactive frame rates: at least 60 frames per second on modern consumer gaming graphics cards
+    \item Correct positional mapping of objects rendered near the globe surface
+    \item Support animation of map datasets with time resolution
     \item An intuitive interaction mode is also required to get the most out of globe browsing. It must support:
 	\begin{enumerate}
-    		\item Horizontal following of reference ellipsoid.
-		\item Decrease in sensitivity when closer to the surface of the globe.
-		\item Terrain following to avoid popping down under the surface.
+    		\item Horizontal following of reference ellipsoid
+		\item Decrease in sensitivity when closer to the surface of the globe
+		\item Terrain following to avoid popping down under the surface
 	\end{enumerate}
 \end{enumerate}
 
@@ -94,11 +94,11 @@ There are multiple technical challenges to tackle when designing a virtual globe
 
 \begin{itemize}
 
-\item \textbf{Precision} - In order to render small scale details of a virtual globe and also dolly out to see multiple virtual globes within the solar system, the limited precision of computer arithmetics needs to be considered.
-\item \textbf{Accuracy} - Modelling globes as spheres is usually not a very accurate approach, as many planets and moons that rotate have different polar and equatorial radii.
-\item \textbf{Curvature} - The curved nature of globes implies some extra challenges as opposed to worlds modelled based on flat surfaces. The challenge includes finding a suitable 2D-parameterization for tessellation and mapping.
-\item \textbf{Massive datasets} - It is usual for real world geographical datasets to be too large to fit in GPU memory, RAM and even local drives. Instead, data need to be fetched from remote servers on demand using a so called out-of-core approach to rendering.
-\item \textbf{Multithreading} - The need for multithreading is necessary as the program needs to retrieve geographical data from multiple sources, while at the same time retain a steady frame rate for rendering.
+\item \textbf{Precision} - In order to render small scale details of a virtual globe and also dolly out to see multiple virtual globes within the solar system, the limited precision of computer arithmetics needs to be considered
+\item \textbf{Accuracy} - Modelling globes as spheres is usually not a very accurate approach, as many planets and moons that rotate have different polar and equatorial radii
+\item \textbf{Curvature} - The curved nature of globes implies some extra challenges as opposed to worlds modelled based on flat surfaces. The challenge includes finding a suitable 2D-parameterization for tessellation and mapping
+\item \textbf{Massive datasets} - It is usual for real world geographical datasets to be too large to fit in GPU memory, RAM and even local drives. Instead, data need to be fetched from remote servers on demand using a so called out-of-core approach to rendering
+\item \textbf{Multithreading} - The need for multithreading is necessary as the program needs to retrieve geographical data from multiple sources, while at the same time retain a steady frame rate for rendering
 
 \end{itemize}
 
@@ -112,16 +112,16 @@ When dealing in mapping and rendering of globes, conversion between different co
 \item \textbf{Cartesian coordinates} - Normal right handed OpenGL coordinates. Can be either in model space, world space, or camera space.
 
 \begin{itemize}
-\item \textbf{World space coordinates} - Coordinate space where the globe does not necessarily have to be in the origin. This, for example, can be the J2000 coordinate system with the origin in the barycenter of the solar system.
-\item \textbf{Model space coordinates} - Coordinate space where the center of mass of the globe is positioned in the origin. This, for example, can be the WGS84 reference frame for the Earth.
-\item \textbf{Camera space coordinates} - Standard OpenGL camera space where $-z$ is in the view direction of the camera.
+\item \textbf{World space coordinates} - Coordinate space where the globe does not necessarily have to be in the origin. This, for example, can be the J2000 coordinate system with the origin in the barycenter of the solar system
+\item \textbf{Model space coordinates} - Coordinate space where the center of mass of the globe is positioned in the origin. This, for example, can be the WGS84 reference frame for the Earth
+\item \textbf{Camera space coordinates} - Standard OpenGL camera space where $-z$ is in the view direction of the camera
 \end{itemize}
 
-\item \textbf{Georeferenced coordinates (projection coordinates)} - Two or three dimensional coordinate space defining a position on the globe surface. This, for example, can be defined in geodetics ($latitude$ and $longitude$) with or without the inclusion of an $altitude$ coordinate.
+\item \textbf{Georeferenced coordinates (projection coordinates)} - Two or three dimensional coordinate space defining a position on the globe surface. This, for example, can be defined in geodetics ($latitude$ and $longitude$) with or without the inclusion of an $altitude$ coordinate
 
-\item \textbf{Raster coordinates} - Two dimensional coordinate space defined for a map or an image. Coordinates are \emph{line} and \emph{pixel}.
+\item \textbf{Raster coordinates} - Two dimensional coordinate space defined for a map or an image. Coordinates are \emph{line} and \emph{pixel}
 
-\item \textbf{Texture coordinates (uv coordinates)} - Two dimensional coordinate space defined for one tile.
+\item \textbf{Texture coordinates (uv coordinates)} - Two dimensional coordinate space defined for one tile
 
 \end{itemize}
 
