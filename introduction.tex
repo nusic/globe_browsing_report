@@ -2,7 +2,7 @@
 
 Scientific visualization of space research, also known as astro-visualization, works as an important tool for scientists to communicate their work in exploring the cosmos. 3D computer graphics has shown to be an efficient tool for bringing insights from geological and astronomical data, as spatial and temporal relations can intuitively be interpreted through 3D visualizations.
 
-Researching and mapping out celestial bodies other than the Earth is an important part of expanding the space frontier; virtually rendering these globes using real gathered map and terrain data is a natural part of any scientifically accurate space visualization software.
+Researching and mapping celestial bodies other than the Earth is an important part of expanding the space frontier; virtually rendering these globes using real gathered map and terrain data is a natural part of any scientifically accurate space visualization software.
 
 Important parts of a software for visualizing celestial bodies include the ability to render terrains together with color textures of various sources. The focus of this thesis is put on terrain rendering on globes using high fidelity geographical data such as texture maps, maps of scientific parameters, and digital terrain models. The globe rendering feature with the research involved was implemented for the software OpenSpace. The implementation was separated enough from the main program to avoid dependencies and make the thesis independent of specific implementation details. 
 
@@ -10,7 +10,7 @@ Important parts of a software for visualizing celestial bodies include the abili
 
 \subsection{OpenSpace}
 
-OpenSpace is an open-source, interactive data visualization software with the goal of bringing astro-visualization to the broad public and serve as a platform for scientists to talk about their research. The software supports rendering across multiple screens, allowing immerse visualizations on tiled displays as well as in dome theatres \cite{openspace}.
+OpenSpace is an open-source, interactive data visualization software with the goal of bringing astro-visualization to the broad public and serve as a platform for scientists to talk about their research. The software supports rendering across multiple screens, allowing immerse visualizations on tiled displays as well as in dome displays using multiple projectors \cite{openspace}.
 
 With a real time rendering software such as OpenSpace, the human curiosity involved in exploration easily becomes obvious when the user is given the ability to freely fly around in space and near the surface of other worlds and discover places they probably never can visit in real life. This is also true for public presentations where researchers such as geologists can go into details about their knowledge and showing it through scientific visualization.
 
@@ -20,13 +20,13 @@ An important part of the software is to avoid the use of procedurally generated 
 
 The term globe browsing can be described as exploration of geospatial data on a virtual representation of a globe. The word globe is a general term used to describe nearly elliptical celestial objects such as planets, moons, dwarf planets, and asteroids.
 
-Globe rendering with the purpose of multi scale browsing has been used for quite some time in flight simulators, map services and astro-visualization. Prerendered flight paths were visualized as early as the late 1970s by NASA's Jet Propulsion Laboratory \cite{cozzi11}. 
+Globe rendering with the purpose of multi-scale browsing has been used for quite some time in flight simulators, map services and astro-visualization. Prerendered flight paths were visualized as early as the late 1970s by NASA's Jet Propulsion Laboratory \cite{cozzi11}. 
 
 Google Earth \cite{googlemaps} enables browsing of the Earth within a web browser using geometries for cities of high detail. The National Oceanic and Atmospheric Administration (NOAA) provides a sophisticated sphere rendering system, ''Science On a Sphere'', with the ability to visualize a vast amount of geospatial data on spheres with a temporal dimension \cite{sos}. The project is not only a software but includes projection displays and floor plans to aid in public presentations.
 
 There are other commercial softwares that enables larger scale visualization of the Universe with real positional data gathered through research by the National Aeronautics and Space Administration (NASA), the European Space Agency (ESA) and others. Satellite Toolkit (STK) enables this by integrating ephemeris information through the SPICE interface \cite{spice} which allows accurate placing of celestial bodies and space crafts within our solar system. Uniview from SCISS AB also enables SPICE integration with sophisticated rendering techniques and dome theatre support \cite{uniview}.
 
-There are other significant globe browsing softwares used in dome theatres such as Microsoft's World Wide Telescope (WWT) \cite{wwt}, Evans \& Sutherland's Digistar \cite{digistar}, and Sky-Skans DigitalSky \cite{digitalsky}.
+There are other significant globe browsing softwares used in dome theatres such as World Wide Telescope (WWT) \cite{wwt}, Evans \& Sutherland's Digistar \cite{digistar}, and Sky-Skans DigitalSky \cite{digitalsky}.
 
 Other relevant softwares that currently do not support dome configuration rendering but none the less are very adequate in their techniques of integrating globe browsing and globe rendering include Outerra \cite{outerra} and Space Engine \cite{spaceengine}. Both focusing on merging real data with procedurally generated terrains where real data is not available.
 
@@ -40,7 +40,7 @@ In table \ref{table:softwares}, features relevant to globe browsing in public pr
     \label{table:softwares}
   \resizebox{\textwidth}{!}{\begin{tabular}{| r | c | c | c | c | c | c |}
     \hline
-        & \textbf{Observable} & \textbf{Focus on DOME} & \textbf{Ephemeris} & \textbf{Scientific} & \textbf{Free} & \textbf{Open} \\ 
+        & \textbf{Observable} & \textbf{Focus on Dome} & \textbf{Ephemeris} & \textbf{Scientific} & \textbf{Free} & \textbf{Open} \\ 
 	& \textbf{Universe scale} & \textbf{configuration support} & \textbf{data integrated} & \textbf{data only} & \textbf{to use}  & \textbf{source} \\ \hline
 
     Google Maps &  &  &  & \ding{52} & \ding{52} & \\
@@ -97,7 +97,7 @@ There are multiple technical challenges to tackle when designing a virtual globe
 \item \textbf{Precision} - In order to render small scale details of a virtual globe and also dolly out to see multiple virtual globes within the solar system, the limited precision of computer arithmetics needs to be considered.
 \item \textbf{Accuracy} - Modelling globes as spheres is usually not a very accurate approach, as many planets and moons that rotate have different polar and equatorial radii.
 \item \textbf{Curvature} - The curved nature of globes implies some extra challenges as opposed to worlds modelled based on flat surfaces. The challenge includes finding a suitable 2D-parameterization for tessellation and mapping.
-\item \textbf{Massive datasets} - It is not unusual for real world geographical datasets to be too large to fit in GPU memory, RAM and even local drives. Instead, data need to be fetched from remote servers on demand using a so called out-of-core approach to rendering.
+\item \textbf{Massive datasets} - It is usual for real world geographical datasets to be too large to fit in GPU memory, RAM and even local drives. Instead, data need to be fetched from remote servers on demand using a so called out-of-core approach to rendering.
 \item \textbf{Multithreading} - The need for multithreading is necessary as the program needs to retrieve geographical data from multiple sources, while at the same time retain a steady frame rate for rendering.
 
 \end{itemize}
@@ -112,15 +112,17 @@ When dealing in mapping and rendering of globes, conversion between different co
 \item \textbf{Cartesian coordinates} - Normal right handed OpenGL coordinates. Can be either in model space, world space, or camera space.
 
 \begin{itemize}
-\item \textbf{World space coordinates} - Coordinate space where the globe does not necessarily have to be in the origin. Can for example be the J2000 coordinate system with the origin in the barycenter of the solar system.
-\item \textbf{Model space coordinates} - Coordinate space where the center of mass of the globe is positioned in the origin. Can for example be the WGS84 reference frame for the Earth.
+\item \textbf{World space coordinates} - Coordinate space where the globe does not necessarily have to be in the origin. This, for example, can be the J2000 coordinate system with the origin in the barycenter of the solar system.
+\item \textbf{Model space coordinates} - Coordinate space where the center of mass of the globe is positioned in the origin. This, for example, can be the WGS84 reference frame for the Earth.
 \item \textbf{Camera space coordinates} - Standard OpenGL camera space where $-z$ is in the view direction of the camera.
 \end{itemize}
 
-\item \textbf{Georeferenced coordinates (projection coordinates)} - Two or three dimensional coordinate space defining a position on the globe surface. Can for example be defined in geodetics ($latitude$ and $longitude$) with or without the inclusion of an $altitude$ coordinate.
+\item \textbf{Georeferenced coordinates (projection coordinates)} - Two or three dimensional coordinate space defining a position on the globe surface. This, for example, can be defined in geodetics ($latitude$ and $longitude$) with or without the inclusion of an $altitude$ coordinate.
 
 \item \textbf{Raster coordinates} - Two dimensional coordinate space defined for a map or an image. Coordinates are \emph{line} and \emph{pixel}.
 
 \item \textbf{Texture coordinates (uv coordinates)} - Two dimensional coordinate space defined for one tile.
 
 \end{itemize}
+
+\todo[inline]{define tiles before this}
