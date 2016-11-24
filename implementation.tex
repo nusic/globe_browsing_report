@@ -57,7 +57,7 @@ The error must not be dependent of the direction of the camera. This is because 
     \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunklod/projectedarea.png}
     \end{subfigure}
-    \caption{Triangle with the area 1/8 of the chunk projected onto a unit sphere}
+    \caption{Triangle with the area 1/8 of the chunk projected onto a unit sphere. The area is used to approximate the solid angle of the chunk used as an error metric when selecting chunks to render}
     \label{fig:chunkprojarea}
 \end{figure}
 
@@ -104,7 +104,7 @@ Given an object in position $\vec{p}$ with a bounding radius $r$ on the surface 
         \put(130,80){$\vec{p}$}
         
     \end{picture}
-    \caption{Horizon culling.}
+    \caption{Horizon culling is performed by comparing the length $l_h+l_m$ with the actual distance to the object at position $\vec{p}$.}
     \label{fig:horizonculling}
 \end{figure}
 
@@ -114,9 +114,9 @@ When culling chunks, the closest position on the chunk is used as the position $
 Fetching the right texture and preparing it for rendering onto chunks is a fairly complicated process. Before digging into the details of this process, there are three concepts that need to be established, as they will be referred to throughout the description of the texture pipeline. These are:
 
 \begin{enumerate}
-	\item \textbf{\class{Tile Index}} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe.
-	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with meta data. Each \class{Raw Tile} is associated with a \class{Tile Index}. They can be instantiated concurrently.
-	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, tiles rely on an OpenGL context and must therefore be initialized on the rendering thread.
+	\item \textbf{\class{Tile Index}} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe
+	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with meta data. Each \class{Raw Tile} is associated with a \class{Tile Index}. They can be instantiated concurrently
+	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, tiles rely on an OpenGL context and must therefore be initialized on the rendering thread
 \end{enumerate}
 
 All chunk height and texture data are represented using \class{Tiles}. \class{Tiles} are created on the client side (i.e. in OpenSpace) on the fly when they are needed. As the pixel data may need to be read from disk or even requested from remote servers, the whole tile preparation pipeline was implemented to be executed on separate threads in order to avoid blocking of the rendering thread with image data reads. 
@@ -125,7 +125,7 @@ During the iterative process of developing the texture tile pipeline, three laye
 
 \begin{center}
   \begin{table}
-  \caption[]{Abstraction layers used in the texture data pipeline.}
+  \caption[]{Abstraction layers used in the texture data pipeline}
     \label{table:tilepipeline}
   \resizebox{\textwidth}{!}{\begin{tabular}{| c | c | c | c |}
     \hline
@@ -146,13 +146,13 @@ The subsequent sections of this chapter will cover each abstraction layer in mor
 Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. GDAL is used as an abstraction layer between all the map formats and the representation of tile datasets. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. GDAL can also be used for disk based caching of data from remote servers. Reading pixel data using the GDAL RasterIO interface requires a set of parameters listed below and illustrated in figure \ref{fig:gdalio}:
 
 \begin{enumerate}
-	\item A map overview to read pixel data from (if the dataset has overviews).
-	\item A pixel region within that map overview to read pixels from.
-	\item The raster band(s) (e.g., color channels) to read.
-	\item A pointer to sufficient user allocated memory where GDAL can write the output of the read operation.
-	\item The pixel region to write the output pixel data. The size of the pixel data to be written may differ from the pixel region to read from, in which case GDAL will resample and interpolate the pixel data automatically.
-	\item The layout (i.e., pixel spacing, raster band spacing and line spacing).
-	\item The data type to retrieve the pixel data in.
+	\item A map overview to read pixel data from (if the dataset has overviews)
+	\item A pixel region within that map overview to read pixels from
+	\item The raster band(s) (e.g., color channels) to read
+	\item A pointer to sufficient user allocated memory where GDAL can write the output of the read operation
+	\item The pixel region to write the output pixel data. The size of the pixel data to be written may differ from the pixel region to read from, in which case GDAL will resample and interpolate the pixel data automatically
+	\item The layout (i.e., pixel spacing, raster band spacing and line spacing)
+	\item The data type to retrieve the pixel data in
 \end{enumerate}
 
 \begin{figure}[htbp]
@@ -280,17 +280,15 @@ The \class{Async Tile Dataset} internally keeps track of what tile indices it ha
 
 Tiles are provided for rendering through \class{Tile Provider}s. They define an interface that allow accessing tiles and meta data about the tiles. There are different types of tile providers, but they must all implement the following functionality:
 
-\todo[inline]{Remove full stops in all lists.}
-
 \begin{itemize}
-\item GetTile(\class{TileIndex}) - access the tile at the provided tile index.
-\item GetDefaultTile() - returns a default tile with status ``OK''.
-\item GetDepthTransform() - pixel value scale factor, e.g. for converting height map values to meters.
-\item GetMaxLevel() - the highest mip level defined for the dataset.
-\item GetNoDataValue() - get value that should be interpreted as ``no data''.
-\item CheckTileStatus(\class{TileIndex}) - check tile status with no side effects.
-\item Update() - called once per frame, allow for internal updates.
-\item Reset() - full reset of internal state.
+\item GetTile(\class{TileIndex}) - access the tile at the provided tile index
+\item GetDefaultTile() - returns a default tile with status ``OK''
+\item GetDepthTransform() - pixel value scale factor, e.g. for converting height map values to meters
+\item GetMaxLevel() - the highest mip level defined for the dataset
+\item GetNoDataValue() - get value that should be interpreted as ``no data''
+\item CheckTileStatus(\class{TileIndex}) - check tile status with no side effects
+\item Update() - called once per frame, allow for internal updates
+\item Reset() - full reset of internal state
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -298,7 +296,7 @@ Tiles are provided for rendering through \class{Tile Provider}s. They define an 
     \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/tileprovider_gettile.pdf}
     \end{subfigure}
-    \caption{Tile provider interface for accessing tiles.}
+    \caption{Tile provider interface for accessing tiles}
     \label{fig:tileprovider}
 \end{figure}
 
@@ -316,7 +314,7 @@ The uploading of texture data to the GPU needs to be on the rendering thread sin
     \begin{subfigure}[bt]{0.7\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_gettile.pdf}
     \end{subfigure}
-    \caption{Tiles are either provided from cache or requested.}
+    \caption{Tiles are either provided from cache or requested}
     \label{fig:cachingtileprovider_gettile}
 \end{figure}
 
@@ -327,7 +325,7 @@ The functionality for internally updating the tile cache is illustrated in figur
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_update.pdf}
     \end{subfigure}
-    \caption{The tile cache is updated once per frame.}
+    \caption{The tile cache is updated once per frame}
     \label{fig:cachingtileprovider_update}
 \end{figure}
 
