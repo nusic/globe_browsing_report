@@ -5,7 +5,7 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 
 \begin{table}[h]
   \centering
-  \caption[]{Benchmark host computer}
+  \caption[]{Computer used for Benchmarking}
     \label{table:benchmark host}
   \begin{tabular}{| r l |}
     \hline
@@ -33,54 +33,50 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
       \textbf{LOD Evaluation:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
       \textbf{Level blending:}    & Enabled \\
-      \textbf{Camera View:}       & Facing down \\
+      \textbf{Camera View:}       & Facing down, varying altitudes\\
     \hline
   \end{tabular}
 \end{table}
-
-
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.31\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/os_view_earth.png}
+        \includegraphics[width=\textwidth]{figures/results/topdown/topdown5.png}
         \caption{Earth}
     \end{subfigure}
     ~
     \begin{subfigure}[bt]{0.31\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/os_view_earth.png}
-        \caption{New York State}
+        \includegraphics[width=\textwidth]{figures/results/topdown/topdown4.png}
+        \caption{East America}
     \end{subfigure}
     ~
     \begin{subfigure}[bt]{0.31\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/os_view_earth.png}
+        \includegraphics[width=\textwidth]{figures/results/topdown/topdown3.png}
         \caption{New York City}
     \end{subfigure}
     ~
     \begin{subfigure}[bt]{0.31\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/os_view_earth.png}
+        \includegraphics[width=\textwidth]{figures/results/topdown/topdown2.png}
         \caption{Manhattan}
     \end{subfigure}
     ~
     \begin{subfigure}[bt]{0.31\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/os_view_earth.png}
+        \includegraphics[width=\textwidth]{figures/results/topdown/topdown1.png}
         \caption{Central Park West}
     \end{subfigure}
     \caption{Top-down views of Earth at different zoom levels}
     \label{fig:topdown}
 \end{figure}
-
-
 \begin{table}[h]
 \centering
-\caption[]{Top down settings}
   \label{table:settingstopdown}
   \begin{tabular}{| r | c c c c c |}
     \hline
       \textbf{Figure \ref{fig:topdown}}  & \textbf{a)} & \textbf{b)} & \textbf{c)} & \textbf{d)}  & \textbf{e)}  \\ \hline
-      \textbf{Chunk Nodes}  & 10 & 54 & 66 & 102 & 106 \\ 
-      \textbf{Leaf Chunk nodes} & 8 & 41 & 50 & 77 & 80 \\ 
-      \textbf{Rendered Chunks} & 7 & 15 & 8 & 14 & 6 \\
-      \textbf{Avg. FPS} & 48 & 42 & 42 & 40 & 41\\
+      \textbf{Chunk Nodes}          & 10      & 70      & 70      & 110     & 142   \\ 
+      \textbf{Leaf Chunk nodes}     & 8       & 53      & 53      & 83      & 107   \\ 
+      \textbf{Rendered Chunks}      & 7       & 14      & 13      & 17      & 11   \\
+      \textbf{Globe render time}    & 1.1 ms  & 3.4 ms  & 3.5 ms  & 5.0 ms  & 5.6 ms   \\
+      \textbf{Frame time}           & 17 ms   & 20 ms   & 20 ms   & 21 ms   & 21 ms  \\
     \hline
   \end{tabular}
 \end{table}
@@ -116,7 +112,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/cam_d.png}
     \end{subfigure}
-    \caption{Camera view.}
+    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey with distance based LOD}
     \label{fig:cullingdcam}
 \end{figure}
 
@@ -191,7 +187,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/cam_a.png}
     \end{subfigure}
-    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey.}
+    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey with Area based LOD}
     \label{fig:cullingacam}
 \end{figure}
 
@@ -238,11 +234,8 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 \end{table}
 
 \clearpage
-\section{Benchmark: Interactive Globe Browsing}
-\FloatBarrier
-text here
-
 \section{Switching using level blending}
+\FloatBarrier
 The visual result of using the distance based level blending is shown in Figure \ref{fig:blending2}.
 \begin{figure}[h]
     \centering
@@ -306,6 +299,37 @@ A performance benchmark of the blending algorithm is described below. Note that 
     \hline
   \end{tabular}
 \end{table}
+
+
+\clearpage
+\section{Benchmark: Interactive Globe Browsing}
+\FloatBarrier
+The purpose of the globe browsing is be able to interactively explore virtual globes and map datasets. In order to captures how the system behaves over time, a user interaction sequence was evaluated. The sequence is described step by step below, and illustrated in Figure \ref{fig:interaction}.
+
+\begin{enumerate}
+  \item Camera views Earth from space
+  \item Descend down to Naturpark Karwendel, north of Innsbruck, Austria
+  \item Tilt camera up, view north horizon
+  \item Turn camera 180 degrees, view south horizon
+  \item Tilt camera down
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[bt]{1.0\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/globebrowsing.png}
+    \end{subfigure}
+    \caption{Chunk tree over time.}
+    \label{fig:interaction}
+\end{figure}
+
+
+Some aspects to note in Figure \ref{fig:interaction} are the following:
+\begin{itemize}
+  \item The chunk tree grows as the camera comes closer to the surface, but the number of rendered chunks remain relativelty constant.
+  \item The chunk tree grows further as the camera views the horizon, as do the number of rendered chunks.
+  \item When turning the the camera 180 degrees, the chunk tree shrinks temporarily. This is a result of the chunk tree being limited by available data. As the new texture tiles are downloaded, the chunk tree grows accordingly.
+\end{itemize}
 
 
 
