@@ -27,17 +27,17 @@ Global maps with high level of detail can easily become too large to be stored a
     \label{fig:overview}
 \end{figure}
 
-The physical disk space of large global map datasets is often measured in terabytes or even petabytes. In order to deal with such large datasets, web based services allow clients to specify parts of the map to download at a time. This is an important aspect in the out of core rendering required for globe visualization.
+The physical disk space of large global map datasets is often measured in terabytes or even petabytes. In order to deal with such large datasets, web based services allow clients to specify parts of the map to download at a time. This is an important aspect in the out-of-core rendering required for globe visualization.
 
 \subsection{Web Map Services}
 
-To standardize web requests for map data, the Open GIS Consortium (OGC) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some more specific examples of WMS-like services are WorldWind, VirtualEarth and AGS. The last three are not covered in this thesis.
+To standardize web requests for map data, the Open GIS Consortium (OGC) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some more specific examples of WMS-like services are WorldWind, VirtualEarth and AGS.
 
 \subsubsection{WMS}
 
 The WMS interface instructs the map server to produce maps as image files with well defined geographic and dimensional parameters. The image files can have different format and compression depending on the provider. A WMS server has the ability to dynamically produce map patches of arbitrary size which puts some load on the server side \cite{wms06}. The basic elements supported by all WMS providers are the \emph{GetCapabilities} and the \emph{GetMap} operations. \emph{GetCapabilities} gives information about the available maps on the server and their corresponding georeferenced metadata. The \emph{GetMap} operation returns the map or a part of the map as an image file.
 
-WMS requests are done using HTTP GET where the standardized request parameters are provided as query parameters in the URL \cite{wms06}. For example, setting the query parameter \texttt{BBOX=-180,-90,180,90} specifies the size of the map in georeferenced coordinates while the parameters \texttt{WIDTH} and \texttt{HEIGHT} specify the size of the requested image in raster coordinates. All name and value pairs for the \emph{GetMap} request are defined under the reference \cite{wms06}.
+WMS requests are done using HTTP GET where the standardized request parameters are provided as query parameters in the URL \cite{wms06}. For example, setting the query parameter \texttt{BBOX=-180,-90,180,90} specifies the size of the map in georeferenced coordinates while the parameters \texttt{WIDTH} and \texttt{HEIGHT} specify the size of the requested image in raster coordinates. All name and value pairs for the \emph{GetMap} request are defined under OpenGIS Web Map Server Implementation Specification \cite{wms06}.
 
 \subsubsection{TMS}
 
@@ -97,13 +97,15 @@ There are several organizations working on gathering GIS data that can be visual
 
 \subsubsection{Earth}
 
-NASA Global Imagery Browse Services (GIBS) provides several global map datasets with information about Earth's changing climate. The two satellites Aqua and Terra orbit the Earth and are continuously measuring multi band quantities such as corrected reflectance and surface reflectance along with a range of scientific parameters such as surface- and water temperatures, ozone, carbon dioxide and more. Many of the GIBS datasets are updated daily or monthly so that changes can be seen over time. Map tiles are downloaded through a TMS interface and a date and time parameter can be set if the dataset is temporal.
+NASA Global Imagery Browse Services (GIBS) provides several global map datasets with information about Earth's changing climate. The two satellites Aqua and Terra orbit the Earth and are continuously measuring multi band quantities such as corrected reflectance and surface reflectance along with a range of scientific parameters such as surface and water temperatures, ozone, carbon dioxide and more. Many of the GIBS datasets are updated temporally so that changes can be seen over time. Map tiles are requested through a TMS interface and a date and time parameter can be set to specify a map within a certain time range.
 
 Environmental Systems Research Institute (ESRI) is the provider of the software ArcGIS that lets their users create and publish map data through different types of web map services. There are a lot of free maps to use; not only for Earth but other globes are covered too. ESRI supports a web publication interface where web maps can be searched and studied in an online map viewer. Many of the maps are given in mercator coordinates since they are meant to be viewed projected on a flat surface such as a screen where aspect ratio should be preserved.
 
 National Oceanic and Atmospheric Administration (NOAA) for the U.S. Department of Commerce gathers and provides weather data of the US that are hosted through different web map services using the ArcGIS online \cite{arcgis} interface by ESRI.
 
 Open Street Map is a free global map of streets and roads created and editable by the public and usable by anyone through a TMS interface. The map uses the web mercator projection.
+
+\todo[inline]{Web mercator has not been introduced?}
 
 \subsubsection{Mars}
 
@@ -467,7 +469,7 @@ Dimitrijevi\'{c} and Ran\v{c}i\'{c} use another polar coordinate system to re-pr
 \end{figure}
 
 \section{Dynamic Level of Detail}
-Dynamic level of detail (LOD) is an important part in handling the extensive amount of data used in an out of core rendering software. The goal is to maximize the visual information on screen while minimizing the workload. In their book Rendering virtual 3D globes, Cozzi and Ring describes LOD rendering algorithms by three typical steps. \cite[p. 367]{cozzi11}
+Dynamic level of detail (LOD) is an important part in handling the extensive amount of data used in an out-of-core rendering software. The goal is to maximize the visual information on screen while minimizing the workload. In their book Rendering virtual 3D globes, Cozzi and Ring describes LOD rendering algorithms by three typical steps. \cite[p. 367]{cozzi11}
 
 \begin{enumerate}
     \item \textbf{Generation} - Create versions at different level of detail of a model
