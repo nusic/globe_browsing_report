@@ -44,6 +44,10 @@
 \usepackage{pifont} %  Check marks
 \usepackage{placeins}
 
+\usepackage{xcolor}
+\usepackage{pgfplots}
+\usepackage{tikz}
+
 \begin{document}
 \renewcommand\bibname{References} %Renames "Bibliography" to "References" on ref page
 
@@ -57,6 +61,15 @@
 }
 
 \newcommand{\class}[1]{$#1$}
+
+
+\pgfplotsset{every tick label/.append style={font=\footnotesize}}
+
+\definecolor{chunks_color}{HTML}{DFC9DC}
+\definecolor{leafs_color}{HTML}{BCD6DD}
+\definecolor{rendered_color}{HTML}{E6C3C3}
+\definecolor{frame_render_time}{HTML}{446A77} %8E4747
+\definecolor{globe_render_time}{HTML}{577D47}
 
 
 

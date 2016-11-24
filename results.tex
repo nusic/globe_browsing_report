@@ -18,8 +18,9 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 \end{table}
 
 \clearpage
-\section{Benchmark: Top-down view}
+\section{Zooming In}
 \FloatBarrier
+The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph}.
 \begin{table}[h]
   \centering
   \caption[]{Top down settings}
@@ -37,6 +38,7 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
     \hline
   \end{tabular}
 \end{table}
+
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.31\textwidth}
@@ -61,25 +63,57 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
     ~
     \begin{subfigure}[bt]{0.31\textwidth}
         \includegraphics[width=\textwidth]{figures/results/topdown/topdown1.png}
-        \caption{Central Park West}
+        \caption{Central Park}
     \end{subfigure}
     \caption{Top-down views of Earth at different zoom levels}
     \label{fig:topdown}
 \end{figure}
-\begin{table}[h]
-\centering
-  \label{table:settingstopdown}
-  \begin{tabular}{| r | c c c c c |}
-    \hline
-      \textbf{Figure \ref{fig:topdown}}  & \textbf{a)} & \textbf{b)} & \textbf{c)} & \textbf{d)}  & \textbf{e)}  \\ \hline
-      \textbf{Chunk Nodes}          & 10      & 70      & 70      & 110     & 142   \\ 
-      \textbf{Leaf Chunk nodes}     & 8       & 53      & 53      & 83      & 107   \\ 
-      \textbf{Rendered Chunks}      & 7       & 14      & 13      & 17      & 11   \\
-      \textbf{Globe render time}    & 1.1 ms  & 3.4 ms  & 3.5 ms  & 5.0 ms  & 5.6 ms   \\
-      \textbf{Frame time}           & 17 ms   & 20 ms   & 20 ms   & 21 ms   & 21 ms  \\
-    \hline
-  \end{tabular}
-\end{table}
+
+\begin{figure}[h]
+\begin{tikzpicture}
+    \begin{axis}[
+        width  = 1.0*\textwidth,
+        height = 12cm,
+        major x tick style = transparent,
+        ybar=2*\pgflinewidth,
+        bar width=8pt,
+        ymajorgrids = true,
+        %ylabel = {Number of},
+        symbolic x coords={Earth, East America, NYC, Manhattan, Central Park},
+        xtick = data,
+        scaled y ticks = false,
+        enlarge x limits=0.25,
+        ymin=0,
+        legend cell align=left,
+        legend style={
+                at={(0.43, 0.66)},
+                anchor=south east,
+                column sep=1ex
+        }
+    ]
+
+      \addplot[style={chunks_color,fill=chunks_color,mark=none}]
+        coordinates { (Earth, 10) (East America, 70) (NYC, 70) (Manhattan, 110) (Central Park, 142) };
+
+      \addplot[style={leafs_color,fill=leafs_color,mark=none}]
+        coordinates { (Earth, 8) (East America, 53) (NYC, 53) (Manhattan, 83) (Central Park, 107) };
+      
+      \addplot[style={rendered_color,fill=rendered_color,mark=none}]
+        coordinates { (Earth, 7) (East America, 14) (NYC, 13) (Manhattan, 17) (Central Park, 11) };
+
+      \addplot[style={globe_render_time,fill=globe_render_time,mark=none}]
+        coordinates { (Earth, 17) (East America, 20) (NYC, 20) (Manhattan, 21) (Central Park, 21) };
+
+      \addplot[style={frame_render_time,fill=frame_render_time,mark=none}]
+        coordinates { (Earth, 1.1) (East America, 3.4) (NYC, 3.5) (Manhattan, 5) (Central Park, 5.6) };
+
+      \legend{Chunks, Leaf chunks, Rendered chunks, Frame time [ms], Globe render time [ms]}
+
+    \end{axis}
+\end{tikzpicture}
+\caption{}
+\label{fig:topdowngraph}
+\end{figure}
 
 
 
@@ -257,7 +291,7 @@ A performance benchmark of the blending algorithm is described below. Note that 
 \begin{table}
   \centering
   \caption[]{Benchmark: Level blending}
-    \label{table:settingstopdown}
+    \label{table:levelblending}
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
@@ -288,7 +322,7 @@ A performance benchmark of the blending algorithm is described below. Note that 
 \begin{table}
 \centering
 \caption[]{Top down settings}
-  \label{table:settingstopdown}
+  \label{table:resultblending}
   \begin{tabular}{| r | c c |}
     \hline
       \textbf{Figure \ref{fig:blending}}  & \textbf{No blending} & \textbf{Level blending} \\ \hline
@@ -300,6 +334,109 @@ A performance benchmark of the blending algorithm is described below. Note that 
   \end{tabular}
 \end{table}
 
+\clearpage
+\section{Polar Pinching}
+\FloatBarrier
+The impact of polar pinching on the chunk tree was evaluated using both Distance based LOD and Area based LOD. The results are presented in Figure \ref{fig:pincheval}.
+
+
+\begin{table}[h]
+  \centering
+  \caption[]{Evaluating pinching}
+    \label{table:pinchingstart}
+  \begin{tabular}{| r l |}
+    \hline
+      \textbf{Globe:}             & Earth \\
+      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
+                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{LOD Scale factor:}  & 10.0 \\
+      \textbf{LOD Evaluation:}    & Evaluated \\
+      \textbf{Culling:}           & Frustum culling, Horizon culling \\
+      \textbf{Camera View:}       & Facing down\\
+      \textbf{Location:}          & Quito, Ecuador and North Pole\\
+    \hline
+  \end{tabular}
+\end{table}
+
+\iffalse
+\begin{table}[h]
+\centering
+\caption[]{Evaluation of polar pinching with Distance based LOD}
+  \label{table:polarpinching}
+  \begin{tabular}{| r | c c |}
+    \hline
+      \textbf{Distance based LOD} & \textbf{Equator} & \textbf{North Pole} \\ \hline
+      \textbf{Chunk nodes}        & 78           & 506               \\ 
+      \textbf{Leaf chunk nodes}   & 59           & 380                \\ 
+      \textbf{Rendered chunks}    & 6            & 151                \\
+      \textbf{Frame Time}         & ? ms         & ? ms              \\
+      \textbf{Globe render time}  & 2,7 ms       & 31 ms              \\
+    \hline
+  \end{tabular}
+\end{table}
+\fi
+
+
+\begin{figure}[h]
+\begin{tikzpicture}
+    \begin{axis}[
+        width  = 1.0*\textwidth,
+        height = 8cm,
+        major x tick style = transparent,
+        ybar=2*\pgflinewidth,
+        bar width=14pt,
+        ymajorgrids = true,
+        %ylabel = {Number of},
+        symbolic x coords={D: Equator, D: Pole, A: Equator, A: Pole},
+        xtick = data,
+        scaled y ticks = false,
+        enlarge x limits=0.25,
+        ymin=0,
+        legend cell align=left,
+        legend style={
+                at={(0.98, 0.60)},
+                anchor=south east,
+                column sep=1ex
+        }
+    ]
+
+      \addplot[style={chunks_color,fill=chunks_color,mark=none}]
+        coordinates { (D: Equator, 78) (D: Pole, 506) (A: Equator, 94) (A: Pole, 250) };
+
+      \addplot[style={leafs_color,fill=leafs_color,mark=none}]
+        coordinates { (D: Equator, 59) (D: Pole, 380) (A: Equator, 94) (A: Pole, 188) };
+      
+      \addplot[style={rendered_color,fill=rendered_color,mark=none}]
+        coordinates { (D: Equator, 6) (D: Pole, 151) (A: Equator, 17) (A: Pole, 64) };
+
+      \addplot[style={globe_render_time,fill=globe_render_time,mark=none}]
+        coordinates { (D: Equator, 27) (D: Pole, 310) (A: Equator, 43) (A: Pole, 140) };
+
+      \legend{Chunks, Leaf chunks, Rendered chunks, Render time [$10^{-4}$ s]}
+
+    \end{axis}
+\end{tikzpicture}
+\caption{Comparison of Distance based and Area based LOD at the Equator and the North Pole. \textbf{D} = Distance based LOD, \textbf{A} = Area based LOD.}
+\label{fig:pincheval}
+\end{figure}
+
+\iffalse
+\begin{table}[h]
+\centering
+\caption[]{Evaluation of polar pinching with Area based LOD}
+  \label{table:polarpinching}
+  \begin{tabular}{| r | c c |}
+    \hline
+      \textbf{Area based LOD}     & \textbf{Equator} & \textbf{North Pole} \\ \hline
+      \textbf{Chunk nodes}        & 94           & 250               \\ 
+      \textbf{Leaf chunk nodes}   & 71           & 188                \\ 
+      \textbf{Rendered chunks}    & 17           & 64                \\
+      \textbf{Frame Time}         & ? ms         & ? ms              \\
+      \textbf{Globe render time}  & 4,3 ms       & 14 ms              \\
+    \hline
+  \end{tabular}
+\end{table}
+\fi
 
 \clearpage
 \section{Benchmark: Interactive Globe Browsing}
