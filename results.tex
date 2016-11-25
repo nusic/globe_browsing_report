@@ -1,7 +1,7 @@
 \chapter{Results}
 This section goes through how the final implementation results in a software that solves the proposed objectives. Section (ref screenshots) includes screenshots showing the globe browsing in use.
 
-The benchmarks were done using an relatively old consumer laptop computer. Its specs are provided below.
+The benchmarks were done using the computer specified in table \ref{table:benchmark host}.
 
 \begin{table}[h]
   \centering
@@ -20,16 +20,16 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 \clearpage
 \section{Top Down views}
 \FloatBarrier
-The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph}.
+The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph1}.
 \begin{table}[h]
   \centering
-  \caption[]{Top down settings}
+  \caption[]{Settings for evaluation based on a top down view}
     \label{table:settingstopdown}
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 10.0 \\
       \textbf{LOD Evaluation:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
@@ -112,7 +112,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
     \end{axis}
 \end{tikzpicture}
 \caption{}
-\label{fig:topdowngraph}
+\label{fig:topdowngraph1}
 \end{figure}
 
 
@@ -130,8 +130,8 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
       \textbf{LOD Evaluation:}    & By distance \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
@@ -255,8 +255,8 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
       \textbf{LOD Evaluation:}    & By Projected Area \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
@@ -449,8 +449,8 @@ A performance benchmark of the blending algorithm is described below. Note that 
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 4.65 \\
       \textbf{LOD Evaluation:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
@@ -501,8 +501,8 @@ The impact of polar pinching on the chunk tree was evaluated using both Distance
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation\cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 10.0 \\
       \textbf{LOD Evaluation:}    & Evaluated \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
