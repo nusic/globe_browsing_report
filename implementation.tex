@@ -69,8 +69,8 @@ The actual approximated solid angle is the projected triangle area multiplied by
 Splitting a chunk will not result in higher level of detail unless the corresponding higher level of detail tile data is also currently available for rendering. Therefore, the growth of the chunk tree can be limited by checking if there is any tile data there in the first place. This is useful in two scenarios:
 
 \begin{enumerate}
-\item Rendering of sparse map datasets which contain geographical regions where there are no data.
-\item Rendering of map datasets which are queried from remote servers; there will always be some delay where the queried map data is not yet available.
+\item Rendering of sparse map datasets which contain geographical regions where there are no data
+\item Rendering of map datasets which are queried from remote servers; there will always be some delay where the queried map data is not yet available
 \end{enumerate}
 
 Being able to limit the chunk tree in these two scenarios, unnecessary chunk rendering calls can be avoided.
@@ -104,7 +104,7 @@ Given an object in position $\vec{p}$ with a bounding radius $r$ on the surface 
         \put(130,80){$\vec{p}$}
         
     \end{picture}
-    \caption{Horizon culling is performed by comparing the length $l_h+l_m$ with the actual distance to the object at position $\vec{p}$.}
+    \caption{Horizon culling is performed by comparing the length $l_h+l_m$ with the actual distance between the camera position and the object at position $\vec{p}$.}
     \label{fig:horizonculling}
 \end{figure}
 
@@ -160,7 +160,7 @@ Geospatial Data Abstraction Library (GDAL) is an open source library providing a
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalio.pdf}
     \end{subfigure}
-    \caption{The required GDAL raster IO parameters. Figure adapted from \cite{mapprojections}}
+    \caption{The required GDAL RasterIO parameters. Figure adapted from \cite{mapprojections}}
     \label{fig:gdalio}
 \end{figure}
 
@@ -187,7 +187,7 @@ GDAL also provides the coefficients of a geo-transform which defines the mapping
     \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/tiledataset.pdf}
     \end{subfigure}
-    \caption{Tile datasets reads tiled pixel regions.}
+    \caption{The tile dataset pipeline takes a tile index as input, interfaces with GDAL and returns a raw tile}
     \label{fig:tiledataset}
 \end{figure}
 
@@ -212,7 +212,7 @@ The IO description contains all tile specific information needed to perform a ma
 \item Finalize the gathered data to an IO description object.
 \end{enumerate}
 
-In the scheme in figure \ref{fig:getiodescription}, step one is performed using equation \ref{eq:latlongindex},
+In the scheme in figure \ref{fig:getiodescription}, step 1 is performed using equation \ref{eq:latlongindex},
 
 \begin{equation}
 \label{eq:latlongindex}
@@ -259,7 +259,7 @@ To summarize, the implementation of \class{Tile Dataset} allow reading pixel dat
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset.pdf}
     \end{subfigure}
-    \caption{Asynchronious reading of Raw tiles.}
+    \caption{Asynchronious reading of Raw tiles can be performed on separate threads. When the tile reading job is finished the raw tile will be appended to a concurrent queue}
     \label{fig:asynctiledataset}
 \end{figure}
 
@@ -268,7 +268,7 @@ To summarize, the implementation of \class{Tile Dataset} allow reading pixel dat
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset_gettiles.pdf}
     \end{subfigure}
-    \caption{Retrieving finished Raw tiles.}
+    \caption{Retrieving finished Raw tiles}
     \label{fig:asynctiledataset2}
 \end{figure}
 
@@ -314,7 +314,7 @@ The uploading of texture data to the GPU needs to be on the rendering thread sin
     \begin{subfigure}[bt]{0.7\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_gettile.pdf}
     \end{subfigure}
-    \caption{Tiles are either provided from cache or requested}
+    \caption{Tiles are either provided from cache or enqueued in an asynchronous tile dataset if it is not available}
     \label{fig:cachingtileprovider_gettile}
 \end{figure}
 
@@ -336,7 +336,7 @@ Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario
     \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_tilerequest.pdf}
     \end{subfigure}
-    \caption{Tiles are fetched on demand}
+    \caption{Tiles are fetched on demand. The first time a tile is requested, the asynchronous tile dataset will request it on a worker thread. As soon as the tile has been initialized it will have the status ``OK'' and can be used for rendering}
     \label{fig:cachingtileprovider_tilerequest}
 \end{figure}
 
@@ -345,7 +345,7 @@ The caching policy implemented and used is LRU - ``Least Recently Used''. This m
 \subsection{Temporal Tile Provider}
 In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented. The \class{Temporal Tile Provider} is instantiated with a template URI containing a time placeholder. Information about the supported time range, time resolution and expected timestamp format to be used in the template URI is also passed during instantiation. In Listing \ref{lst:temporal}, all tags starting with \texttt{OpenSpace} are used to configure information used to instantiate the temporal dataset. The tag \texttt{GDAL\_WMS} contains a functional GDAL WMS dataset specification. When requesting the URLs for the dataset, \texttt{\$\{OpenSpaceTimeId\}} will be replaced with the date and time in the specified format.
 
-\begin{lstlisting}[language=XML,caption={Temporal WMS dataset specification.} \label{lst:temporal}]
+\begin{lstlisting}[language=XML,caption={Temporal WMS dataset specification} \label{lst:temporal}]
 <OpenSpaceTemporalGDALDataset>
     <OpenSpaceTimeStart>2015-11-24</OpenSpaceTimeStart>
     <OpenSpaceTimeEnd></OpenSpaceTimeEnd>
@@ -371,7 +371,7 @@ A schematic illustration of the implementation of the \class{Temporal Tile Provi
     \begin{subfigure}[bt]{0.7\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/temporaltileprovider_gettile.pdf}
     \end{subfigure}
-    \caption{Each temporal snapshot is internally represented by a caching tile provider.}
+    \caption{Each temporal snapshot is internally represented by a caching tile provider}
     \label{fig:temporaltileprovider_gettile}
 \end{figure}
 
@@ -384,7 +384,7 @@ This is a very simple implementation of the tile provider interface which only s
     \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/singleimagetileprovider_gettile.pdf}
     \end{subfigure}
-    \caption{Serving single tiles can be useful for debugging chunk and texture alignment.}
+    \caption{Serving single tiles can be useful for debugging chunk and texture alignment}
     \label{fig:singleimagetileprovider_gettile}
 \end{figure}
 
@@ -396,7 +396,7 @@ The ability to serve tiles with text rendered on the fly was implemented as a ge
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/texttileprovider_gettile.pdf}
     \end{subfigure}
-    \caption{Serving single tiles can be useful for debugging chunk and texture alignment.}
+    \caption{Serving tiles with custom text rendered on them can be used as size references or providing other information. The tile provider is internally holding a LRU cache for initialized tiles}
     \label{fig:texttileprovider_gettile}
 \end{figure}
 
@@ -413,12 +413,12 @@ When an accessed \class{Tile} does not have the status ``OK'', it can not be use
     \centering
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktile1.jpg}
-        \caption{Requested tile.}
+        \caption{Requested tile}
     \end{subfigure}
     \quad
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktile2.jpg}
-        \caption{Requested tile's region shown in its parent tile.}
+        \caption{Requested tile's region shown in its parent tile}
     \end{subfigure}
     \caption{Only the highlighted subset of the parent tile is used for rendering the chunk. Figure adapted from \cite{mapprojections}}
     \label{fig:tiles}
@@ -598,19 +598,19 @@ Assuming that the texture data is available in local memory, invoking the getChu
     \centering
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile3.png}
-        \caption{Tile.}
+        \caption{Tile}
     \end{subfigure}
     \quad
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile2.png}
-        \caption{Parent 1.}
+        \caption{Parent 1}
     \end{subfigure}
     \quad
     \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/chunktile/chunktilepile1.png}
-        \caption{Parent 2.}
+        \caption{Parent 2}
     \end{subfigure}
-    \caption{Only the highlighted subset of the parent tiles are used for rendering the chunk. Figure from \cite{imageryworld2d}}
+    \caption{The image data of a given chunk tile pile. Only the highlighted subset of the parent tiles are used for rendering the chunk. Figure from \cite{imageryworld2d}}
     \label{fig:chunktilepile}
 \end{figure}
 
@@ -643,7 +643,7 @@ Much like in image editing softwares, a layer in this context represents a raste
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/implementation/layers/layermanager.pdf}
-    \caption{UML diagram of the \class{Layer Manager} and its related classes.}
+    \caption{UML diagram of the \class{Layer Manager} and its related classes}
     \label{fig:layermanager}
 \end{figure}
 
@@ -666,7 +666,7 @@ Incorporating these few differences yields a similar class hierarchy, as illustr
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/implementation/layers/gpulayermanager.pdf}
-    \caption{UML structure for corresponding GPU-mapped hierarchy. The class \texttt{GPUData<T>} maintains an OpenGL uniform location.}
+    \caption{UML structure for corresponding GPU-mapped hierarchy. The class \texttt{GPUData<T>} maintains an OpenGL uniform location}
     \label{fig:gpulayermanager}
 \end{figure}
 
@@ -677,8 +677,8 @@ The leaf classes within the class hierarchy store one uniform location each and 
 With this 1:1 data mapping between the CPU and GPU, all the GPU-prefixed classes were given two responsibilities.
 
 \begin{enumerate}
-\item Bind its uniform locations to GLSL variable names within a provided shader program.
-\item Set its uniform values within a provided shader program. That is, a \class{GPU Chunk Tile} should be able to set its uniform values from a regular \class{ChunkTile}.
+\item Bind its uniform locations to GLSL variable names within a provided shader program
+\item Set its uniform values within a provided shader program. That is, a \class{GPU Chunk Tile} should be able to set its uniform values from a regular \class{ChunkTile}
 \end{enumerate}
 
 The leaf classes automatically takes care of both binding its uniform location to specific GLSL variables and  setting their uniform values. The compound GPU-prefixed classes (non leaf classes) more or less simply propagates the method calls to all its dependents. When binding an object to a variable name, the GLSL variable identifiers are built up successively during the propagation down to the leaf classes. \class{GPU Layer} is used as an example in Listing \ref{lst:bindgpulayer}.
@@ -723,7 +723,7 @@ A chunk grid is defined by a number of segments $N$ in two dimensions, which is 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/implementation/rendering/grid.pdf}
-    \caption{Grid with skirts.}
+    \caption{Grid with skirts with a side of $N=4$ segments. Green represents the main area with texture coordinates $\in \left[  0, 1 \right] $ and blue is the skirt of the grid}
     \label{fig:grid}
 \end{figure}
 
@@ -762,12 +762,12 @@ The most straightforward method for rendering geodetic chunks is to transform th
     \label{fig:global}
 \end{figure}
 
-The model space rendering method essentially achieves the same precision as rendering a predefined chunk mesh relative to the center of mass of the globe. Figure \ref{fig:pipelineglobal} shows the pipeline for rendering a chunk using the model space method. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU.
+The model space rendering method essentially achieves the same precision as rendering a predefined chunk mesh relative to the center of mass of the globe. Figure \ref{fig:pipelineglobal} shows the pipeline for rendering a chunk using the model space method.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/implementation/rendering/pipeline_global.pdf}
-    \caption{Vertex pipeline for model space rendering.}
+    \caption{Vertex pipeline for model space rendering. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU}
     \label{fig:pipelineglobal}
 \end{figure}
 
@@ -796,12 +796,12 @@ With bilinear interpolation, high precision is achieved for vertices placed clos
 
 \todo[inline]{Maybe have a discussion in the Discussion chapter about measuring the error of using bilinear surfaces at different levels.}
 
-Figure \ref{fig:pipelinelocal} shows a flowchart of the local vertex rendering pipeline. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU.
+Figure \ref{fig:pipelinelocal} shows a flowchart of the local vertex rendering pipeline.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/implementation/rendering/pipeline_local.pdf}
-    \caption{Vertex pipeline for camera space rendering.}
+    \caption{Vertex pipeline for camera space rendering. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU}
     \label{fig:pipelinelocal}
 \end{figure}
 
@@ -811,21 +811,21 @@ The purpose of layered texture rendering is to provide the user an ability to to
 
 
 \begin{enumerate}
-\item \textbf{For all ColorLayers}: Sample RGB, apply layer settings and update fragment RGBA using alpha blending.
-\item \textbf{For all GrayscaleLayers}: Sample the grayscale value R, apply layer settings and update fragment V in color space HSV using alpha blending.
-\item \textbf{For all GrayscaleOverlays}: Sample grayscale value R and A, apply layer settings and update fragment RGBA using alpha blending.
-\item \textbf{For all WaterMasks}: Sample A, apply layer settings and add A as a specularity component for the fragment.
-\item \textbf{For all NightTextures}: Sample RGB, apply layer settings and update fragment RGBA using alpha blending in shaded regions of the globe.
-\item Perform shading by darkening shaded regions.
-\item Add simple atmosphere color to RGB.
-\item \textbf{For all ColorOverlays}: Sample RGBA, apply layer settings and update fragment RGBA using alpha blending.
+\item \textbf{For all ColorLayers}: Sample RGB, apply layer settings and update fragment RGBA using alpha blending
+\item \textbf{For all GrayscaleLayers}: Sample the grayscale value R, apply layer settings and update fragment V in color space HSV using alpha blending
+\item \textbf{For all GrayscaleOverlays}: Sample grayscale value R and A, apply layer settings and update fragment RGBA using alpha blending
+\item \textbf{For all WaterMasks}: Sample A, apply layer settings and add A as a specularity component for the fragment
+\item \textbf{For all NightTextures}: Sample RGB, apply layer settings and update fragment RGBA using alpha blending in shaded regions of the globe
+\item Perform shading by darkening shaded regions
+\item Add simple atmosphere color to RGB
+\item \textbf{For all ColorOverlays}: Sample RGBA, apply layer settings and update fragment RGBA using alpha blending
 
 \end{enumerate}
 
 All of these steps are optional and can be toggled by activating or deactivating layers or specifying whether or not to perform shading or use atmosphere for rendering. Sampling the color from a layer group is done by looping through all layers in that group, see Listing \ref{lst:loopthroughlayers}. Listing \ref{lst:gettexval1} and \ref{lst:gettexval2} shows how layer weights and texture transforms for chunk tile piles are used for sampling of the tile textures. Layer settings is performed for all raster bands within all layers. The application of layer settings is shown in Listing \ref{lst:performsettings}.
 
 \begin{lstlisting}[
-  caption={Setting color for a given layer group. Example using ColorLayers.} 
+  caption={Setting color for a given layer group. Example using ColorLayers} 
   \label{lst:loopthroughlayers}
 ]
 #for i in 0..#{lastLayerIndexColorLayers} {
@@ -839,7 +839,7 @@ All of these steps are optional and can be toggled by activating or deactivating
 \end{lstlisting}
 
 \begin{lstlisting}[
-  caption={Getting texture value by blending a chunk tile pile.} 
+  caption={Getting texture value by blending a chunk tile pile} 
   \label{lst:gettexval1}
 ]
 vec4 getTexVal(ChunkTilePile chunkTilePile, LevelWeights w, vec2 uv){
@@ -850,7 +850,7 @@ vec4 getTexVal(ChunkTilePile chunkTilePile, LevelWeights w, vec2 uv){
 \end{lstlisting}
 
 \begin{lstlisting}[
-  caption={Using texture transform and sampling a texture.} 
+  caption={Using texture transform and sampling a texture} 
   \label{lst:gettexval2}
 ]
 vec4 getTexVal(ChunkTile chunkTile, vec2 tileUV){
@@ -862,12 +862,12 @@ vec4 getTexVal(ChunkTile chunkTile, vec2 tileUV){
 
 
 \begin{lstlisting}[
-  caption={Perform layer settings.} 
+  caption={Perform layer settings} 
   \label{lst:performsettings}
 ]
 float performLayerSettings(float currentValue, const LayerSettings settings) {
 	float newValue = currentValue;
-	newValue = sign(newValue) * pow(newValue, settings.gamma);
+	newValue = sign(newValue) * pow(abs(newValue), settings.gamma);
 	newValue = newValue * settings.multiplier;
 	newValue = newValue * settings.opacity;
 	return newValue;
@@ -885,7 +885,7 @@ To decide whether or not a layer shader program needs to be preprocessed and re-
 
 \begin{table}
 \centering 
-\caption[]{Data used for a layer group for preprocessing of layer shader programs.}
+\caption[]{Data used for a layer group for preprocessing of layer shader programs}
 \label{table:layergrouppreprocessingdata}
 \begin{tabular}{ c }    
     	\hline
@@ -899,7 +899,7 @@ To decide whether or not a layer shader program needs to be preprocessed and re-
 
 \begin{table}
 \centering
-\caption[]{Data used for a renderable globe for preprocessing of layer shader programs.}
+\caption[]{Data used for a renderable globe for preprocessing of layer shader programs}
 \label{table:layergrouppreprocessingdata}
 \begin{tabular}{ c }
     
@@ -920,7 +920,7 @@ Instead of the time based switching routine proposed by Cozzi and Ring \cite{coz
 When rendering a specific fragment of a chunk, blending between up to three chunk levels can be used as a part of the switching in the chunked LOD algorithm. Assuming that the level of Tile 0 is equal to the level of the chunk to render and that Chunk Tile 1 and Chunk Tile 2 are 1 and 2 levels lower respectively, three level weights can be determined based on the distance to the fragment to achieve smooth transitions between levels. The three level weights are based on an interpolation parameter $t$ as in Listing \ref{lst:levelweights}.
 
 \begin{lstlisting}[
-  caption={Calculate level weights.} 
+  caption={Calculate level weights for three chunk tiles using an interpolation parameter calculated based on the distance between the camera and the fragment}
   \label{lst:levelweights}
 ]
 LevelWeights getLevelWeights(float t){ // level interpolation parameter
@@ -936,23 +936,23 @@ The interpolation parameter $t$ is calculated using the distance to the camera $
 
 \begin{equation}
 \label{eq:interpolation}
-t = l-log_2(\frac{s}{d})
+t = l-log_2(\frac{s}{d}),
 \end{equation}
 
-where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough with two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor $s$ is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{fig:blending} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
+where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough with two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor $s$ is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{fig:switchingblending} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[tb]{0.49\textwidth}
     	\includegraphics[width=\textwidth]{figures/implementation/rendering/blending1.pdf}
-	\caption{Blending disabled.}
+	\caption{Blending disabled}
     \end{subfigure}
     \begin{subfigure}[tb]{0.49\textwidth}
     	\includegraphics[width=\textwidth]{figures/implementation/rendering/blending2.pdf}
-	\caption{Blending enabled.}
+	\caption{Blending enabled}
     \end{subfigure}
-    \caption{Blending on a per fragment basis.}
-    \label{fig:blending}
+    \caption{Blending on a per fragment basis. The level interpolation parameter $t$ is used to calculate level weights $w_1 = 1-t$ and $w_2 = t$, in this case using two chunk tiles per chunk tile pile.}
+    \label{fig:switchingblending}
 \end{figure}
 
 \section{Interaction}

@@ -115,15 +115,13 @@ NASA's Mars Reconnaissance Orbiter (MRO) is a satellite that has been orbiting M
 
 \subsubsection{Moon}
 
-The Lunar Mapping Modeling Project (LMMP) is an initiative by NASA to gather and publish map data of the Moon from a vast range of lunar missions. The Lunar Reconnaissance Orbiter (LRO) is a satellite orbiting the moon and gathering map data for future landing missions. These maps have been put together into global image mosaics as well as DEMs. Most global maps from LMMP can be accessed via the "onmoon" web interface \cite{onmoon}.
+The Lunar Mapping Modeling Project (LMMP) is an initiative by NASA to gather and publish map data of the Moon from a vast range of lunar missions. The Lunar Reconnaissance Orbiter (LRO) is a satellite orbiting the moon and gathering map data for future landing missions. These maps have been put together into global image mosaics as well as DEMs. Most global maps from LMMP can be accessed via the ``OnMoon'' web interface \cite{onmoon}.
 
 
 
 \section{Modelling Globes}
 
-We will discuss different proposed methods used for modelling and rendering of globes. The globe can be modelled either as a sphere or an ellipsoid and there are different tessellation schemes for meshing the globe. Different map projections can also be considered and it all ties together with the use of a level of detail algorithm.
-
-\todo[inline]{Possibly rephrase}
+We will discuss different proposed methods used for modelling and rendering of globes. The globe can be modelled either as a sphere or an ellipsoid and there are different tessellation schemes for meshing the globe. The tessellation depends on a map projection and out-of-core rendering requires a dynamic level of detail approach for rendering.
 
 \subsection{Globes as Ellipsoids}
 
@@ -246,7 +244,7 @@ Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is a spherical tessella
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_healpix3.png}
     \end{subfigure}
-    \caption{HEALPix tesselation of three different levels of detail.}
+    \caption{HEALPix tesselation of three different levels of detail}
     \label{fig:tesselation_healpix}
 \end{figure}
 
@@ -287,7 +285,7 @@ A map projection $P$ defines a transformation from Cartesian model space coordin
 \begin{pmatrix} x \\ y \\ z \end{pmatrix}_{ modelspace }=\vec { P }^{-1} (s ,t ),
 \end{equation}
 
-Where $x$, $y$ and $z$ are the Cartesian coordinates of a point on the ellipsoid surface. The parameters $s$ and $t$ are georeferenced coordinates defining all positions on the globe. The georeferenced coordinates can have different definition range depending on which projection is used. An example can be letting is $s = \phi \in [-90,90]$ and $t = \theta \in [-180,180]$ which are latitude and longitude respectively for geographic projections.
+where $x$, $y$ and $z$ are the Cartesian coordinates of a point on the ellipsoid surface. The parameters $s$ and $t$ are georeferenced coordinates defining all positions on the globe. The georeferenced coordinates can have different definition range depending on which projection is used. An example can be letting is $s = \phi \in [-90,90]$ and $t = \theta \in [-180,180]$ which are latitude and longitude respectively for geographic projections.
 
 The globally positive gaussian curvature of any intrinsic ellipsoid surface makes it impossible to unproject it on a flat 2D surface without any distortions. Since it is embedded in a 3D space, some distortions must be introduced when unprojecting the surface. The distortion can differ depending on the projection used. Equal-area projections preserve the size of a projected area as $\partial s \partial t / \partial s_0 \partial t_0 = 1$, while conformal projections preserve the shape of projected objects as $\partial s / \partial t = 1$; $s_0$ and $t_0$ are coordinates at the center of the projection with no distortion. No global projection can be both area-preserving and conformal \cite{dimi15}.
 
@@ -335,7 +333,7 @@ Figure \ref{fig:geodetic} shows the difference between geocentric latitudes alon
     \put(82, 75){$\phi_c$}
     \label{fig:proj_equirectangular}
 \end{picture}
-\caption{Difference between geocentric latitudes, $\phi_c$ and geodetic latitudes, $\phi_d$ for a point $\vec{p}$ on the surface of an ellipsoid. The figure also shows the difference between geocentric and geodetic surface normals, $\hat{n_c}$ and $\hat{n_d}$, respectively. }
+\caption{Difference between geocentric latitudes, $\phi_c$ and geodetic latitudes, $\phi_d$ for a point $\vec{p}$ on the surface of an ellipsoid. The figure also shows the difference between geocentric and geodetic surface normals, $\hat{n_c}$ and $\hat{n_d}$, respectively }
 \label{fig:geodetic}
 \end{figure}
 
@@ -497,7 +495,7 @@ In the Discrete Level Of Detail (DLOD) approach, multiple different representati
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/lod/decimation1.png}
     \end{subfigure}
-    \caption{A range of predefined meshes with increasing resolution. Dynamic level of detail algorithms are used to choose the most suitable mesh for rendering.}
+    \caption{A range of predefined meshes with increasing resolution. Dynamic level of detail algorithms are used to choose the most suitable mesh for rendering}
     \label{fig:dlod}
 \end{figure}
 
@@ -520,7 +518,7 @@ The continuous LOD (CLOD) approach represents a model in a way that allows the r
     \begin{subfigure}[tb]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/lod/vertex_split2.png}
     \end{subfigure}
-    \caption{Mesh operations in continous LOD.}
+    \caption{Mesh operations in continous LOD}
     \label{fig:clod}
 \end{figure}
 
@@ -544,7 +542,7 @@ HLOD uses spatial hierarchical data structures such as binary trees, quadtrees, 
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/lod/hlod.pdf}
     \end{subfigure}
-    \caption{Bunny model chunked up using HLOD. Child nodes represent higher resolution representations of the parent models}
+    \caption{Bunny model chunked up using HLOD. Child nodes represent higher resolution representations of parts of the parent models}
     \label{fig:hlod}
 \end{figure}
 
@@ -589,19 +587,19 @@ Using a geographic grid tesselation, the chunks are in geographic space using la
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/chunkedlodtree.pdf}
-        \caption{Chunk tree.}
+        \caption{Chunk tree}
     \end{subfigure}
     \quad
     \begin{subfigure}[b]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/tiled.png}
-        \caption{Geodetic chunks.}
+        \caption{Geodetic chunks}
     \end{subfigure}
     \quad
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/chunkedlod/tiled_globe.png}
-        \caption{Globe.}
+        \caption{Globe}
     \end{subfigure}
-    \caption{Chunked LOD for a globe.}
+    \caption{Chunked LOD for a globe}
     \label{fig:chunkedlod}
 \end{figure}
 
@@ -756,7 +754,7 @@ Using geometry clipmaps to achieve dynamic level of detail for a height mapped g
         \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap2.png}
         \caption{Near a pole}
     \end{subfigure}
-    \caption{Geometry Clipmaps on a geographic grid cause pinching around the poles, which needs to be handled explicitly.}
+    \caption{Geometry Clipmaps on a geographic grid cause pinching around the poles, which needs to be handled explicitly}
     \label{fig:mipclip}
 \end{figure}
 
@@ -806,7 +804,7 @@ A floating point number $y$ is represented by a sign bit $s$, a significand $c \
 
 \begin{equation}
 \label{eq:float}
-y=(-1)^s c b^q
+y=(-1)^s \times c \times b^q
 \end{equation}
 
 These numbers are flexible since they can represent big ranges. They have varying accuracy depending on the exponent $q$ since the numbers $c$ and $q$ are stored as integers with a limited number of bits.
