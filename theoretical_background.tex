@@ -23,7 +23,7 @@ Global maps with high level of detail can easily become too large to be stored a
 
         \label{fig:proj_equirectangular}
     \end{picture}
-    \caption{The size of the map is decreasing exponentially with the overview}
+    \caption{The size of the map is decreasing exponentially with the overview. Figure adapted from \cite{mapprojections}}
     \label{fig:overview}
 \end{figure}
 
@@ -134,7 +134,7 @@ The World Geodetic System 1984 (WGS84) standard defined by National Geospatial-I
 \begin{figure}
 \centering
 \includegraphics[scale=0.25]{figures/wgs84.pdf}
-\caption{The WGS84 coordinate system and globe.}
+\caption{The WGS84 coordinate system and globe. Figure adapted from \cite{mapprojections}}
 \label{fig:wgs84}
 \end{figure}
 
@@ -312,7 +312,7 @@ Geographic coordinates are defined with a latitude $\phi$ and a longitude $\thet
     \begin{subfigure}[bt]{0.15\textwidth}
         \includegraphics[width=\textwidth]{figures/map_projection/projection_geo.png}
     \end{subfigure}
-    \caption{Geographic map projection.}
+    \caption{Geographic map projection. Figure adapted from \cite{mapprojections}}
     \label{fig:proj_equi}
 \end{figure}
 
@@ -353,14 +353,14 @@ The mercator projection is a cylindrical projection widely used for presenting g
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[bt]{0.3\textwidth}
+    \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/central_park_equirectangular.png}
-	\caption{The equirectangular projection is not conformal.}
+	\caption{The equirectangular projection is not conformal. Figure from \cite{imageryworld2d}}
     \end{subfigure}
     \qquad
-    \begin{subfigure}[bt]{0.3\textwidth}
+    \begin{subfigure}[t]{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/central_park_mercator.png}
-        \caption{The mercator projection is conformal and preserves aspect ratio.}
+        \caption{The mercator projection is conformal and preserves aspect ratio. Figure from \cite{worldimagery}}
     \end{subfigure}
     \caption{Unwrapped equirectangular and mercator projections. The mercator projection works when it is unwrapped due to it being conformal (preserving aspect ratio)}
     \label{fig:mercator}
@@ -377,7 +377,7 @@ The mercator projection compensates for the longitudinal distortion by introduci
     \begin{subfigure}[bt]{0.15\textwidth}
         \includegraphics[width=\textwidth]{figures/map_projection/projection_mercator.png}
     \end{subfigure}
-    \caption{Mercator projection.}
+    \caption{Mercator projection. Figure adapted from \cite{mapprojections}}
     \label{fig:proj_mercator}
 \end{figure}
 
@@ -396,7 +396,7 @@ Cube maps lack the polar singularities apparent in geographic parameterizations.
     \begin{subfigure}[bt]{0.15\textwidth}
         \includegraphics[width=\textwidth]{figures/map_projection/projection_cube.png}
     \end{subfigure}
-    \caption{Cube map projection.}
+    \caption{Cube map projection. Figure adapted from \cite{mapprojections}}
     \label{fig:proj_cube}
 \end{figure}
 
@@ -417,7 +417,7 @@ The Tessellated Octahedral Adaptive Subdivision Transform (TOAST) map format use
     \begin{subfigure}[bt]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/map_projection/projection_toast.png}
     \end{subfigure}
-    \caption{TOAST map projection.}
+    \caption{TOAST map projection. Figure adapted from \cite{mapprojections}}
     \label{fig:proj_toast}
 \end{figure}
 
@@ -436,7 +436,7 @@ The map projection that is used for the HEALPix tessellation is equal-area as th
     \begin{subfigure}[bt]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/map_projection/projection_healpix.png}
     \end{subfigure}
-    \caption{HEALPix map projection.}
+    \caption{HEALPix map projection. Figure adapted from \cite{mapprojections}}
     \label{fig:proj_healpix}
 \end{figure}
 
@@ -464,7 +464,7 @@ Dimitrijevi\'{c} and Ran\v{c}i\'{c} use another polar coordinate system to re-pr
         \includegraphics[width=\textwidth]{figures/map_projection/projection_stereographic.png}
     	\caption{Stereographic}
     \end{subfigure}
-    \caption{Polar map projections.}
+    \caption{Polar map projections. Figure adapted from \cite{mapprojections}}
     \label{fig:proj_polar}
 \end{figure}
 
@@ -723,7 +723,7 @@ A clipmap texture is a dynamic mip map where each image in the so called clipmap
     \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap_mipmap.pdf}
     \end{subfigure}
-    \caption{Clip maps are smaller than mip maps as only parts of the complete map need to be stored}
+    \caption{Clip maps are smaller than mip maps as only parts of the complete map need to be stored. Figure adapted from \cite{mapprojections}}
     \label{fig:clipmapmipmap}
 \end{figure}
 
