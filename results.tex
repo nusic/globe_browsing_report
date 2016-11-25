@@ -65,7 +65,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
         \includegraphics[width=\textwidth]{figures/results/topdown/topdown1.png}
         \caption{Central Park}
     \end{subfigure}
-    \caption{Top-down views of Earth at different zoom levels}
+    \caption{Top-down views of Earth at different altitudes}
     \label{fig:topdown}
 \end{figure}
 
@@ -173,7 +173,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
         \includegraphics[width=\textwidth]{figures/results/culling/dhf.png}
         \caption{Frustum and Horizon culling}
     \end{subfigure}
-    \caption{Culling of chunks at distance based LOD}
+    \caption{Culling of chunks with distance based LOD}
     \label{fig:cullingd}
 \end{figure}
 
@@ -372,7 +372,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 \section{LOD: Distance based vs Area based}
 \FloatBarrier
 
-The benchmark results in Chapter \ref{ch:culld} and \ref{ch:culla} was compared and evaluated in relation to each other. In Figure \ref{fig:lodcomp} the two approaches are compared using both frustum culling and horizon culling.
+The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared and evaluated in relation to each other. In figure \ref{fig:lodcomp} the two approaches are compared where both frustum culling and horizon culling were enabled.
 
 \begin{figure}[h]
 \begin{tikzpicture}
@@ -511,6 +511,8 @@ The impact of polar pinching on the chunk tree was evaluated using both Distance
     \hline
   \end{tabular}
 \end{table}
+
+\todo{Vadå locations? Vi har ju bara Pole och Equator i diagrammet.}
 
 \iffalse
 \begin{table}[h]
