@@ -18,7 +18,7 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 \end{table}
 
 \clearpage
-\section{Zooming In}
+\section{Top Down views}
 \FloatBarrier
 The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph}.
 \begin{table}[h]
@@ -119,6 +119,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
 
 \clearpage
 \section{Culling for distance based LOD}
+\label{ch:culld}
 \FloatBarrier
 The culling algorithms Frustum culling and Horizon Culling were compared and evaluated. The settings used are provided in Table \ref{table:cullingd}. Note that LOD evaluation is done by distance. Figure \ref{fig:cullingdcam} shows the camera view evaluated. Figure \ref{fig:cullingd} shows and overview of the rendered chunks using the different culling and benchmarks are listed in Table \ref{table:cullingd}.
 
@@ -153,29 +154,30 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 \clearpage
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[bt]{0.48\textwidth}
+    \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/d.png}
         \caption{No culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.48\textwidth}
+    \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/df.png}
         \caption{Frustum culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.48\textwidth}
+    \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/dh.png}
         \caption{Horizon culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.48\textwidth}
+    \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/dhf.png}
         \caption{Frustum and Horizon culling}
     \end{subfigure}
-    \caption{Demonstration of culling algorithms}
+    \caption{Culling of chunks at distance based LOD}
     \label{fig:cullingd}
 \end{figure}
 
+\iffalse
 \begin{table}[h]
 \centering
 \caption[]{Culling for projected area based LOD}
@@ -191,16 +193,65 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
     \hline
   \end{tabular}
 \end{table}
+\fi
+
+\begin{figure}[h]
+\begin{tikzpicture}
+    \begin{axis}[
+        width  = 1.0*\textwidth,
+        height = 6.5cm,
+        major x tick style = transparent,
+        ybar=2*\pgflinewidth,
+        bar width=8pt,
+        ymajorgrids = true,
+        %ylabel = {Number of},
+        symbolic x coords={No Culling, Horizon Culling, Frustum Culling, Both},
+        xtick = data,
+        scaled y ticks = false,
+        enlarge x limits=0.25,
+        ymin=0,
+        legend cell align=left,
+        legend style={
+                at={(0.99, 0.44)},
+                anchor=south east,
+                column sep=1ex
+        }
+    ]
+
+      \addplot[style={chunks_color,fill=chunks_color,mark=none}]
+        coordinates { (No Culling, 514) (Horizon Culling, 390) (Frustum Culling, 214) (Both, 154)};
+
+      \addplot[style={leafs_color,fill=leafs_color,mark=none}]
+        coordinates { (No Culling, 386) (Horizon Culling, 293) (Frustum Culling, 161) (Both, 116)};
+      
+      \addplot[style={rendered_color,fill=rendered_color,mark=none}]
+        coordinates { (No Culling, 386) (Horizon Culling, 254) (Frustum Culling, 79) (Both, 53)};
+
+      \addplot[style={frame_render_time,fill=globe_render_time,mark=none}]
+        coordinates { (No Culling, 155) (Horizon Culling, 53) (Frustum Culling, 39) (Both, 28)};
+
+      \addplot[style={globe_render_time,fill=frame_render_time,mark=none}]
+        coordinates { (No Culling, 119) (Horizon Culling, 30) (Frustum Culling, 14) (Both, 10) };
+
+      \legend{Chunks, Leaf chunks, Rendered chunks, Frame time [ms], Globe render time [ms]}
+
+    \end{axis}
+\end{tikzpicture}
+\caption{}
+\label{fig:topdowngraph}
+\end{figure}
 
 \clearpage
 \section{Culling for Projected Area based LOD}
+\label{ch:culla}
+
 \FloatBarrier
 The culling algorithms Frustum culling and Horizon Culling were compared and evaluated. The settings used are provided in Table \ref{table:cullinga}. Note that LOD evaluation is done by distance. Figure \ref{fig:cullingacam} shows the camera view evaluated. Figure \ref{fig:cullinga} shows and overview of the rendered chunks using the different culling and benchmarks are listed in Table \ref{table:cullinga}.
 
 \begin{table}[h]
   \centering
   \caption[]{Culling test}
-    \label{table:cullingd}
+    \label{table:cullingasettings}
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
@@ -228,29 +279,30 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 \clearpage
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[bt]{0.48\textwidth}
+    \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/a.png}
         \caption{No culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.48\textwidth}
+    \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/af.png}
         \caption{Frustum culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.48\textwidth}
+    \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/ah.png}
         \caption{Horizon culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.48\textwidth}
+    \begin{subfigure}[bt]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/afh.png}
         \caption{Frustum and Horizon culling}
     \end{subfigure}
-    \caption{Demonstration of culling algorithms}
+    \caption{Culling of chunks at Area based LOD}
     \label{fig:cullinga}
 \end{figure}
 
+\iffalse
 \begin{table}[h]
 \centering
 \caption[]{Projcted area based}
@@ -266,6 +318,108 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
     \hline
   \end{tabular}
 \end{table}
+\fi
+
+
+
+\begin{figure}[h]
+\begin{tikzpicture}
+    \begin{axis}[
+        width  = 1.0*\textwidth,
+        height = 6.5cm,
+        major x tick style = transparent,
+        ybar=2*\pgflinewidth,
+        bar width=8pt,
+        ymajorgrids = true,
+        %ylabel = {Number of},
+        symbolic x coords={No Culling, Horizon Culling, Frustum Culling, Both},
+        xtick = data,
+        scaled y ticks = false,
+        enlarge x limits=0.25,
+        ymin=0,
+        legend cell align=left,
+        legend style={
+                at={(0.995, 0.44)},
+                anchor=south east,
+                column sep=1ex
+        }
+    ]
+
+      \addplot[style={chunks_color,fill=chunks_color,mark=none}]
+        coordinates { (No Culling, 270) (Horizon Culling, 202) (Frustum Culling, 134) (Both, 94)};
+
+      \addplot[style={leafs_color,fill=leafs_color,mark=none}]
+        coordinates { (No Culling, 203) (Horizon Culling, 152) (Frustum Culling, 101) (Both, 71)};
+
+      \addplot[style={rendered_color,fill=rendered_color,mark=none}]
+        coordinates { (No Culling, 203) (Horizon Culling, 133) (Frustum Culling, 43) (Both, 26)};
+
+      \addplot[style={frame_render_time,fill=globe_render_time,mark=none}]
+        coordinates { (No Culling, 123) (Horizon Culling, 41) (Frustum Culling, 30) (Both, 23)};
+
+      \addplot[style={globe_render_time,fill=frame_render_time,mark=none}]
+        coordinates { (No Culling, 62) (Horizon Culling, 16) (Frustum Culling, 7.9) (Both, 5.6) };
+
+      \legend{Chunks, Leaf chunks, Rendered chunks, Frame time [ms], Globe render time [ms]}
+
+    \end{axis}
+\end{tikzpicture}
+\caption{}
+\label{fig:topdowngraph}
+\end{figure}
+
+\clearpage
+\section{LOD: Distance based vs Area based}
+\FloatBarrier
+
+The benchmark results in Chapter \ref{ch:culld} and \ref{ch:culla} was compared and evaluated in relation to each other. In Figure \ref{fig:lodcomp} the two approaches are compared using both frustum culling and horizon culling.
+
+\begin{figure}[h]
+\begin{tikzpicture}
+    \begin{axis}[
+        width  = 0.9*\textwidth,
+        height = 15cm,
+        major x tick style = transparent,
+        ybar=2*\pgflinewidth,
+        bar width=15pt,
+        ymajorgrids = true,
+        ylabel = {},
+        symbolic x coords={Distance based LOD, Area based LOD},
+        xtick = data,
+        scaled y ticks = false,
+        enlarge x limits=0.55,
+        ymin=0,
+        legend cell align=left,
+        legend style={
+                at={(0.995, 0.74)},
+                anchor=south east,
+                column sep=1ex
+        }
+    ] 
+
+
+      \addplot[style={chunks_color,fill=chunks_color,mark=none}]
+        coordinates { (Distance based LOD, 154) (Area based LOD, 94) };
+
+      \addplot[style={leafs_color,fill=leafs_color,mark=none}]
+        coordinates { (Distance based LOD, 116) (Area based LOD, 71) };
+
+      \addplot[style={rendered_color,fill=rendered_color,mark=none}]
+        coordinates { (Distance based LOD, 53) (Area based LOD, 26) };
+
+      \addplot[style={frame_render_time,fill=frame_render_time,mark=none}]
+        coordinates { (Distance based LOD, 28) (Area based LOD, 23) };
+
+      \addplot[style={globe_render_time,fill=globe_render_time,mark=none}]
+        coordinates { (Distance based LOD, 10) (Area based LOD, 5.6) };
+
+      \legend{Chunks, Leaf chunks, Rendered chunks, Frame time [ms], Globe render time [ms]}
+
+    \end{axis}
+\end{tikzpicture}
+\caption{Comparison of Distance based LOD and Area based LOD.}
+\label{fig:lodcomp}
+\end{figure}
 
 \clearpage
 \section{Switching using level blending}
