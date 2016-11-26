@@ -1,5 +1,6 @@
 \chapter{Results}
 \label{chapter:results}
+
 This section goes through how the final implementation results in a software that solves the proposed objectives. Section (ref screenshots) \todo{ref} includes screenshots showing the globe browsing in use.
 
 The benchmarks were done using the computer specified in table \ref{table:benchmark host}.
@@ -17,6 +18,33 @@ The benchmarks were done using the computer specified in table \ref{table:benchm
     \hline
   \end{tabular}
 \end{table}
+
+
+\clearpage
+\section{Chunk Bounding volumes}
+\FloatBarrier
+Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by a polyhedron shape.
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/culling/bbox_earth.png}
+        \caption{Earth}
+    \end{subfigure}
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/culling/bbox_europe.png}
+        \caption{Europe}
+    \end{subfigure}
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/culling/bbox_himalaya3.png}
+        \caption{Himalaya mountain ridge}
+    \end{subfigure}
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/culling/bbox_himalaya.png}
+        \caption{Himalayan valley}
+    \end{subfigure}
+    \caption{Bounding volumes for each chunk are calculated for each chunk.}
+    \label{fig:boundingvolume}
+\end{figure}
 
 \clearpage
 \section{Top Down Views}
