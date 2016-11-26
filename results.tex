@@ -487,7 +487,7 @@ The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared
 \end{figure}
 
 \clearpage
-\subsection{Switching using level blending}
+\subsection{Switching Using Level Blending}
 \label{section:res_switching}
 \FloatBarrier
 The visual result of using the distance based level blending is shown in Figure \ref{fig:blending2}.
@@ -682,5 +682,24 @@ The purpose of the globe browsing is be able to interactively explore virtual gl
     \caption{Chunk tree over time when browsing the globe}
     \label{fig:interaction}
 \end{figure}
+
+\subsection{Camera Space Rendering}
+
+Comparing the use of camera space rendering and model space rendering, vertex jittering is apparent when interacting close to the surface. Figure \ref{fig:camspacemodelspace} shows how vertex jittering is apparent when browsing a HiRISE patch close to the surface of Mars. The visual result in the image is not as striking as the artifact that appears when the camera is moving. Then the vertices are jittering only in the case of model space rendering and not for camera space rendering. 
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[bt]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/camspace.jpg}
+        \caption{Camera space rendering}
+    \end{subfigure}
+    \begin{subfigure}[bt]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/modelspace.jpg}
+        \caption{Model space rendering}
+    \end{subfigure}
+    \caption{Vertex jittering of model space rendering}
+    \label{fig:camspacemodelspace}
+\end{figure}
+
 
 \FloatBarrier
