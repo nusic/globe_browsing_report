@@ -1,6 +1,6 @@
 \chapter{Future Work}
 
-\todo[inline]{Intro to future work}
+We will discuss the most relevant features that could be added to the software in the future. There are possibilities for optimizations as well as a need for features, required from a fully versatile globe browsing software, that easily extends beyond the scope of this thesis.
 
 \section{Parallelization Per Overview}
 Given the discussion about parallelization of GDAL WMS requests \ref{section:parallelrequests}, testing parallelization on a per overview level would be reasonable to maximize efficiency in tile requests. The best thing, of course, would be if the developers of GDAL made sure that WMS requests would be thread safe. \todo{vetefan asså}
@@ -23,5 +23,5 @@ Annotations such as country names can currently only be rendered using pixel bas
 
 Other types of tile providers can also be implemented. Examples are: text tile provider for visualizing a lat-long grid, temporal tile provider using local image data.
 
-\section{Other Uses of Chunked LOD Spheres}
+\section{Other Uses of Chunked LOD Spheres in Astro-Visualization}
 Rendering of ellipsoidal or spherical models is not only useful for globes. Being able to for example browse the night sky using an inverted sphere also requires a LOD approach to be able to visualize the most distant objects. World Wide Telescope uses such a  technique to render photographs of distant galaxies when pointing the camera to the sky. The edge of our observable Universe could also be rendered as a sphere textured with the WMAP mapping of the cosmic microwave background radiation.
