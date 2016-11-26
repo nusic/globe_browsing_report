@@ -1,6 +1,6 @@
 \chapter{Results}
 \label{chapter:results}
-This section goes through how the final implementation results in a software that solves the proposed objectives. Section (ref screenshots) includes screenshots showing the globe browsing in use.
+This section goes through how the final implementation results in a software that solves the proposed objectives. Section (ref screenshots) \todo{ref} includes screenshots showing the globe browsing in use.
 
 The benchmarks were done using the computer specified in table \ref{table:benchmark host}.
 
@@ -19,9 +19,9 @@ The benchmarks were done using the computer specified in table \ref{table:benchm
 \end{table}
 
 \clearpage
-\section{Top Down views}
+\section{Top Down Views}
 \FloatBarrier
-The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph1}.
+The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}. The camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph1}.
 \begin{table}[h]
   \centering
   \caption[]{Settings for evaluation based on a top down view}
@@ -32,7 +32,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 10.0 \\
-      \textbf{LOD Evaluation:}    & By distance \\
+      \textbf{Chunk Selction:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
       \textbf{Level blending:}    & Enabled \\
       \textbf{Camera View:}       & Facing down, varying altitudes\\
@@ -66,7 +66,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
         \includegraphics[width=\textwidth]{figures/results/topdown/topdown1.png}
         \caption{Central Park}
     \end{subfigure}
-    \caption{Top-down views of Earth at different altitudes}
+    \caption{Top down views of Earth at different altitudes}
     \label{fig:topdown}
 \end{figure}
 
@@ -112,29 +112,31 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
 
     \end{axis}
 \end{tikzpicture}
-\caption{}
+\caption{When facing down, the number of rendered chunks stays relatively constant even when the chunk tree grows}
 \label{fig:topdowngraph1}
 \end{figure}
 
 
 
 \clearpage
-\section{Culling for distance based LOD}
+\section{Culling For Distance Based Selection}
 \label{ch:culld}
 \FloatBarrier
-The culling algorithms Frustum culling and Horizon Culling were compared and evaluated. The settings used are provided in Table \ref{table:cullingd}. Note that LOD evaluation is done by distance. Figure \ref{fig:cullingdcam} shows the camera view evaluated. Figure \ref{fig:cullingd} shows and overview of the rendered chunks using the different culling and benchmarks are listed in Table \ref{table:cullingd}.
+The culling algorithms frustum culling and horizon culling were compared and evaluated.
+The settings used are provided in table \ref{table:cullingdsettings}. Note that LOD evaluation is done by distance. Figure \ref{fig:cullingdcam} shows the camera view evaluated. Figure \ref{fig:cullingd} shows an overview of the rendered chunks with the results shown in figure \ref{fig:topdowngraphd}.
+
 
 \begin{table}[h]
   \centering
-  \caption[]{Culling test}
-    \label{table:cullingd}
+  \caption[]{Settings for evaluation of culling with distance based selection}
+    \label{table:cullingdsettings}
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
-      \textbf{LOD Evaluation:}    & By distance \\
+      \textbf{Chunk Selction:}    & By distance \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
       \textbf{Level blending:}    & Enabled \\
       \textbf{Camera View:}       & Looking towards western horizon\\
@@ -148,33 +150,33 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/cam_d.png}
     \end{subfigure}
-    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey with distance based LOD}
+    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey with distance based LOD. Chunk edges are shown to illustrate the difference in level of detail}
     \label{fig:cullingdcam}
 \end{figure}
 
 \clearpage
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[bt]{0.4\textwidth}
+    \begin{subfigure}[t]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/d.png}
         \caption{No culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.4\textwidth}
+    \begin{subfigure}[t]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/df.png}
         \caption{Frustum culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.4\textwidth}
+    \begin{subfigure}[t]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/dh.png}
         \caption{Horizon culling}
     \end{subfigure}
     ~
-    \begin{subfigure}[bt]{0.4\textwidth}
+    \begin{subfigure}[t]{0.4\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/dhf.png}
-        \caption{Frustum and Horizon culling}
+        \caption{Frustum and horizon culling}
     \end{subfigure}
-    \caption{Culling of chunks with distance based LOD}
+    \caption{Culling of chunks with distance based selection}
     \label{fig:cullingd}
 \end{figure}
 
@@ -238,20 +240,21 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 
     \end{axis}
 \end{tikzpicture}
-\caption{}
-\label{fig:topdowngraph}
+\caption{The number of chunks effected by culling}
+\label{fig:topdowngraphd}
 \end{figure}
 
 \clearpage
-\section{Culling for Projected Area based LOD}
+\section{Culling For Projected Area Based Selection}
 \label{ch:culla}
 
 \FloatBarrier
-The culling algorithms Frustum culling and Horizon Culling were compared and evaluated. The settings used are provided in Table \ref{table:cullinga}. Note that LOD evaluation is done by distance. Figure \ref{fig:cullingacam} shows the camera view evaluated. Figure \ref{fig:cullinga} shows and overview of the rendered chunks using the different culling and benchmarks are listed in Table \ref{table:cullinga}.
+
+Another test was conducted to evaluate the culling algorithms. Instead of using chunk selection based on camera distance, the projected area evaluation was used. The settings used are provided in table \ref{table:cullingasettings}. Figure \ref{fig:cullingacam} shows the camera view evaluated. Figure \ref{fig:cullinga} shows an overview of the rendered chunks with the results shown in figure \ref{fig:topdowngrapha}.
 
 \begin{table}[h]
   \centering
-  \caption[]{Culling test}
+  \caption[]{Settings for evaluation of culling with area based selection}
     \label{table:cullingasettings}
   \begin{tabular}{| r l |}
     \hline
@@ -259,7 +262,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
-      \textbf{LOD Evaluation:}    & By Projected Area \\
+      \textbf{Chunk Selction:}    & By projected area \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
       \textbf{Level blending:}    & Enabled \\
       \textbf{Camera View:}       & Looking towards western horizon\\
@@ -273,7 +276,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/cam_a.png}
     \end{subfigure}
-    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey with Area based LOD}
+    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey with area based LOD}
     \label{fig:cullingacam}
 \end{figure}
 
@@ -299,7 +302,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
         \includegraphics[width=\textwidth]{figures/results/culling/afh.png}
         \caption{Frustum and Horizon culling}
     \end{subfigure}
-    \caption{Culling of chunks at Area based LOD}
+    \caption{Culling of chunks with area based selection}
     \label{fig:cullinga}
 \end{figure}
 
@@ -365,12 +368,12 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 
     \end{axis}
 \end{tikzpicture}
-\caption{}
-\label{fig:topdowngraph}
+\caption{The number of chunks effected by culling}
+\label{fig:topdowngrapha}
 \end{figure}
 
 \clearpage
-\section{LOD: Distance based vs Area based}
+\section{LOD: Distance Based vs. Area Based}
 \FloatBarrier
 
 The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared and evaluated in relation to each other. In figure \ref{fig:lodcomp} the two approaches are compared where both frustum culling and horizon culling were enabled.
@@ -418,7 +421,7 @@ The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared
 
     \end{axis}
 \end{tikzpicture}
-\caption{Comparison of Distance based LOD and Area based LOD.}
+\caption{Comparison of Distance based LOD and Area based selection}
 \label{fig:lodcomp}
 \end{figure}
 
@@ -431,18 +434,17 @@ The visual result of using the distance based level blending is shown in Figure 
     \centering
     \begin{subfigure}[bt]{0.48\textwidth}
         \includegraphics[width=\textwidth]{figures/results/blending/blending_bali2_disabled.jpg}
-        \caption{No blending}
+        \caption{Blending disabled}
     \end{subfigure}
     \begin{subfigure}[bt]{0.48\textwidth}
         \includegraphics[width=\textwidth]{figures/results/blending/blending_bali2_enabled.jpg}
-        \caption{Distance based level blending}
+        \caption{Blending enabled}
     \end{subfigure}
-    \caption{Comparison of level blending and no blending. The LOD scale factor is set low to show the resolution penalty of using blending.}
+    \caption{Comparison of level blending and no blending}
     \label{fig:blending2}
 \end{figure}
 
-
-A performance benchmark of the blending algorithm is described below. Note that the in order to see the pixel resolution penalty of using level blending with the bear eye, the LOD scale factor was tuned down enough 
+Table \ref{table:levelblending} shows the settings used to compare having level blending enabled and disabled. To show the penalty in texture detail that is payed for using level blending, the LOD scale factor was set low. Figure \ref{fig:blending} shows that the texture resolution becomes low enough to see the individual pixels when having a low LOD. The results in table \ref{table:resultblending} also show that figure \ref{fig:blendingdisabled} contains more visual information than \ref{fig:blendingenabled}. 
 
 \begin{table}
   \centering
@@ -454,7 +456,7 @@ A performance benchmark of the blending algorithm is described below. Note that 
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 4.65 \\
-      \textbf{LOD Evaluation:}    & By distance \\
+      \textbf{Chunk Selction:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
       \textbf{Camera View:}       & Horizon \\
     \hline
@@ -465,19 +467,21 @@ A performance benchmark of the blending algorithm is described below. Note that 
     \centering
     \begin{subfigure}[bt]{0.48\textwidth}
         \includegraphics[width=\textwidth]{figures/results/blending/blending_bali_disabled.jpg}
-        \caption{No blending}
+        \caption{Blending disabled}
+        \label{fig:blendingdisabled}
     \end{subfigure}
     \begin{subfigure}[bt]{0.48\textwidth}
         \includegraphics[width=\textwidth]{figures/results/blending/blending_bali_enabled.jpg}
-        \caption{Level blending}
+        \caption{Blending enabled}
+        \label{fig:blendingenabled}
     \end{subfigure}
-    \caption{Comparison of level blending and no blending. The LOD scale factor is set low to show the resolution penalty of using blending.}
+    \caption{Comparison of level blending and no blending. The LOD scale factor is set low to show the resolution penalty of using blending}
     \label{fig:blending}
 \end{figure}
 
 \begin{table}
 \centering
-\caption[]{Top down settings}
+\caption[]{Level blending benchmarks. Comparing the disk space of a compressed JPEG image of both cases works as a heuristic to the information contained in each image}
   \label{table:resultblending}
   \begin{tabular}{| r | c c |}
     \hline
@@ -494,12 +498,11 @@ A performance benchmark of the blending algorithm is described below. Note that 
 \section{Polar Pinching}
 \label{section:res_polarpinching}
 \FloatBarrier
-The impact of polar pinching on the chunk tree was evaluated using both Distance based LOD and Area based LOD. The results are presented in Figure \ref{fig:pincheval}.
-
+The impact of polar pinching on the chunk tree was evaluated using both distance based selection and area based selection. The results are presented in figure \ref{fig:pincheval}.
 
 \begin{table}[h]
   \centering
-  \caption[]{Evaluating pinching}
+  \caption[]{Settings for evaluation of polar pinching}
     \label{table:pinchingstart}
   \begin{tabular}{| r l |}
     \hline
@@ -507,8 +510,8 @@ The impact of polar pinching on the chunk tree was evaluated using both Distance
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation\cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 10.0 \\
-      \textbf{LOD Evaluation:}    & Evaluated \\
-      \textbf{Culling:}           & Frustum culling, Horizon culling \\
+      \textbf{Chunk Selction:}    & \textbf{Evaluated} \\
+      \textbf{Culling:}           & Frustum culling, horizon culling \\
       \textbf{Camera View:}       & Facing down\\
       \textbf{Location:}          & Quito, Ecuador and North Pole\\
     \hline
@@ -600,7 +603,7 @@ The impact of polar pinching on the chunk tree was evaluated using both Distance
 \clearpage
 \section{Benchmark: Interactive Globe Browsing}
 \FloatBarrier
-The purpose of the globe browsing is be able to interactively explore virtual globes and map datasets. In order to captures how the system behaves over time, a user interaction sequence was evaluated. The sequence is described step by step below, and illustrated in Figure \ref{fig:interaction}.
+The purpose of the globe browsing is be able to interactively explore virtual globes and map datasets. In order to capture how the system behaves over time, a user interaction sequence was evaluated. The sequence is described step by step below, and illustrated in Figure \ref{fig:interaction}.
 
 \begin{enumerate}
   \item Camera views Earth from space
@@ -615,7 +618,7 @@ The purpose of the globe browsing is be able to interactively explore virtual gl
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/globebrowsing.pdf}
     \end{subfigure}
-    \caption{Chunk tree over time.}
+    \caption{Chunk tree over time when browsing the globe}
     \label{fig:interaction}
 \end{figure}
 
