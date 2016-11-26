@@ -14,5 +14,14 @@ Integrating a sophisticated atmosphere rendering technique for globe browsing wo
 \section{Local Patches and Rover Terrains}
 The ability to read and render local patches will be developed further to ensure easy integration of geographically smaller datasets. A goal in the future is to be able to read and render even higher resolution imagery than demonstrated in this thesis. Rendering Mars rover terrain models, on top of HiRISE patches, on top of CTX patches, on top of a global terrain datasets would transport audiences and users of the software even closer to the real surface of Mars with all the detail in imagery currently available through research of the planet's geology.
 
+\section{Other Features}
+There are other features that naturally can be incorporated to make the software more usable. A different switching approach than the blending introduced can be to temporally interpolate between levels as chunks are split. This will decrease the number of textures needed for switching but will still lead to visible edges between chunks of different levels.
+
+The skirt lengths can be optimized to decrease the number of fragments rendered. This can be done if each chunk has knowledge of the adjacent chunks height data at the edges. To avoid potential cracks that might appear when a chunk of high level is adjacent to a chunk of low level, skirt lengths can be set to be proportional to the geodetic size of the available height map and not the chunk itself.
+
+Annotations such as country names can currently only be rendered using pixel based layers. Introducing vector formats for layers would make it possible to display annotations such as text without the discrete changes of different levels.
+
+Other types of tile providers can also be implemented. Examples are: text tile provider for visualizing a lat-long grid, temporal tile provider using local image data.
+
 \section{Other Uses of Chunked LOD Spheres}
 Rendering of ellipsoidal or spherical models is not only useful for globes. Being able to for example browse the night sky using an inverted sphere also requires a LOD approach to be able to visualize the most distant objects. World Wide Telescope uses such a  technique to render photographs of distant galaxies when pointing the camera to the sky. The edge of our observable Universe could also be rendered as a sphere textured with the WMAP mapping of the cosmic microwave background radiation.
