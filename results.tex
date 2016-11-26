@@ -1,27 +1,10 @@
 \chapter{Results}
+Two types of results are presented in this chapter: Screenshots showing different visual aspects of the system and benchmarks focusing on the achieved performance.
+
 \label{chapter:results}
+\section{Screenshots}
 
-This section goes through how the final implementation results in a software that solves the proposed objectives. Section (ref screenshots) \todo{ref} includes screenshots showing the globe browsing in use.
-
-The benchmarks were done using the computer specified in table \ref{table:benchmark host}.
-
-\begin{table}[h]
-  \centering
-  \caption[]{Computer used for Benchmarking}
-    \label{table:benchmark host}
-  \begin{tabular}{| r l |}
-    \hline
-      \textbf{Computer Model:}  & MacBook Pro (15'' early 2011) \\
-      \textbf{Processor:}       & 2GHz Intel Core i7 \\
-      \textbf{RAM:}             & 8 GB 1333MHz DDR3 RAM \\
-      \textbf{Graphics:}        & AMD Radeon HD 6490M 256 MB \\
-    \hline
-  \end{tabular}
-\end{table}
-
-
-\clearpage
-\section{Chunk Bounding volumes}
+\subsection{Chunk Bounding volumes}
 \FloatBarrier
 Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by a polyhedron shape.
 \begin{figure}[h]
@@ -46,8 +29,32 @@ Bounding polyhedra are calculated on the fly for each chunk, taking onto conside
     \label{fig:boundingvolume}
 \end{figure}
 
+
 \clearpage
-\section{Top Down Views}
+\section{Benchmarking}
+\FloatBarrier
+This section goes through how the final implementation results in a software that solves the proposed objectives. Section (ref screenshots) \todo{ref} includes screenshots showing the globe browsing in use.
+
+The benchmarks were done using the computer specified in table \ref{table:benchmark host}.
+
+\begin{table}[h]
+  \centering
+  \caption[]{Computer used for Benchmarking}
+    \label{table:benchmark host}
+  \begin{tabular}{| r l |}
+    \hline
+      \textbf{Computer Model:}  & MacBook Pro (15'' early 2011) \\
+      \textbf{Processor:}       & 2GHz Intel Core i7 \\
+      \textbf{RAM:}             & 8 GB 1333MHz DDR3 RAM \\
+      \textbf{Graphics:}        & AMD Radeon HD 6490M 256 MB \\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+
+\clearpage
+\subsection{Top Down Views}
 \FloatBarrier
 The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}. The camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph1}.
 \begin{table}[h]
@@ -147,7 +154,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
 
 
 \clearpage
-\section{Culling For Distance Based Chunk Selection}
+\subsection{Culling For Distance Based Chunk Selection}
 \label{ch:culld}
 \FloatBarrier
 The culling algorithms frustum culling and horizon culling were compared and evaluated.
@@ -273,7 +280,7 @@ The settings used are provided in table \ref{table:cullingdsettings}. Note that 
 \end{figure}
 
 \clearpage
-\section{Culling For Projected Area Based Chunk Selection}
+\subsection{Culling For Projected Area Based Chunk Selection}
 \label{ch:culla}
 
 \FloatBarrier
@@ -401,7 +408,7 @@ Another test was conducted to evaluate the culling algorithms. Instead of using 
 \end{figure}
 
 \clearpage
-\section{LOD: Distance Based vs. Area Based}
+\subsection{LOD: Distance Based vs. Area Based}
 \FloatBarrier
 
 The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared and evaluated in relation to each other. In figure \ref{fig:lodcomp} the two approaches are compared where both frustum culling and horizon culling were enabled.
@@ -453,7 +460,7 @@ The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared
 \end{figure}
 
 \clearpage
-\section{Switching using level blending}
+\subsection{Switching using level blending}
 \label{section:res_switching}
 \FloatBarrier
 The visual result of using the distance based level blending is shown in Figure \ref{fig:blending2}.
@@ -522,7 +529,7 @@ Table \ref{table:levelblending} shows the settings used to compare having level 
 \end{table}
 
 \clearpage
-\section{Polar Pinching}
+\subsection{Polar Pinching}
 \label{section:res_polarpinching}
 \FloatBarrier
 The impact of polar pinching on the chunk tree was evaluated using both distance based chunk selection and area based chunk selection. The results are presented in figure \ref{fig:pincheval}.
@@ -628,7 +635,7 @@ The impact of polar pinching on the chunk tree was evaluated using both distance
 \fi
 
 \clearpage
-\section{Benchmark: Interactive Globe Browsing}
+\subsection{Benchmark: Interactive Globe Browsing}
 \FloatBarrier
 The purpose of the globe browsing is be able to interactively explore virtual globes and map datasets. In order to capture how the system behaves over time, a user interaction sequence was evaluated. The sequence is described step by step below, and illustrated in Figure \ref{fig:interaction}.
 
@@ -649,5 +656,4 @@ The purpose of the globe browsing is be able to interactively explore virtual gl
     \label{fig:interaction}
 \end{figure}
 
-\section{Screenshots}
 \FloatBarrier
