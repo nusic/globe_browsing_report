@@ -23,7 +23,7 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph}.
 \begin{table}[h]
   \centering
-  \caption[]{Top down settings}
+  \caption[]{Globe rendering settings used in benchmark}
     \label{table:settingstopdown}
   \begin{tabular}{| r l |}
     \hline
@@ -111,7 +111,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
 
     \end{axis}
 \end{tikzpicture}
-\caption{}
+\caption{As the camera descends towards the ground looking straight down, the chunk tree grows but the number of rendered chunks remains relatively constant due to culling.}
 \label{fig:topdowngraph}
 \end{figure}
 
@@ -125,7 +125,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 
 \begin{table}[h]
   \centering
-  \caption[]{Culling test}
+  \caption[]{Globe rendering settings used in benchmark}
     \label{table:cullingd}
   \begin{tabular}{| r l |}
     \hline
@@ -250,7 +250,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 
 \begin{table}[h]
   \centering
-  \caption[]{Culling test}
+  \caption[]{Globe rendering settings used in benchmark}
     \label{table:cullingasettings}
   \begin{tabular}{| r l |}
     \hline
@@ -395,8 +395,7 @@ The benchmark results in Chapter \ref{ch:culld} and \ref{ch:culla} was compared 
                 anchor=south east,
                 column sep=1ex
         }
-    ] 
-
+    ]
 
       \addplot[style={chunks_color,fill=chunks_color,mark=none}]
         coordinates { (Distance based LOD, 154) (Area based LOD, 94) };
@@ -435,7 +434,7 @@ The visual result of using the distance based level blending is shown in Figure 
         \includegraphics[width=\textwidth]{figures/results/blending/blending_bali2_enabled.jpg}
         \caption{Distance based level blending}
     \end{subfigure}
-    \caption{Comparison of level blending and no blending. The LOD scale factor is set low to show the resolution penalty of using blending.}
+    \caption{Comparison of using level blending and no blending. Notice level blending hides edges the underlying chunks}
     \label{fig:blending2}
 \end{figure}
 
@@ -444,7 +443,7 @@ A performance benchmark of the blending algorithm is described below. Note that 
 
 \begin{table}
   \centering
-  \caption[]{Benchmark: Level blending}
+  \caption[]{Globe rendering settings used in benchmark}
     \label{table:levelblending}
   \begin{tabular}{| r l |}
     \hline
@@ -493,10 +492,9 @@ A performance benchmark of the blending algorithm is described below. Note that 
 \FloatBarrier
 The impact of polar pinching on the chunk tree was evaluated using both Distance based LOD and Area based LOD. The results are presented in Figure \ref{fig:pincheval}.
 
-
 \begin{table}[h]
   \centering
-  \caption[]{Evaluating pinching}
+  \caption[]{Globe rendering settings used in benchmark}
     \label{table:pinchingstart}
   \begin{tabular}{| r l |}
     \hline
@@ -507,7 +505,7 @@ The impact of polar pinching on the chunk tree was evaluated using both Distance
       \textbf{LOD Evaluation:}    & Evaluated \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
       \textbf{Camera View:}       & Facing down\\
-      \textbf{Location:}          & Quito, Ecuador and North Pole\\
+      \textbf{Location:}          & Equator (at Quito, Ecuador) and North Pole\\
     \hline
   \end{tabular}
 \end{table}
