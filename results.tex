@@ -1,7 +1,8 @@
 \chapter{Results}
+\label{chapter:results}
 This section goes through how the final implementation results in a software that solves the proposed objectives. Section (ref screenshots) includes screenshots showing the globe browsing in use.
 
-The benchmarks were done using an relatively old consumer laptop computer. Its specs are provided below.
+The benchmarks were done using the computer specified in table \ref{table:benchmark host}.
 
 \begin{table}[h]
   \centering
@@ -20,16 +21,16 @@ The benchmarks were done using an relatively old consumer laptop computer. Its s
 \clearpage
 \section{Top Down views}
 \FloatBarrier
-The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph}.
+The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}, the camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph1}.
 \begin{table}[h]
   \centering
-  \caption[]{Globe rendering settings used in benchmark}
+  \caption[]{Globe rendering settings for top down view benchmark}
     \label{table:settingstopdown}
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 10.0 \\
       \textbf{LOD Evaluation:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
@@ -65,7 +66,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
         \includegraphics[width=\textwidth]{figures/results/topdown/topdown1.png}
         \caption{Central Park}
     \end{subfigure}
-    \caption{Top-down views of Earth at different zoom levels}
+    \caption{Top-down views of Earth at different altitudes}
     \label{fig:topdown}
 \end{figure}
 
@@ -112,7 +113,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
     \end{axis}
 \end{tikzpicture}
 \caption{As the camera descends towards the ground looking straight down, the chunk tree grows but the number of rendered chunks remains relatively constant due to culling.}
-\label{fig:topdowngraph}
+\label{fig:topdowngraph1}
 \end{figure}
 
 
@@ -130,8 +131,8 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
       \textbf{LOD Evaluation:}    & By distance \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
@@ -173,7 +174,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
         \includegraphics[width=\textwidth]{figures/results/culling/dhf.png}
         \caption{Frustum and Horizon culling}
     \end{subfigure}
-    \caption{Culling of chunks at distance based LOD}
+    \caption{Culling of chunks with distance based LOD}
     \label{fig:cullingd}
 \end{figure}
 
@@ -255,8 +256,8 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
       \textbf{LOD Evaluation:}    & By Projected Area \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
@@ -372,7 +373,7 @@ The culling algorithms Frustum culling and Horizon Culling were compared and eva
 \section{LOD: Distance based vs Area based}
 \FloatBarrier
 
-The benchmark results in Chapter \ref{ch:culld} and \ref{ch:culla} was compared and evaluated in relation to each other. In Figure \ref{fig:lodcomp} the two approaches are compared using both frustum culling and horizon culling.
+The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared and evaluated in relation to each other. In figure \ref{fig:lodcomp} the two approaches are compared where both frustum culling and horizon culling were enabled.
 
 \begin{figure}[h]
 \begin{tikzpicture}
@@ -422,6 +423,7 @@ The benchmark results in Chapter \ref{ch:culld} and \ref{ch:culla} was compared 
 
 \clearpage
 \section{Switching using level blending}
+\label{section:res_switching}
 \FloatBarrier
 The visual result of using the distance based level blending is shown in Figure \ref{fig:blending2}.
 \begin{figure}[h]
@@ -448,8 +450,8 @@ A performance benchmark of the blending algorithm is described below. Note that 
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 4.65 \\
       \textbf{LOD Evaluation:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
@@ -489,6 +491,7 @@ A performance benchmark of the blending algorithm is described below. Note that 
 
 \clearpage
 \section{Polar Pinching}
+\label{section:res_polarpinching}
 \FloatBarrier
 The impact of polar pinching on the chunk tree was evaluated using both Distance based LOD and Area based LOD. The results are presented in Figure \ref{fig:pincheval}.
 
@@ -499,8 +502,8 @@ The impact of polar pinching on the chunk tree was evaluated using both Distance
   \begin{tabular}{| r l |}
     \hline
       \textbf{Globe:}             & Earth \\
-      \textbf{Map datasets:}      & HeightLayers=[GCS\_Elevation\footnote{http://services.arcgisonline.com/ArcGIS/rest/services/ESRI\_Imagery\_World\_2D/MapServer}] \\
-                                  & ColorLayers=[ESRI\_World\_2D\footnote{http://198.102.45.23/arcgis/rest/services/worldelevation3d/terrain3d?}] \\
+      \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation\cite{worldelevation3d}] \\
+                                  & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 10.0 \\
       \textbf{LOD Evaluation:}    & Evaluated \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
@@ -509,6 +512,8 @@ The impact of polar pinching on the chunk tree was evaluated using both Distance
     \hline
   \end{tabular}
 \end{table}
+
+\todo{Vad?locations? Vi har ju bara Pole och Equator i diagrammet.}
 
 \iffalse
 \begin{table}[h]
@@ -598,15 +603,15 @@ The purpose of the globe browsing is be able to interactively explore virtual gl
 \begin{enumerate}
   \item Camera views Earth from space
   \item Descend down to Naturpark Karwendel, north of Innsbruck, Austria
-  \item Tilt camera up, view north horizon
-  \item Turn camera 180 degrees, view south horizon
+  \item Tilt camera up, view northern horizon
+  \item Turn camera 180 degrees, view southern horizon
   \item Tilt camera down
 \end{enumerate}
 
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{1.0\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/globebrowsing.png}
+        \includegraphics[width=\textwidth]{figures/results/globebrowsing.pdf}
     \end{subfigure}
     \caption{Chunk tree over time.}
     \label{fig:interaction}
