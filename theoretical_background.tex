@@ -873,12 +873,12 @@ There are six levels of caching important to take into consideration for globe r
 \item Remote server
 \end{enumerate}
 
-Caching for the purpose of an implementation of the client side rendering relies on stage 1-3 where local RAM memory caching is the most important one.
+When implementing a globe rendering system, the local RAM memory caching is of most interested and needs to be implemented explicitly.
 
 \subsection{Cache Replacement Policies}
 There are multiple different cache replacement policies, each used for different purposes. Some common policies are: First-In-First-Out, Last-In-First-Out, Least-Recently-Used, Most-Recently-Used, Least-Frequently-Used, Most-Frequently-Used.
 
-When it comes to caching of texture tiles used for globe rendering, the most reasonable policy gets rid of the tiles that have not been used after a significant amount of requests in favor of more recently used ones. Therefore the Least-Recently-Used (LRU) cache replacement policy is used.
+When it comes to caching of texture tiles used for globe rendering, the most reasonable policy gets rid of the tiles that have not been used after a significant amount of requests in favor of more recently used ones. Therefore the Least-Recently-Used (LRU) cache replacement policy is typically used \cite[p. 386]{cozzi11}.
 
 \subsubsection{LRU Caching}
 \label{section:lrucaching}
