@@ -109,6 +109,32 @@ Bounding polyhedra are calculated on the fly for each chunk, taking onto conside
 \end{figure}
 
 \clearpage
+\subsection{Visualizing Scientific Parameters}
+\FloatBarrier
+
+Using the vast amount of datasets provided by NASA GIBS \cite{gibs}, several scientific parameters measured by the Terra and Aqua satellites among others could be visualized as a result of layered texture rendering. Three examples are shown in figure \ref{fig:sciparam}.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/ozone.jpg}
+        \caption{Ozone (measured in streaks)}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/land_temp.jpg}
+        \caption{Land temperature}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.90\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/sea_surface.jpg}
+        \caption{Sea surface temperature}
+    \end{subfigure}
+    \caption{Visualization of scientific parameters on the globe. Datasets from \cite{gibs}}
+    \label{fig:sciparam}
+\end{figure}
+
+\clearpage
 \section{Benchmarking}
 \FloatBarrier
 This section cover a range of benchmarks diagnosing the behavior and performace of the system. The spec for the computer used for benchmarking is specified in table \ref{table:benchmark host}. 
