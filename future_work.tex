@@ -1,21 +1,25 @@
 \chapter{Future Work}
 
-We will discuss the most relevant features that could be added to the software in the future. There are possibilities for optimizations as well as a need for features, required from a fully versatile globe browsing software, that easily extends beyond the scope of this thesis.
+We will discuss the most relevant features that could be added to the globe browsing module in the future. There are possibilities for optimizations as well as a need for features, required from a fully versatile globe browsing system, that easily extends beyond the scope of this thesis.
 
 \section{Parallelization Per Overview}
 Given the discussion about parallelization of GDAL WMS requests under section \ref{section:parallelrequests}, testing parallelization on a per overview level would be reasonable to maximize efficiency in tile requests. The best thing, of course, would be if the developers of GDAL made sure that WMS requests would be thread safe. \todo{vetefan asså}
 
 \section{Browsing WMS Datasets Upon Request}
-The focus was not put on user interfacing, but instead the techniques required for rendering. A given future feature however would be to provide the users of the software the ability to specify datasets to read upon request instead of needing to specify them before initialization. This could be done using the GetCapabilities operation for WMS or WMTS providers to be able to list all available datasets behind a service. Then the user could choose a specific dataset to load on demand.
+The focus was not put on user interfacing, but instead the techniques required for rendering. A given future feature however would be to provide the users of the software the ability to specify datasets to read during runtime. This could be done using the GetCapabilities operation for WMS or WMTS providers to be able to list all available datasets behind a service. Then users could select a specific dataset to load on demand.
 
 \section{Integrating Atmosphere Rendering}
-Integrating a sophisticated atmosphere rendering technique for globe browsing would make the experience given in public presentations more rewarding. Using atmospheric parameters defining phenomena such as Rayleigh scattering and Mie scattering estimated for globes around our solar system, the representations of other worlds would be more accurate. Atmospheres also works great for generating depth cues which enhances the illusion of true scale within the visualization of globes.
+Integrating a sophisticated atmosphere rendering technique for globe browsing would make the complete experience more rewarding. Using atmospheric parameters defining phenomena such as Rayleigh scattering and Mie scattering estimated for globes around our solar system, the representations of other worlds would be more accurate. With the implemented system, these estimations could be based on public, real world weather data. Atmospheres also works great for generating depth cues which enhances the illusion of true scale within the visualization of globes.
 
 \section{Local Patches and Rover Terrains}
 The ability to read and render local patches will be developed further to ensure easy integration of geographically smaller datasets. A goal in the future is to be able to read and render even higher resolution imagery than demonstrated in this thesis. Rendering Mars rover terrain models, on top of HiRISE patches, on top of CTX patches, on top of a global terrain datasets would transport audiences and users of the software even closer to the real surface of Mars with all the detail in imagery currently available through research of the planet's geology.
 
 \section{Other Features}
-There are other features that naturally can be incorporated to make the software more usable. A different switching approach than the blending introduced can be to temporally interpolate between levels as chunks are split. This will decrease the number of textures needed for switching but will still lead to visible edges between chunks of different levels.
+There are other features that naturally can be incorporated to make the software more usable. 
+
+A switching algorithm implemented on the shader corresponding to the area based chunk selection algorithm can be researched and explored with further.
+
+Another switching approach than the level blending approach introduced can be to temporally interpolate between levels as chunks are split. This will decrease the number of textures needed for switching but will still lead to visible edges between chunks of different levels.
 
 The skirt lengths can be optimized to decrease the number of fragments rendered. This can be done if each chunk has knowledge of the adjacent chunks height data at the edges. To avoid potential cracks that might appear when a chunk of high level is adjacent to a chunk of low level, skirt lengths can be set to be proportional to the geodetic size of the available height map and not the chunk itself.
 
@@ -24,4 +28,4 @@ Annotations such as country names can currently only be rendered using pixel bas
 Other types of tile providers can also be implemented. Examples are: text tile provider for visualizing a lat-long grid, temporal tile provider using local image data.
 
 \section{Other Uses of Chunked LOD Spheres in Astro-Visualization}
-Rendering of ellipsoidal or spherical models is not only useful for globes. Being able to for example browse the night sky using an inverted sphere also requires a LOD approach to be able to visualize the most distant objects. World Wide Telescope uses such a  technique to render photographs of distant galaxies when pointing the camera to the sky. The edge of our observable Universe could also be rendered as a sphere textured with the WMAP or the Planck mapping of the cosmic microwave background radiation.
+Rendering of ellipsoidal or spherical models is not only useful for globes. Being able to browse the night sky using an inverted sphere also requires a LOD approach to be able to visualize the most distant objects. World Wide Telescope uses such a  technique to render photographs of distant galaxies when pointing the camera to the sky. The edge of our observable Universe could also be rendered as a sphere textured with the WMAP or the Planck mapping of the cosmic microwave background radiation.
