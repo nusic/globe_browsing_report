@@ -180,7 +180,7 @@ Using the RasterIO interface on an open GDAL dataset, the notion of image format
 GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates. The geo-transform can be inverted to transform a georeferenced region to raster space when specifying the area of an image tile to read.
 
 \subsection{Tile Dataset}
-\class{Tile Dataset}s carves out \class{Raw Tile}s from GDAL datasets based on a \class{Tile Index}. Along with the pixel data, the served \class{Raw Tile}s also contain some metadata. The metadata includes an error code if the read operation failed and some basic information about to read pixel data, such as minimum and maximum pixel values. Figure \ref{fig:tiledataset} illustrates how the process from \class{Tile Index} to \class{Raw Tile} is carried out. There are three gray subroutines; \emph{Get IO description}, \emph{Read image data} and \emph{Calculate metadata}. These subroutines are explained below.
+\class{Tile Dataset}s carves out \class{Raw Tile}s from GDAL datasets based on a \\ \class{Tile Index}. Along with the pixel data, the served \class{Raw Tile}s also contain some metadata. The metadata includes an error code if the read operation failed and some basic information about to read pixel data, such as minimum and maximum pixel values. Figure \ref{fig:tiledataset} illustrates how the process from \class{Tile Index} to \class{Raw Tile} is carried out. There are three gray subroutines; \emph{Get IO description}, \emph{Read image data} and \emph{Calculate metadata}. These subroutines are explained below.
 
 \begin{figure}[htbp]
     \centering
@@ -343,7 +343,9 @@ Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario
 The caching policy implemented and used is LRU - ``Least Recently Used''. This means that tiles that have not been accessed for a while are thrown out only when the cache limit is exceeded, see section \ref{section:lrucaching} for details.
 
 \subsection{Temporal Tile Provider}
-In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented. The \class{Temporal Tile Provider} is instantiated with a template URI containing a time placeholder. Information about the supported time range, time resolution and expected timestamp format to be used in the template URI is also passed during instantiation. In Listing \ref{lst:temporal}, all tags starting with \texttt{OpenSpace} are used to configure information used to instantiate the temporal dataset. The tag \texttt{GDAL\_WMS} contains a functional GDAL WMS dataset specification. When requesting the URLs for the dataset, \texttt{\$\{OpenSpaceTimeId\}} will be replaced with the date and time in the specified format.
+In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented.
+
+The \class{Temporal Tile Provider} is instantiated with a template URI containing a time placeholder. Information about the supported time range, time resolution and expected timestamp format to be used in the template URI is also passed during instantiation. In Listing \ref{lst:temporal}, all tags starting with \texttt{OpenSpace} are used to configure information used to instantiate the temporal dataset. The tag \texttt{GDAL\_WMS} contains a functional GDAL WMS dataset specification. When requesting the URLs for the dataset, \texttt{\$\{OpenSpaceTimeId\}} will be replaced with the date and time in the specified format.
 
 \begin{lstlisting}[language=XML,caption={Temporal WMS dataset specification} \label{lst:temporal}]
 <OpenSpaceTemporalGDALDataset>
@@ -364,7 +366,7 @@ In order to incorporate time-resolved map datasets into the rendering scheme, a 
 
 At runtime, the \class{Temporal Tile Provider} checks the global simulation time, quantizes that time with respect to the provided time resolution and lazily instantiates new \class{Caching Tile Provider}s per timeframe within the temporal dataset. 
 
-A schematic illustration of the implementation of the \class{Temporal Tile Provider} is illustrated in figure \ref{fig:temporaltileprovider_gettile}.
+A schematic illustration of the implementation of the \\ \class{Temporal Tile Provider} is illustrated in figure \ref{fig:temporaltileprovider_gettile}.
 
 \begin{figure}[htbp]
     \centering
@@ -400,7 +402,7 @@ The ability to serve tiles with text rendered on the fly was implemented as a ge
     \label{fig:texttileprovider_gettile}
 \end{figure}
 
-Two different types of \class{Text Tile Provider}s were implemented. \class{Tile Index Tile Provider} serves tiles where each tile has its tile index rendered onto it, and \class{Size Reference Tile Provider} uses the globe's reference ellipsoid to render a size reference in meters or kilometers onto its tiles.
+Two different types of \class{Text Tile Provider}s were implemented. \\ \class{Tile Index Tile Provider} serves tiles where each tile has its tile index rendered onto it, and \class{Size Reference Tile Provider} uses the globe's reference ellipsoid to render a size reference in meters or kilometers onto its tiles.
 
 
 \section{Mapping Tiles onto Chunks}
@@ -653,7 +655,7 @@ The data hierarchy defined by \class{Layer Manager} can almost be reproduced on 
 
 \subsubsection{CPU to GPU Data Mapping}
 
-There are some key differences between the \class{Layer Manager} data structure on the CPU and its corresponding GPU-synchronized representation - \class{GPU Layer Manager}. These are:
+There are some key differences between the \class{Layer Manager} data structure on the CPU and its corresponding GPU-synchronized representation - \\ \class{GPU Layer Manager}. These are:
 
 \begin{itemize}
 \item The GPU representation does not store any of the actual \class{Layer} data - only the uniform locations within a shader program so that it knows where to upload the layer data to the GPU. 
@@ -793,8 +795,6 @@ To avoid both the texture distortion of NURBS and the precision issues of model 
 This method is performed by, just as in the case of NURBS surfaces, transforming control points from cartesian model space to camera space where they can be cast to single precision representations. Instead of NURBS interpolation, a simple bilinear interpolation is used to place all the vertices on the surface defined by the four corner points of the patch that covers the chunk.
 
 With bilinear interpolation, high precision is achieved for vertices placed close to the camera. Also, the vertices will be uniformly spaced which means that the textures will not be distorted. Worth noticing is that if bilinear interpolation rendering is performed on chunks with low level, the approximation will be less accurate. Switching to camera space rendering with bilinear interpolation at level 10 gives a reasonable balance between the ellipsoidal mapping of the model space rendering and the high precision of the camera space chunk rendering.
-
-\todo[inline]{Maybe have a discussion in the Discussion chapter about measuring the error of using bilinear surfaces at different levels.}
 
 Figure \ref{fig:pipelinelocal} shows a flowchart of the local vertex rendering pipeline.
 
