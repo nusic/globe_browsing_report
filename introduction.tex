@@ -14,11 +14,11 @@ OpenSpace is an open-source, interactive data visualization software with the go
 
 With a real time rendering software such as OpenSpace, the human curiosity involved in exploration easily becomes obvious when the user is given the ability to freely fly around in space and near the surface of other worlds and discover places they probably never can visit in real life. This is also true for public presentations where researchers such as geologists can go into details about their knowledge and showing it through scientific visualization.
 
-An important part of the software is to avoid the use of procedurally generated data. This is to express where the frontier of science and exploration is currently at, and how it progresses through space missions with the goal of mapping the Universe. A general globe browsing feature provides a means of communicating this progress through continuous mapping of planets, moons, and dwarf planets within our solar system.
+An important part of the software is to avoid the use of procedurally generated data. This is to express where the frontier of science and exploration is currently at and how it progresses through space missions with the goal of mapping the Universe. A general globe browsing feature provides a means of communicating this progress through continuous mapping of planets, moons and dwarf planets within our solar system.
 
 \subsection{Globe Browsing}
 
-The term globe browsing can be described as exploration of geospatial data on a virtual representation of a globe. The word globe is a general term used to describe nearly elliptical celestial objects such as planets, moons, dwarf planets, and asteroids.
+The term globe browsing can be described as exploration of geospatial data on a virtual representation of a globe. The word globe is a general term used to describe nearly elliptical celestial objects such as planets, moons, dwarf planets and asteroids.
 
 Globe rendering with the purpose of multi-scale browsing has been used for quite some time in flight simulators, map services and astro-visualization. Prerendered flight paths were visualized as early as the late 1970s by NASA's Jet Propulsion Laboratory \cite{cozzi11}. 
 
@@ -26,7 +26,7 @@ Google Earth \cite{googlemaps} enables browsing of the Earth within a web browse
 
 There are other commercial softwares that enables larger scale visualization of the Universe with real positional data gathered through research by the National Aeronautics and Space Administration (NASA), the European Space Agency (ESA) and others. Satellite Toolkit (STK) enables this by integrating ephemeris information through the SPICE interface \cite{spice} which allows accurate placing of celestial bodies and space crafts within our solar system. Uniview from SCISS AB also enables SPICE integration with sophisticated rendering techniques and dome theatre support \cite{uniview}.
 
-There are other significant globe browsing softwares used in dome theatres such as World Wide Telescope (WWT) \cite{wwt}, Evans \& Sutherland's Digistar \cite{digistar}, and Sky-Skans DigitalSky \cite{digitalsky}.
+There are other significant globe browsing softwares used in dome theatres such as World Wide Telescope (WWT) \cite{wwt}, Evans \& Sutherland's Digistar \cite{digistar} and Sky-Skans DigitalSky \cite{digitalsky}.
 
 Other relevant softwares that currently do not support dome configuration rendering but none the less are very adequate in their techniques of integrating globe browsing and globe rendering include Outerra \cite{outerra} and Space Engine \cite{spaceengine}. Both focusing on merging real data with procedurally generated terrains where real data is not available.
 
@@ -62,7 +62,7 @@ In table \ref{table:softwares}, features relevant to globe browsing in public pr
 The goal of this thesis is not only to provide OpenSpace with a globe browsing feature. There are some specific demands that play a significant role in the focus of this work. These features are listed below:
 
 \begin{enumerate}
-    \item Ability to retrieve map data from the most common standardized web map data interfaces: WMS, TMS, WMTS.
+    \item Ability to retrieve map data from the most common standardized web map data interfaces: WMS, TMS and WMTS.
     \item Ability to render height maps and color textures with up to 25 cm per pixel resolution \todo{Something to fix here?}
     \item Ability to layer multiple map datasets on top of each other. This makes it possible to visualize a range of scientific parameters on top of a textured globe
     \item Globe browsing should be done at interactive frame rates: at least 60 frames per second on modern consumer gaming graphics cards
@@ -109,7 +109,7 @@ Details in issues and proposed solutions to these challenges will be discussed t
 When dealing in mapping and rendering of globes, conversion between different coordinate systems becomes important. The coordinate systems needed for considering in development are listed below:
 
 \begin{itemize}
-\item \textbf{Cartesian coordinates} - Normal right handed OpenGL coordinates. Can be either in model space, world space, or camera space.
+\item \textbf{Cartesian coordinates} - Normal right handed OpenGL coordinates. Can be either in model space, world space or camera space.
 
 \begin{itemize}
 \item \textbf{World space coordinates} - Coordinate space where the globe does not necessarily have to be in the origin. This, for example, can be the J2000 coordinate system with the origin in the barycenter of the solar system

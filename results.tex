@@ -106,12 +106,12 @@ The canyon Candor Shasma at Mars is rendered with a low resolution color layer c
     ~
     \begin{subfigure}[t]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/west_candor_chasma2.jpg}
-        \caption{CTX mosaic, CTX DTM patch, and HiRISE DTM patch}
+        \caption{CTX mosaic, CTX DTM patch and HiRISE DTM patch}
     \end{subfigure}
     ~
     \begin{subfigure}[t]{0.90\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/west_candor_chasma3.jpg}
-        \caption{CTX mosaic, CTX DTM patch, and HiRISE 25 cm per pixel DTM patch closeup}
+        \caption{CTX mosaic, CTX DTM patch and HiRISE 25 cm per pixel DTM patch closeup}
     \end{subfigure}
     \caption{Local DTM patches of West Candor Chasma, Valles Marineris, Mars. All figures use Color Layer: Viking MDIM, Height Map: MOLA}
     \label{fig:localpatches}
@@ -173,9 +173,22 @@ Using the vast amount of datasets provided by NASA GIBS \cite{gibs}, several sci
 \end{figure}
 
 \clearpage
+\subsection{Culling}
+\FloatBarrier
+
+Figure \ref{fig:frustummars} shows the affect of frustum culling on chunks together with the difference in skirt length between levels.
+
+\begin{figure}[h]
+    \centering
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/frustum_mars.jpg}
+    \caption{Chunks culled outside the view frustum. The skirt length of the chunks differ depending on the level. The figure also shows how some chunks are rendered in model space (green edges) and some in camera space (red edges).}
+    \label{fig:frustummars}
+\end{figure}
+
+\clearpage
 \section{Benchmarking}
 \FloatBarrier
-This section cover a range of benchmarks diagnosing the behavior and performace of the system. The spec for the computer used for benchmarking is specified in table \ref{table:benchmark host}. 
+This section cover a range of benchmarks diagnosing the behavior and performace of the system. The specifications for the computer used for benchmarking is specified in table \ref{table:benchmark host}. 
 
 \begin{table}[h]
   \centering
@@ -779,7 +792,7 @@ The impact of polar pinching on the chunk tree was evaluated using both distance
 \clearpage
 \subsection{Benchmark: Interactive Globe Browsing}
 \FloatBarrier
-The purpose of the globe browsing is be able to interactively explore virtual globes and map datasets. In order to capture how the system behaves over time, a user interaction sequence was evaluated. The sequence is described step by step below, and illustrated in Figure \ref{fig:interaction}.
+The purpose of the globe browsing is be able to interactively explore virtual globes and map datasets. In order to capture how the system behaves over time, a user interaction sequence was evaluated. The sequence is described step by step below and illustrated in Figure \ref{fig:interaction}.
 
 \begin{enumerate}
   \item Camera views Earth from space
@@ -798,7 +811,9 @@ The purpose of the globe browsing is be able to interactively explore virtual gl
     \label{fig:interaction}
 \end{figure}
 
+\clearpage
 \subsection{Camera Space Rendering}
+\FloatBarrier
 
 Comparing the use of camera space rendering and model space rendering, vertex jittering is apparent when interacting close to the surface. Figure \ref{fig:camspacemodelspace} shows how vertex jittering is apparent when browsing a HiRISE patch close to the surface of Mars. The visual result in the image is not as striking as the artifact that appears when the camera is moving. Then the vertices are jittering only in the case of model space rendering and not for camera space rendering. 
 
