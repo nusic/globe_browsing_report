@@ -173,6 +173,19 @@ Using the vast amount of datasets provided by NASA GIBS \cite{gibs}, several sci
 \end{figure}
 
 \clearpage
+\subsection{Culling}
+\FloatBarrier
+
+Figure \ref{fig:frustummars} shows the affect of frustum culling on chunks together with the difference in skirt length between levels.
+
+\begin{figure}[h]
+    \centering
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/frustum_mars.jpg}
+    \caption{Chunks culled outside the view frustum. The skirt length of the chunks differ depending on the level. The figure also shows how some chunks are rendered in model space (green edges) and some in camera space (red edges).}
+    \label{fig:frustummars}
+\end{figure}
+
+\clearpage
 \section{Benchmarking}
 \FloatBarrier
 This section cover a range of benchmarks diagnosing the behavior and performace of the system. The specifications for the computer used for benchmarking is specified in table \ref{table:benchmark host}. 
