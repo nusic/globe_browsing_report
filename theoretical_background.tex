@@ -658,8 +658,6 @@ An important thing to consider when dealing with chunks of a virtual globe is th
 
 \subsubsection{Switching}
 
-\todo[inline]{Do you want us to remove this and the Cracks and Skirts section}
-
 Even when chunks can be selected in a way that guarantees a maximum pixel error per vertex, the fact that full areas of multiple triangles are replaced all at once causes a drastic change in the rendered view. Even when the updates are small per vertex, the update of whole chunk areas may be easily noticed. This is what is referred to as popping.
 
 Minimizing popping artifacts is typically done by smoothly transitioning between levels over time. Cozzi and Ring suggest an approach, where along with each vertex, a delta offset is also stored \cite[p. 451]{cozzi11}. This delta offset stores the difference between the chunk itself and the same region within the parent chunk. Using this difference, new vertices can be placed on already defined edges and then interpolated into their actual positions. Figure \ref{fig:lodswitch} illustrates the idea.
