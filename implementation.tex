@@ -31,11 +31,11 @@ The base of the chunked LOD algorithm revolves around the self updating chunk tr
 \subsection{Chunks}
 As opposed to the definition of chunks in the background section \ref{section:chunkedlodbacground}, this implementation of chunks is very lightweight - it does not store any texture or triangle mesh data. Instead, it stores the information needed to query texture tiles from local in-memory caches. In the implementation suggested by Cozzi and Ring, terrain triangle meshes are stored in each chunk. In the case of this implementation however, all terrain is rendered using height mapped vertex grids. Thus there is no need for each chunk to store their own vertex arrays. Instead they can simply share one single instance of a vertex grid within a whole chunk tree. This means that vertices need to be offset by height mapping on the GPU which makes it possibly to dynamically change height datasets that does not require pre processing before they can be used for rendering.
 
-The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. 
+The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. This is done by evaluating all the leaf nodes of the chunk tree. Chunks that are cullable will indicate that they can be merged by their chunk parent node. Chunks that cannot be culled indicate whether they want be splitted or merged based on a chunk selection algorithm. If all child nodes to a common chunk parent want to merge, the parent will merge its children. If any chunk reports it want to be splitted, its chunk node will initialize four new children within the chunk tree.
 
 \subsection{Chunk Selection}
 \label{section:chunkselection}
-The chunk tree is automatically reshaped depending on the virtual camera. A chunk node splits, merges or remain the same depending on the chunk's error metric for the current LOD. Three different approaches for calculating the error metric were implemented. By letting the user dynamically adjust a LOD scale factor, performance can be weighted against detail level.
+The chunk tree is automatically reshaped depending on the virtual camera. Three different approaches for calculating the error metric were implemented. By letting the user dynamically adjust a LOD scale factor, performance can be weighted against detail level.
 
 \subsubsection{By Distance}
 Letting the error depend on the distance between the closest point on the chunk, and the camera $d$ as in Equation \ref{eq:loddistance}, will lead to more or less constant size of the chunks in screen space.
