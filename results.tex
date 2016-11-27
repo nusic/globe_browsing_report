@@ -119,7 +119,33 @@ The canyon Candor Shasma at Mars is rendered with a low resolution color layer c
 
 
 \clearpage
-\subsection{Chunk Bounding Volumes}
+\subsection{Visualizing Scientific Parameters}
+\FloatBarrier
+
+Using the vast amount of datasets provided by NASA GIBS \cite{gibs}, several scientific parameters measured by the Terra and Aqua satellites among others could be visualized as a result of layered texture rendering. Three examples are shown in figure \ref{fig:sciparam}.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/ozone.jpg}
+        \caption{Ozone (measured in streaks)}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/land_temp.jpg}
+        \caption{Land temperature}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.90\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/sea_surface.jpg}
+        \caption{Sea surface temperature}
+    \end{subfigure}
+    \caption{Visualization of scientific parameters on the globe. Datasets from \cite{gibs}}
+    \label{fig:sciparam}
+\end{figure}
+
+\clearpage
+\subsection{Visual Debugging: Bounding Volumes}
 \FloatBarrier
 Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by polyhedron shapes.
 \begin{figure}[h]
@@ -147,36 +173,10 @@ Bounding polyhedra are calculated on the fly for each chunk, taking onto conside
 \end{figure}
 
 \clearpage
-\subsection{Visualizing Scientific Parameters}
+\subsection{Visual Debugging: Camera Frustum}
 \FloatBarrier
 
-Using the vast amount of datasets provided by NASA GIBS \cite{gibs}, several scientific parameters measured by the Terra and Aqua satellites among others could be visualized as a result of layered texture rendering. Three examples are shown in figure \ref{fig:sciparam}.
-
-\begin{figure}[h]
-    \centering
-    \begin{subfigure}[t]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/ozone.jpg}
-        \caption{Ozone (measured in streaks)}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[t]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/land_temp.jpg}
-        \caption{Land temperature}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[t]{0.90\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/sea_surface.jpg}
-        \caption{Sea surface temperature}
-    \end{subfigure}
-    \caption{Visualization of scientific parameters on the globe. Datasets from \cite{gibs}}
-    \label{fig:sciparam}
-\end{figure}
-
-\clearpage
-\subsection{Culling}
-\FloatBarrier
-
-Figure \ref{fig:frustummars} shows the affect of frustum culling on chunks together with the difference in skirt length between levels.
+Figure \ref{fig:frustummars} shows a camera frustum visualized and the affect of frustum culling on chunks together with the difference in skirt length between levels.
 
 \begin{figure}[h]
     \centering
