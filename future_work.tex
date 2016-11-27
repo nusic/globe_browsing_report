@@ -3,7 +3,7 @@
 We will discuss the most relevant features that could be added to the globe browsing module in the future. There are possibilities for optimizations as well as a need for features, required from a fully versatile globe browsing system, that easily extends beyond the scope of this thesis.
 
 \section{Parallelization Per Overview}
-Given the discussion about parallelization of GDAL WMS requests under section \ref{section:parallelrequests}, testing parallelization on a per overview level would be reasonable to maximize efficiency in tile requests. The best thing, of course, would be if the developers of GDAL made sure that WMS requests would be thread safe. \todo{vetefan asså}
+Given the discussion about parallelization of GDAL WMS requests under section \ref{section:parallelrequests}, testing parallelization on a per overview level would be reasonable to maximize efficiency in tile requests. The best thing, of course, would be if the developers of GDAL made sure that WMS requests would be thread safe.
 
 \section{Browsing WMS Datasets Upon Request}
 The focus was not put on user interfacing, but instead the techniques required for rendering. A given future feature however would be to provide the users of the software the ability to specify datasets to read during runtime. This could be done using the GetCapabilities operation for WMS or WMTS providers to be able to list all available datasets behind a service. Then users could select a specific dataset to load on demand.
