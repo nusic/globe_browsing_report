@@ -97,7 +97,7 @@ There are several organizations working on gathering GIS data that can be visual
 
 \subsubsection{Earth}
 
-NASA Global Imagery Browse Services (GIBS) provides several global map datasets with information about Earth's changing climate. The two satellites Aqua and Terra orbit the Earth and are continuously measuring multi band quantities such as corrected reflectance and surface reflectance along with a range of scientific parameters such as surface and water temperatures, ozone, carbon dioxide and more. Many of the GIBS datasets are updated temporally so that changes can be seen over time. Map tiles are requested through a TMS interface and a date and time parameter can be set to specify a map within a certain time range.
+NASA Global Imagery Browse Services (GIBS) provides several global map datasets with information about Earth's changing climate \cite{gibs}. The two satellites Aqua and Terra orbit the Earth and are continuously measuring multi band quantities such as corrected reflectance and surface reflectance along with a range of scientific parameters such as surface and water temperatures, ozone, carbon dioxide and more. Many of the GIBS datasets are updated temporally so that changes can be seen over time. Map tiles are requested through a TMS interface and a date and time parameter can be set to specify a map within a certain time range.
 
 Environmental Systems Research Institute (ESRI) is the provider of the software ArcGIS that lets their users create and publish map data through different types of web map services. There are a lot of free maps to use; not only for Earth but other globes are covered too. ESRI supports a web publication interface where web maps can be searched and studied in an online map viewer. Many of the maps are given in mercator coordinates since they are meant to be viewed projected on a flat surface such as a screen where aspect ratio should be preserved.
 
@@ -127,7 +127,7 @@ The World Geodetic System 1984 (WGS84) standard defined by National Geospatial-I
 
 \begin{figure}
 \centering
-\includegraphics[scale=0.25]{figures/wgs84.pdf}
+\includegraphics[scale=0.25]{figures/wgs84.jpg}
 \caption{The WGS84 coordinate system and globe. Figure adapted from \cite{mapprojections}}
 \label{fig:wgs84}
 \end{figure}
@@ -289,7 +289,7 @@ There are several possibilities for defining a coordinate transform for map proj
 
 The choice of map projection is tied together with the choice of ellipsoid tessellation. This is because the map often needs to be tiled up when rendering. Each tile has its local texture coordinate system which need to have a simple transform from the georeferenced coordinate system for texture sampling. If the tiles can be affinely transformed to the georeferenced coordinate system, texture sampling can be done on the fly; otherwise the georeferenced coordinates need to be re-projected which may be computationally heavy or impossible for real time applications.
 
-The European Petroleum Survey Group (EPSG) has defined several standards for map projections of the Earth. Many of these are mentioned when discussing the different projections.
+The European Petroleum Survey Group (EPSG) \cite{epsg} has defined several standards for map projections of the Earth . Many of these are mentioned when discussing the different projections.
 
 \subsubsection{Geographic Projections}
 
@@ -520,7 +520,7 @@ The continuous LOD (CLOD) approach represents a model in a way that allows the r
 
 According to Cozzi and Ring \cite[p. 368]{cozzi11} CLOD has previously been the most popular approach for rendering terrain at interactive rates, with implementations such as Real-time Optimally Adaptive Mesh (ROAM) \cite{roam}. The main reason CLOD algorithms are not widely employed these days is due to the increase in triangle throughput on modern GPUs, causing the CLOD operations done on the CPU in many cases to act as a bottleneck for the rendering.
 
-A special branch of CLOD worth mentioning is the so called infinite LOD. In this approach the terrain is represented by a mathematical function; an implicit surface. These functions can be defined by fractal algorithms and produce complex characteristics or they can define simple geometric shapes such as spheres or ellipsoids. As all points on these types of surfaces are precisely defined, triangle meshes can be generated with no limit on the level of detail. This approach is not suitable for incorporating real world data, but it is used by terrain engines such as Outerra and Terragen to procedurally generate terrain at any desired level of detail \cite{outerraprocedural09}. 
+A special branch of CLOD worth mentioning is the so called infinite LOD. In this approach the terrain is represented by a mathematical function; an implicit surface. These functions can be defined by fractal algorithms and produce complex characteristics or they can define simple geometric shapes such as spheres or ellipsoids. As all points on these types of surfaces are precisely defined, triangle meshes can be generated with no limit on the level of detail. This approach is not suitable for incorporating real world data, but it is used by terrain engines such as Outerra and Terragen to procedurally generate terrain at any desired level of detail \cite{outerraprocedural09} \cite{terragen}. 
 
 \subsection{Hierarchical Level of Detail}
 \label{section:hlod}
