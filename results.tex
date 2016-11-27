@@ -33,29 +33,80 @@ Earth rendered with a water mask layer enhancing specular contrasts between land
 \clearpage
 \subsection{Chunk Bounding Volumes}
 \FloatBarrier
-Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by a polyhedron shape.
+Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by polyhedron shapes.
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/culling/bbox_earth.png}
-        \caption{Earth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds1.jpg}
+        %\caption{Earth}
     \end{subfigure}
+    ~
     \begin{subfigure}[bt]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/culling/bbox_europe.png}
-        \caption{Europe}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds2.jpg}
+        %\caption{Europe}
     \end{subfigure}
+    ~
     \begin{subfigure}[bt]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/culling/bbox_himalaya3.png}
-        \caption{Himalaya mountain ridge}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds3.jpg}
+        %\caption{Himalaya mountain ridge}
     \end{subfigure}
+    ~
     \begin{subfigure}[bt]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/culling/bbox_himalaya.png}
-        \caption{Himalayan valley}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds4.jpg}
+        %\caption{Himalayan valley}
     \end{subfigure}
-    \caption{Bounding volumes for each chunk are calculated for each chunk.}
+    \caption{Bounding volumes are calculated for each chunk. Figures shows a descent towards Valles Marinaris, Mars}
     \label{fig:boundingvolume}
 \end{figure}
 
+\clearpage
+\subsection{HSV Blending}
+\FloatBarrier
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/valles_marineris1.jpg}
+        \caption{Color Layer: Viking MDIM}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/valles_marineris2.jpg}
+        \caption{Grayscale Layer: CTX Mosaic}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[bt]{0.90\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/valles_marineris3.jpg}
+        \caption{CTX Mosaic HSV blended on top of Viking MDIM}
+    \end{subfigure}
+    \caption{Valles Marineris, Mars with different layers}
+    \label{fig:hsvblending}
+\end{figure}
+
+\clearpage
+\subsection{Local Patches}
+\FloatBarrier
+
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/west_candor_chasma1.jpg}
+        \caption{Local Patch: CTX DTM patch}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/west_candor_chasma2.jpg}
+        \caption{CTX mosaic, CTX DTM patch, and HiRISE DTM patch}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.90\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/west_candor_chasma3.jpg}
+        \caption{CTX mosaic, CTX DTM patch, and HiRISE DTM patch closeup}
+    \end{subfigure}
+    \caption{Local DTM patches of West Candor Chasma, Valles Marineris, Mars. All figures use Color Layer: Viking MDIM, Height Map: MOLA}
+    \label{fig:localpatches}
+\end{figure}
 
 \clearpage
 \section{Benchmarking}
