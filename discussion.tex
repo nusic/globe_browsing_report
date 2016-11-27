@@ -5,7 +5,7 @@ In this chapter, the resulting implementation and design decisions made through 
 The performance related results of the benchmarks presented in section \ref{section:benchmarking} are discussed below.
 
 \subsection{Chunk Culling}
-From Figure \ref{fig:topdown} and \ref{fig:interaction} it is noted that the chunk tree grows as the ground facing camera comes closer to the surface, but the number of rendered chunks remain relativelty constant. 
+From Figure \ref{fig:topdown} and \ref{fig:interaction} it is noted that the chunk tree grows as the ground facing camera comes closer to the surface, but the number of rendered chunks remain relatively constant. 
 This is the desired result of the frustum culling algorithm, which efficiently culls most of the chunk tree as the camera looks straight down towards the ground. 
 In Figure \ref{fig:topdown} we can also see that the total globe rendering time does not only depend on the number of rendered chunks. 
 Even though the render call done for each rendered chunk is quite heavy (including accessing texture data and setting uniforms on the GPU), other things such as chunk selection and performing culling (done for each leaf node) are operations that also affect the render time. 
@@ -15,28 +15,28 @@ Looking at the horizon means a much larger geographical area is visible to the c
 This means that chunk culling algorithms can not be expected to increase the rendering performance as much as in the case above. 
 However, it can be seen that by using both the culling approaches, the globe rendering time is reduced approximately by a factor 10. 
 When comparing the two, we see that the frustum culling algorithm does a much better job reducing the number of rendered chunks than than horizon culling. 
-This is intuitively explained by the fact that horizon culling can only cull chunks far away, where the selection algorithm preferes choosing a few big, low resolution chunks any way. 
+This is intuitively explained by the fact that horizon culling can only cull chunks far away, where the selection algorithm prefers choosing a few big, low resolution chunks any way. 
 The frustum culling algorithm, on the other hand, may cull chunks that are both far away and very close to the camera. 
 However, there is no practical reason for not using both the algorithms in combination at any time. 
 The overhead of running both algorithms is payed back in rendering time as seen in figure \ref{fig:cullingcomp}.
 
 \subsection{Chunk Selection}
-In order to efficiently render camera views including the horizon, parameter tuning and optimization should not focus on chunk culling. 
+In order to efficiently render camera views including facing the horizon, parameter tuning and optimization should not focus on chunk culling. 
 Instead, the selection algorithm need to be carefully considered. 
 In figure \ref{fig:lodcomp}, the two implemented chunk selection algorithms are compared to each other for such a camera view. 
-We see that the algorithm based on the projected is significantly faster than the distance based approach. 
+We see that the algorithm based on the projected area is significantly faster than the distance based approach. 
 The explanation for this is found by looking at the figures \ref{fig:cullingdcam} and \ref{fig:cullingacam} showing the corresponding view for the distance based and projected area based algorithm respectively. 
-The area based algorithm prioritizes high level of detail close to the camera to a larger extent than the distance based approach - which is also how algorithm gains its performance. 
+The projected area based algorithm prioritizes high level of detail close to the camera to a larger extent than the distance based approach, which is also how the algorithm gains its performance. 
 By looking at the closest rendered chunks however, we see that the same level of detail was selected for both algorithms. 
-Considering the relatively low difference in the visual appearence, one conclude that the projected area based algorithm is an efficient way to select chunks for rendering, especially for camera views looking at the horizon.
+Considering the relatively low difference in the visual appearance, one conclusion is that the projected area based algorithm is an efficient way to select chunks for rendering, especially for camera views looking at the horizon.
 
 \subsection{Inconsistent globebrowsing performance}
 Using quad trees (chunk trees) is a simple approach for hierarchically dividing a region into smaller subregions. 
 However, the way the chunk trees are structured may cause different geographical regions to correspond to different types of chunk tree structures. 
 That is, two different chunks on the same chunk level can correspond to large differences in the total number of nodes in the chunk tree. 
 As an example: if the camera is looking at a small region just north of the equator, the whole southern hemisphere can be efficiently culled. 
-However, if the camera moves just a few meters south, the chunk tree needs to suddenly consider a lot of chunks than previously. 
-This aspect will cause the performance of the rendering system to be affected by location. 
+However, if the camera moves just a few meters south, the chunk tree needs to suddenly consider a lot more chunks than previously. 
+This effect will cause the performance of the rendering system to be affected by location. 
 This would explain the same number of chunk nodes in figure \ref{fig:topdowngraph1} for East America and New York. 
 
 From Figure \ref{fig:interaction} we can see that the chunk tree grows as the camera views the horizon, as do the number of rendered chunks. When turning the camera 180 degrees, the chunk tree shrinks temporarily. This is explained by the fact that the chunk tree growth is limited by the available tile data. Rotating half a revolution causes a lot of previously unseen chunks to no longer be culled by the culling algorithms. The tree grows again as the map tiles for these chunks are being fetched. 
@@ -65,7 +65,7 @@ Even though geometry clipmaps would pose some very different rendering challenge
 The commonly used components would include the entire texture data pipeline and layer structure along with all the geometric related calculations, the interaction mode and various helper classes. The main difference is the rendering pipeline even though it also has similarities; for example, using the model space and camera space vertex rendering schemes could be done for geometry clipmaps just as well as for chunk grids.
 
 \section{Mip Level Blending}
-All the chunk tiles represent the same geodetic area at different mip level. 
+All the chunk tiles in a given chunk tile pile represent the same geodetic area at different mip level. 
 The texture data within a single dataset does not have to be strictly down sampled versions of the original size. 
 The dataset may be combined from multiple different data sources such as satellite imagery and aerial photographs. 
 Thus, two adjacent mip levels within a map dataset may look very different from one another. 
