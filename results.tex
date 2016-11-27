@@ -111,9 +111,7 @@ Bounding polyhedra are calculated on the fly for each chunk, taking onto conside
 \clearpage
 \section{Benchmarking}
 \FloatBarrier
-This section goes through how the final implementation results in a software that solves the proposed objectives. Section (ref screenshots) \todo{ref} includes screenshots showing the globe browsing in use.
-
-The benchmarks were done using the computer specified in table \ref{table:benchmark host}.
+This section cover a range of benchmarks diagnosing the behavior and performace of the system. The spec for the computer used for benchmarking is specified in table \ref{table:benchmark host}. 
 
 \begin{table}[h]
   \centering
@@ -232,11 +230,13 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
 
 
 \clearpage
-\subsection{Culling For Distance Based Chunk Selection}
+\subsection{Culling for Distance Based Chunk Selection}
 \label{ch:culld}
 \FloatBarrier
-The culling algorithms frustum culling and horizon culling were compared and evaluated.
-The settings used are provided in table \ref{table:cullingdsettings}. Note that LOD evaluation is done by distance. Figure \ref{fig:cullingdcam} shows the camera view evaluated. Figure \ref{fig:cullingd} shows an overview of the rendered chunks with the results shown in figure \ref{fig:topdowngraphd}.
+The two culling algorithms \emph{Frustum culling} and \emph{Horizon culling} were evaluated in combination with the \emph{distance based} chunk selection algorithm.
+The settings used are provided in table \ref{table:cullingdsettings}. 
+Figure \ref{fig:cullingdcam} shows the camera view evaluated. 
+Figure \ref{fig:cullingd} shows an overview of the rendered chunks with the results shown in figure \ref{fig:topdowngraphd}.
 
 
 \begin{table}[h]
@@ -263,7 +263,7 @@ The settings used are provided in table \ref{table:cullingdsettings}. Note that 
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/cam_d.png}
     \end{subfigure}
-    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey with distance based chunk selection. Chunk edges are shown to illustrate the difference in level of detail}
+    \caption{Chunks yielded by the distance based chunk selection algorithm. Brooklyn, Manhattan and New Jersey is seen in the camera view.}
     \label{fig:cullingdcam}
 \end{figure}
 
@@ -358,12 +358,14 @@ The settings used are provided in table \ref{table:cullingdsettings}. Note that 
 \end{figure}
 
 \clearpage
-\subsection{Culling For Projected Area Based Chunk Selection}
+\subsection{Culling for Area Based Chunk Selection}
 \label{ch:culla}
 
 \FloatBarrier
-
-Another test was conducted to evaluate the culling algorithms. Instead of using chunk selection based on camera distance, the projected area evaluation was used. The settings used are provided in table \ref{table:cullingasettings}. Figure \ref{fig:cullingacam} shows the camera view evaluated. Figure \ref{fig:cullinga} shows an overview of the rendered chunks with the results shown in figure \ref{fig:topdowngrapha}.
+The two culling algorithms \emph{Frustum culling} and \emph{Horizon culling} were evaluated in combination with the \emph{area based} chunk selection algorithm.
+The settings used are provided in table \ref{table:cullingasettings}. 
+Figure \ref{fig:cullingacam} shows the camera view evaluated. 
+Figure \ref{fig:cullinga} shows an overview of the rendered chunks with the results shown in figure \ref{fig:topdowngrapha}.
 
 \begin{table}[h]
   \centering
@@ -389,7 +391,7 @@ Another test was conducted to evaluate the culling algorithms. Instead of using 
     \begin{subfigure}[bt]{1.0\textwidth}
         \includegraphics[width=\textwidth]{figures/results/culling/cam_a.png}
     \end{subfigure}
-    \caption{Camera view looking over Brooklyn, Manhattan and New Jersey with projected area based chunk selection}
+    \caption{Chunks yielded by the projected area based chunk selection algorithm. Brooklyn, Manhattan and New Jersey is seen in the camera view.}
     \label{fig:cullingacam}
 \end{figure}
 
