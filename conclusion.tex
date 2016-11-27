@@ -1,1 +1,11 @@
 \chapter{Conclusions}
+Through the design, implementation and experimentation of this globe rendering system, the following conclusions have been drawn.
+\begin{itemize}
+	\item Chunked LOD is the best suited approach for out-of-core rendering of large map datasets, considering rendering performance as well as implementation time.
+	\item Using a combination of frustum culling and horizon culling, the rendering time can be kept relativetly constant with respect to distance to the ground when camera is faced straight down.
+	\item A chunk selection algorithm based on the chunks projected area is more efficient than one based on just the chunk's distance to the camera. The projected are based approach is better in terms of rendering performance and the resulting visual appeal.
+	\item Distance based level blending can be done on the fragment shader to significantly reduce the appearence of chunk edges successfully when used in combination with distance based chunk selection. However, in order to do accurate level blending using a area based chunk selection algorithm, another approach for the fragment shader must be considered.
+	\item The number of chunk nodes in the tree depend not only on the chunk selection algorithm per se, but also on the geographic location of the camera due to the underlying quad tree.
+	\item 
+
+\end{itemize}
