@@ -9,14 +9,14 @@ Screenshots from the implemented system are presented and described in each subs
   \centering
   \begin{subfigure}[bt]{0.9\textwidth}
     \includegraphics[width=\textwidth]{figures/results/screenshots/specular_earth.png}
-    \caption{Shaded Earth rendered with Nasa Gibs VIIRS daily image.}
+    \caption{Shaded Earth rendered with NASA GIBS VIIRS daily image \cite{gibs}}
   \end{subfigure}
 \end{figure}
 
 \clearpage
 \subsection{Height Mapping}
 \FloatBarrier
-Earth rendered with a height dataset displacing the chunks' vertices to according to the geometric shape of the ground. No atmosphere is rendered.
+Earth rendered with a height dataset displacing the chunks' vertices according to the geometric shape of the ground. No atmosphere is rendered.
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.9\textwidth}
@@ -94,8 +94,8 @@ The canyon Candor Shasma at Mars is rendered with a low resolution color layer c
 
 \clearpage
 \subsection{Local Patches}
+\label{section:localpatchesresult}
 \FloatBarrier
-
 
 \begin{figure}[h]
     \centering
@@ -111,7 +111,7 @@ The canyon Candor Shasma at Mars is rendered with a low resolution color layer c
     ~
     \begin{subfigure}[t]{0.90\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/west_candor_chasma3.jpg}
-        \caption{CTX mosaic, CTX DTM patch, and HiRISE DTM patch closeup}
+        \caption{CTX mosaic, CTX DTM patch, and HiRISE 25 cm per pixel DTM patch closeup}
     \end{subfigure}
     \caption{Local DTM patches of West Candor Chasma, Valles Marineris, Mars. All figures use Color Layer: Viking MDIM, Height Map: MOLA}
     \label{fig:localpatches}
@@ -144,6 +144,32 @@ Bounding polyhedra are calculated on the fly for each chunk, taking onto conside
     \end{subfigure}
     \caption{Rendering the bounding polyhedra for chunks at Mars. Note how the polyhedra start out as tetrahedras for the largest chunks in a) and converges towards cuboids as seen in d). }
     \label{fig:boundingvolume}
+\end{figure}
+
+\clearpage
+\subsection{Visualizing Scientific Parameters}
+\FloatBarrier
+
+Using the vast amount of datasets provided by NASA GIBS \cite{gibs}, several scientific parameters measured by the Terra and Aqua satellites among others could be visualized as a result of layered texture rendering. Three examples are shown in figure \ref{fig:sciparam}.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/ozone.jpg}
+        \caption{Ozone (measured in streaks)}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/land_temp.jpg}
+        \caption{Land temperature}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.90\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/sea_surface.jpg}
+        \caption{Sea surface temperature}
+    \end{subfigure}
+    \caption{Visualization of scientific parameters on the globe. Datasets from \cite{gibs}}
+    \label{fig:sciparam}
 \end{figure}
 
 \clearpage
