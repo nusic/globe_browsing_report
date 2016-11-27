@@ -48,39 +48,10 @@ Earth rendered with a water mask layer enhancing specular contrasts between land
 \end{figure}
 
 
-
 \clearpage
-\subsection{Chunk Bounding Volumes}
+\subsection{Grayscale Overlaying}
 \FloatBarrier
-Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by polyhedron shapes.
-\begin{figure}[h]
-    \centering
-    \begin{subfigure}[bt]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds1.jpg}
-        %\caption{Earth}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[bt]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds2.jpg}
-        %\caption{Europe}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[bt]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds3.jpg}
-        %\caption{Himalaya mountain ridge}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[bt]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds4.jpg}
-        %\caption{Himalayan valley}
-    \end{subfigure}
-    \caption{Bounding volumes are calculated for each chunk. Figures shows a descent towards Valles Marinaris, Mars}
-    \label{fig:boundingvolume}
-\end{figure}
-
-\clearpage
-\subsection{HSV Blending}
-\FloatBarrier
+The canyon Candor Shasma at Mars is rendered with a low resolution color layer combined with a higher resolution grayscale overlay.
 
 \begin{figure}[h]
     \centering
@@ -125,6 +96,35 @@ Bounding polyhedra are calculated on the fly for each chunk, taking onto conside
     \end{subfigure}
     \caption{Local DTM patches of West Candor Chasma, Valles Marineris, Mars. All figures use Color Layer: Viking MDIM, Height Map: MOLA}
     \label{fig:localpatches}
+\end{figure}
+
+
+\clearpage
+\subsection{Chunk Bounding Volumes}
+\FloatBarrier
+Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by polyhedron shapes.
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds1.jpg}
+        %\caption{Earth}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds2.jpg}
+        %\caption{Europe}
+    \end{subfigure}
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds3.jpg}
+        %\caption{Himalaya mountain ridge}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds4.jpg}
+        %\caption{Himalayan valley}
+    \end{subfigure}
+    \caption{Bounding volumes are calculated for each chunk. Figures shows a descent towards Valles Marinaris, Mars}
+    \label{fig:boundingvolume}
 \end{figure}
 
 \clearpage
