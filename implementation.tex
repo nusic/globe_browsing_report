@@ -38,7 +38,7 @@ The most important part of the chunked LOD algorithm is the ability to dynamical
 The chunk tree is automatically reshaped depending on the virtual camera. A chunk node splits, merges or remain the same depending on the chunk's error metric for the current LOD. Three different approaches for calculating the error metric were implemented. By letting the user dynamically adjust a LOD scale factor, performance can be weighted against detail level.
 
 \subsubsection{By Distance}
-Letting the error depend on the distance between the closest point on the chunk, and the camera $d$ as in Equation \ref{eq:loddistance}, will lead to more or less constant size of the chunks in screen space.
+Letting the error depend on the distance between the closest point on the chunk and the camera $d$ as in Equation \ref{eq:loddistance}, will lead to more or less constant size of the chunks in screen space.
 
 \begin{equation}
 	\label{eq:loddistance}
@@ -76,10 +76,10 @@ The chunk selection algorithms described above determine a suitable level of det
 Being able to limit the chunk tree in these two scenarios, unnecessary chunk rendering calls is be avoided.
 
 \subsection{Chunk Culling}
-Given a chunk tree with chunks selected based on the camera position, each chunk can be tested using chunk cullers to determine if they are ``cullable'' and therefore can be set to invisible so that the chunk renderer will not bother in rendering them. The two implemented chunk cullers are the frustum culler and the horizon culler. They both rely on, and have access to, minimum and maximum values of the chunk's height maps. 
+Given a chunk tree with chunks selected based on the camera position, each chunk can be tested using chunk cullers to determine if they are ``cullable'' and therefore can be set to invisible so that the chunk renderer will not bother in rendering them. The two implemented chunk cullers are the frustum culler and the horizon culler. They both rely on and have access to minimum and maximum values of the chunk's height maps. 
 
 \subsubsection{Frustum Culling}
-Frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC) using the view-projection matrix of the camera followed by perspective division. Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view, and thus is cullable. This is illustrated in figure \ref{fig:frustumculling}.
+Frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC) using the view-projection matrix of the camera followed by perspective division. Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view and thus is cullable. This is illustrated in figure \ref{fig:frustumculling}.
 
 \begin{figure}[htbp]
     \centering
@@ -192,7 +192,7 @@ GDAL also provides the coefficients of a geo-transform which defines the mapping
 \end{figure}
 
 \subsubsection{Get IO Description}
-The IO description contains all tile specific information needed to perform a map read request using GDAL. This includes the pixel region to read, and where to store the result. The derivation of this information is summarized in the following steps, and illustrated in figure \ref{fig:getiodescription}.
+The IO description contains all tile specific information needed to perform a map read request using GDAL. This includes the pixel region to read and where to store the result. The derivation of this information is summarized in the following steps and illustrated in figure \ref{fig:getiodescription}.
 
 \begin{figure}[htbp]
     \centering
@@ -402,7 +402,7 @@ The ability to serve tiles with text rendered on the fly was implemented as a ge
     \label{fig:texttileprovider_gettile}
 \end{figure}
 
-Two different types of \class{Text Tile Provider}s were implemented. \\ \class{Tile Index Tile Provider} serves tiles where each tile has its tile index rendered onto it, and \class{Size Reference Tile Provider} uses the globe's reference ellipsoid to render a size reference in meters or kilometers onto its tiles.
+Two different types of \class{Text Tile Provider}s were implemented. \\ \class{Tile Index Tile Provider} serves tiles where each tile has its tile index rendered onto it and \class{Size Reference Tile Provider} uses the globe's reference ellipsoid to render a size reference in meters or kilometers onto its tiles.
 
 
 \section{Mapping Tiles onto Chunks}
@@ -660,7 +660,7 @@ There are some key differences between the \class{Layer Manager} data structure 
 \begin{itemize}
 \item The GPU representation does not store any of the actual \class{Layer} data - only the uniform locations within a shader program so that it knows where to upload the layer data to the GPU. 
 \item Render calls are done on a per chunk basis. This means that all texture data to be used within a single render call is contained in a single \class{Chunk Tile Pile} for each \class{Layer}. Thus, the \emph{provides}-relation between \class{Layer} and \class{Chunk Tile Pile} in figure \ref{fig:layermanager} simply becomes a \emph{has}-relation between a \class{GPU Layer} and a \class{GPU Chunk Tile Pile}.
-\item Layers that are disabled are not rendered, and consequently not uploaded to the GPU. This means that all layers on the GPU are enabled, thus they do not need to store that information.
+\item Layers that are disabled are not rendered and consequently not uploaded to the GPU. This means that all layers on the GPU are enabled, thus they do not need to store that information.
 \end{itemize}
 
 Incorporating these few differences yields a similar class hierarchy, as illustrated in figure \ref{fig:gpulayermanager}. 
@@ -672,7 +672,7 @@ Incorporating these few differences yields a similar class hierarchy, as illustr
     \label{fig:gpulayermanager}
 \end{figure}
 
-The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with a range of conformly named fields, or plain GLSL arrays.
+The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with a range of conformly named fields or plain GLSL arrays.
 
 \subsubsection{Updating the GPU Data}
 
@@ -701,7 +701,7 @@ In Listing \ref{lst:bindgpulayer}, it can be concluded that each layer in the GL
 "ColorLayers[0].pile.chunkTile0.tileUvTransform.scaling"
 \end{lstlisting}
 
-When setting the values, the GPU representation of the data is updated based on the currently available \class{Layer} data, and the update is propagated down to all the leaf classes. This is exemplified using code from the \class{GPULayer} class defined in Listing \ref{lst:gpulayersetvalue}.
+When setting the values, the GPU representation of the data is updated based on the currently available \class{Layer} data and the update is propagated down to all the leaf classes. This is exemplified using code from the \class{GPULayer} class defined in Listing \ref{lst:gpulayersetvalue}.
 
 \begin{lstlisting}[
   caption={Set all GPU Layer variables from a CPU Layer} 
@@ -963,6 +963,6 @@ Representing the camera state as a three dimensional cartesian vector for the po
 
 The horizontal movement interaction speed was set to be proportional to the distance from the camera to the terrain surface. That way the user can come in close and slowly hover across the detailed terrains as well as quickly moving from one continent to the other by increasing the height to the surface.
 
-The camera rotation quaternion can be decomposed in to two rotations; one directing the camera in the direction of the geodetic normal, and one directing it in the remaining view direction with a given roll. This way it is possible to both travel across the surface and keeping the horizon angle as well as looking around at the spot.
+The camera rotation quaternion can be decomposed in to two rotations; one directing the camera in the direction of the geodetic normal and one directing it in the remaining view direction with a given roll. This way it is possible to both travel across the surface and keeping the horizon angle as well as looking around at the spot.
 
 The camera is always pushed up above the surface of the terrain to avoid penetrating it. The minimum height given in meters can be set together with other parameters such as sensitivity and friction.

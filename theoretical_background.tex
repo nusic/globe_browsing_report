@@ -167,7 +167,7 @@ A common issue with geographic grids is something referred to as polar pinching.
  
 Another common tessellation method for spheres which can be generalized to ellipsoids is the quadrilateralized spherical cube tessellation. The standard approach is to subdivide a cube centered in the origin and then normalize the coordinates of all vertices to map them on a sphere. There are also other more complicated schemes designed to work with specific map projections \cite{dimi15}.
 
-To model an ellipsoid from a sphere, the vertices can be linearly transformed with a scaling in the $x$, $y$, and $z$ directions individually. Figure \ref{fig:tesselation_cube} shows a tessellated spherical cube of four different detail levels.
+To model an ellipsoid from a sphere, the vertices can be linearly transformed with a scaling in the $x$, $y$ and $z$ directions individually. Figure \ref{fig:tesselation_cube} shows a tessellated spherical cube of four different detail levels.
 
 \begin{figure}
     \centering
@@ -311,7 +311,7 @@ Geographic coordinates are defined with a latitude $\phi$ and a longitude $\thet
 \end{figure}
 
 \paragraph{Geocentric projection}
-The simplest geographic parameterization uses geocentric coordinates. Here the latitude and longitude are defined as the angle between a vector from the origin to a point on the ellipsoid surface, and the $xy-$ and $xz-$planes respectively.
+The simplest geographic parameterization uses geocentric coordinates. Here the latitude and longitude are defined as the angle between a vector from the origin to a point on the ellipsoid surface and the $xy-$ and $xz-$planes respectively.
 
 \paragraph{Geodetic projection}
 The equirectangular cylindrical projection, using geodetic coordinates, is another variety of the geographic coordinate systems where the distance differential along the latitude $\partial \phi$ maps linearly to the latitude differential of the projected coordinates of the map.
@@ -360,7 +360,7 @@ The mercator projection is a cylindrical projection widely used for presenting g
     \label{fig:mercator}
 \end{figure}
 
-The mercator projection compensates for the longitudinal distortion by introducing a latitudinal distortion as well. Due to the polar singularities which lead to infinite latitudes at the poles when $\phi_d = \pm 90$, the domain of definition for the latitudes need to be constrained in mercator projection, see figure mercator.
+The mercator projection compensates for the longitudinal distortion by introducing a latitudinal distortion as well. Due to the polar singularities which lead to infinite latitudes at the poles when $\phi_d = \pm 90$, the domain of definition for the latitudes need to be constrained in mercator projection, see figure \ref{fig:proj_mercator}.
 
 \begin{figure}[htbp]
     \centering
@@ -467,11 +467,11 @@ Dynamic level of detail (LOD) is an important part in handling the extensive amo
 
 \begin{enumerate}
     \item \textbf{Generation} - Create versions at different level of detail of a model
-    \item \textbf{Selection} - Choose a version based on some criteria or error metric (e.g., distance to object or the projected area it occupies on the screen)
+    \item \textbf{Selection} - Choose a version based on some criteria or error metric (e.g. distance to object or the projected area it occupies on the screen)
     \item \textbf{Switching} - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
 \end{enumerate}
 
-There are different types of LOD approaches for terrain rendering, and a suitable approach should be chosen based on characteristics of the terrain. Terrains can for example be restricted to being represented as height maps - a characteristic that can be exploited by the rendering algorithm. Cozzi and Ring describe the following three categories of LOD approaches: Discrete Level of Detail, Continuous Level of Detail and Hierarchical Level of Detail \cite[p. 368-371]{cozzi11}.
+There are different types of LOD approaches for terrain rendering and a suitable approach should be chosen based on characteristics of the terrain. Terrains can for example be restricted to being represented as height maps - a characteristic that can be exploited by the rendering algorithm. Cozzi and Ring describe the following three categories of LOD approaches: Discrete Level of Detail, Continuous Level of Detail and Hierarchical Level of Detail \cite[p. 368-371]{cozzi11}.
 
 \subsection{Discrete Level of Detail}
 In the Discrete Level Of Detail (DLOD) approach, multiple different representations of the model are created at different resolutions. DLOD is arguably the most simple LOD algorithm. It works not only for digital terrain models, but for arbitrary meshes. The set of terrain representations can either be predefined or generated using mesh simplification algorithms.
@@ -520,7 +520,7 @@ The continuous LOD (CLOD) approach represents a model in a way that allows the r
 
 According to Cozzi and Ring \cite[p. 368]{cozzi11} CLOD has previously been the most popular approach for rendering terrain at interactive rates, with implementations such as Real-time Optimally Adaptive Mesh (ROAM) \cite{roam}. The main reason CLOD algorithms are not widely employed these days is due to the increase in triangle throughput on modern GPUs, causing the CLOD operations done on the CPU in many cases to act as a bottleneck for the rendering.
 
-A special branch of CLOD worth mentioning is the so called infinite LOD. In this approach the terrain is represented by a mathematical function; an implicit surface. These functions can be defined by fractal algorithms and produce complex characteristics, or they can define simple geometric shapes such as spheres or ellipsoids. As all points on these types of surfaces are precisely defined, triangle meshes can be generated with no limit on the level of detail. This approach is not suitable for incorporating real world data, but it is used by terrain engines such as Outerra and Terragen to procedurally generate terrain at any desired level of detail \cite{outerraprocedural09}. 
+A special branch of CLOD worth mentioning is the so called infinite LOD. In this approach the terrain is represented by a mathematical function; an implicit surface. These functions can be defined by fractal algorithms and produce complex characteristics or they can define simple geometric shapes such as spheres or ellipsoids. As all points on these types of surfaces are precisely defined, triangle meshes can be generated with no limit on the level of detail. This approach is not suitable for incorporating real world data, but it is used by terrain engines such as Outerra and Terragen to procedurally generate terrain at any desired level of detail \cite{outerraprocedural09}. 
 
 \subsection{Hierarchical Level of Detail}
 \label{section:hlod}
@@ -528,10 +528,10 @@ Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLO
 
 \begin{enumerate}
     \item Reducing processing time on CPU: The only CPU task that HLOD algorithms has to deal with during runtime is to select a suitable subset of the predefined chunks for rendering. This is a relatively fast procedure in contrast to iteratively applying changes to the raw geometry, as done in CLOD
-    \item Reducing the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis, and can not be cached on the GPU. Being able to perform GPU caching allows HLOD to better minimize the traffic to the GPU
+    \item Reducing the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis and can not be cached on the GPU. Being able to perform GPU caching allows HLOD to better minimize the traffic to the GPU
 \end{enumerate}
 
-HLOD uses spatial hierarchical data structures such as binary trees, quadtrees, or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail in one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated with a quad tree holding chunks representing a bunny model in figure \ref{fig:hlod}.
+HLOD uses spatial hierarchical data structures such as binary trees, quadtrees or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail in one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated with a quad tree holding chunks representing a bunny model in figure \ref{fig:hlod}.
 
 \begin{figure}[htbp]
     \centering
@@ -662,7 +662,7 @@ An important thing to consider when dealing with chunks of a virtual globe is th
 
 Even when chunks can be selected in a way that guarantees a maximum pixel error per vertex, the fact that full areas of multiple triangles are replaced all at once causes a drastic change in the rendered view. Even when the updates are small per vertex, the update of whole chunk areas may be easily noticed. This is what is referred to as popping.
 
-Minimizing popping artifacts is typically done by smoothly transitioning between levels over time. Cozzi and Ring suggest an approach, where along with each vertex, a delta offset is also stored \cite[p. 451]{cozzi11}. This delta offset stores the difference between the chunk itself and the same region within the parent chunk. Using this difference, new vertices can be placed on already defined edges, and then interpolated into their actual positions. Figure \ref{fig:lodswitch} illustrates the idea.
+Minimizing popping artifacts is typically done by smoothly transitioning between levels over time. Cozzi and Ring suggest an approach, where along with each vertex, a delta offset is also stored \cite[p. 451]{cozzi11}. This delta offset stores the difference between the chunk itself and the same region within the parent chunk. Using this difference, new vertices can be placed on already defined edges and then interpolated into their actual positions. Figure \ref{fig:lodswitch} illustrates the idea.
 
 \begin{figure}[htbp]
     \centering
@@ -796,7 +796,7 @@ Modern graphics cards work with floating point variables and single precision is
 In most computer graphics applications it is often sufficient to describe positional information in single precision floating point values. However, when simulating and visualizing the full scale of the universe and at the same time globes with sub meter resolution, the issues of low precision float operations easily become predominant unless handled right.
 
 \subsection{Floating Point Numbers}
-A floating point number $y$ is represented by a sign bit $s$, a significand $c \in N$, a base (also known as the radix) $b \in Z, b > 2$, and an exponent $q \in Z$. See equation \ref{eq:float}.
+A floating point number $y$ is represented by a sign bit $s$, a significand $c \in N$, a base (also known as the radix) $b \in Z, b > 2$ and an exponent $q \in Z$. See equation \ref{eq:float}.
 
 \begin{equation}
 \label{eq:float}
@@ -815,7 +815,7 @@ Considering an Earth sized globe with the origin in the center and a radius of $
 
 \subsection{Double Precision Floating Point Numbers}
 
-A double precision floating point number is able to accurately represent 16 decimal figures \cite{cozzi11}. Consider the Voyager 1 spacecraft, which left the solar system and entered interstellar space in August 25, 2012, and currently is at a distance in the order of magnitude of $10^{13}$ meters. This spacecraft is the farthest any human made object has gone; farther away than all the planets, and can still be accurately positioned with sub meter resolution using double precision floating point variables (of course assuming that the positional data is correct).
+A double precision floating point number is able to accurately represent 16 decimal figures \cite{cozzi11}. Consider the Voyager 1 spacecraft, which left the solar system and entered interstellar space in August 25, 2012 and currently is at a distance in the order of magnitude of $10^{13}$ meters. This spacecraft is the farthest any human made object has gone; farther away than all the planets and can still be accurately positioned with sub meter resolution using double precision floating point variables (of course assuming that the positional data is correct).
 
 NASA's Navigation and Ancillary Information Facility (NAIF) is the producer of the SPICE interface \cite{spice}. In SPICE, positional information of celestial bodies within our solar system are defined in double precision floating point numbers. Utilizing this precision makes it possible to accurately visualize space crafts in relation to globes.
 
@@ -833,7 +833,7 @@ The artifact is shown as discrete positioning of vertices which causes jagged ed
     \label{fig:jittering}
 \end{figure}
 
-Cozzi and Ring propose several different solutions to this problem which include rendering ``relative to center'', ``CPU - relative to eye'', ``GPU - relative to eye'', and ``GPU - relative to eye - FUN90'' \cite{cozzi11}. 
+Cozzi and Ring propose several different solutions to this problem which include rendering ``relative to center'', ``CPU - relative to eye'', ``GPU - relative to eye'' and ``GPU - relative to eye - FUN90'' \cite{cozzi11}. 
 
 \subsubsection{Z-Fighting}
 
