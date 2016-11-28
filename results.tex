@@ -21,7 +21,7 @@ Earth rendered with a height dataset displacing the chunks' vertices according t
     \centering
     \begin{subfigure}[bt]{0.9\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/height_bali.png}
-        \caption{The vulcano Gunung Agung at Bali.}
+        \caption{The volcano Gunung Agung at Bali.}
     \end{subfigure}
     \begin{subfigure}[bt]{0.9\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/height_mt_everest.png}
@@ -38,19 +38,19 @@ Earth rendered with a water mask layer enhancing specular contrasts between land
     \centering
     \begin{subfigure}[bt]{0.9\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/specular_brazil.png}
-        \caption{Suns's specular reflection in Amazon River.}
+        \caption{Sun's specular reflection in Amazon River.}
     \end{subfigure}
     \begin{subfigure}[bt]{0.9\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/specular_indonesia.png}
         \caption{Sun's specular reflection around Bali, Indonesia.}
     \end{subfigure}
-    \caption{Shaded globe using using water mask texture}
+    \caption{Shaded globe using water mask texture}
 \end{figure}
 
 \clearpage
 \subsection{Night Layers}
 \FloatBarrier
-Earth rendered with a night layer showing light coming from cities. which is only rendered where there is night. 
+Earth rendered with a night layer showing light coming from cities, which is only rendered where there is night. 
 
 \begin{figure}[h]
     \centering
@@ -94,7 +94,7 @@ To demonstrate color overlays, the three examples of figure \ref{fig:coloroverla
 \clearpage
 \subsection{Grayscale Overlaying}
 \FloatBarrier
-The canyon Candor Shasma at Mars is rendered with a low resolution color layer combined with a higher resolution grayscale overlay.
+The canyon Candor Chasma at Mars is rendered with a low resolution color layer combined with a higher resolution grayscale overlay.
 
 \begin{figure}[h]
     \centering
@@ -192,7 +192,7 @@ Bounding polyhedra are calculated on the fly for each chunk, taking onto conside
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds4.jpg}
         \caption{}
     \end{subfigure}
-    \caption{Rendering the bounding polyhedra for chunks at Mars. Note how the polyhedra start out as tetrahedras for the largest chunks in a) and converges towards cuboids as seen in d). }
+    \caption{Rendering the bounding polyhedra for chunks at Mars. Note how the polyhedra start out as tetrahedra for the largest chunks in a) and converges towards cuboids as seen in d). }
     \label{fig:boundingvolume}
 \end{figure}
 
@@ -213,7 +213,7 @@ Figure \ref{fig:frustummars} shows a camera frustum visualized and the affect of
 \section{Benchmarking}
 \label{section:benchmarking}
 \FloatBarrier
-This section cover a range of benchmarks diagnosing the behavior and performace of the system. The specifications for the computer used for benchmarking is specified in table \ref{table:benchmark host}. 
+This section cover a range of benchmarks diagnosing the behavior and performance of the system. The specifications for the computer used for benchmarking is specified in table \ref{table:benchmark host}. 
 
 \begin{table}[h]
   \centering
@@ -245,7 +245,7 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 10.0 \\
-      \textbf{Chunk Selction:}    & By distance \\
+      \textbf{Chunk Selection:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
       \textbf{Level blending:}    & Enabled \\
       \textbf{Camera View:}       & Facing down, varying altitudes\\
@@ -351,7 +351,7 @@ Figure \ref{fig:cullingd} shows an overview of the rendered chunks with the resu
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
-      \textbf{Chunk Selction:}    & By distance \\
+      \textbf{Chunk Selection:}    & By distance \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
       \textbf{Level blending:}    & Enabled \\
       \textbf{Camera View:}       & Looking towards western horizon\\
@@ -479,7 +479,7 @@ Figure \ref{fig:cullinga} shows an overview of the rendered chunks with the resu
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 7.8 \\
-      \textbf{Chunk Selction:}    & By projected area \\
+      \textbf{Chunk Selection:}    & By projected area \\
       \textbf{Culling:}           & \textbf{Evaluated} \\
       \textbf{Level blending:}    & Enabled \\
       \textbf{Camera View:}       & Looking towards western horizon\\
@@ -526,7 +526,7 @@ Figure \ref{fig:cullinga} shows an overview of the rendered chunks with the resu
 \iffalse
 \begin{table}[h]
 \centering
-\caption[]{Projcted area based}
+\caption[]{Projected area based}
   \label{table:cullinga}
   \begin{tabular}{| r | c c c c |}
     \hline
@@ -660,7 +660,7 @@ The visual result of using the distance based level blending is shown in Figure 
     \label{fig:blending2}
 \end{figure}
 
-Table \ref{table:levelblending} shows the settings used to compare having level blending enabled and disabled. To show the penalty in texture detail that is payed for using level blending, the LOD scale factor was set low. Figure \ref{fig:blending} shows that the texture resolution becomes low enough to see the individual pixels when having a low LOD. The results in table \ref{table:resultblending} also show that figure \ref{fig:blendingdisabled} contains more visual information than \ref{fig:blendingenabled}. 
+Table \ref{table:levelblending} shows the settings used to compare having level blending enabled and disabled. To show the penalty in texture detail that is paid for using level blending, the LOD scale factor was set low. Figure \ref{fig:blending} shows that the texture resolution becomes low enough to see the individual pixels when having a low LOD. The results in table \ref{table:resultblending} also show that figure \ref{fig:blendingdisabled} contains more visual information than \ref{fig:blendingenabled}. 
 
 \begin{table}
   \centering
@@ -672,7 +672,7 @@ Table \ref{table:levelblending} shows the settings used to compare having level 
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation \cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 4.65 \\
-      \textbf{Chunk Selction:}    & By distance \\
+      \textbf{Chunk Selection:}    & By distance \\
       \textbf{Culling:}           & Frustum culling, Horizon culling \\
       \textbf{Camera View:}       & Horizon \\
     \hline
@@ -697,14 +697,14 @@ Table \ref{table:levelblending} shows the settings used to compare having level 
 
 \begin{table}
 \centering
-\caption[]{Level blending benchmarks. Comparing the disk space of a compressed JPEG image of both cases works as a heuristic to the information contained in each image}
+\caption[]{Level blending benchmarks. Comparing the disk space of a compressed JPG image of both cases works as a heuristic to the information contained in each image}
   \label{table:resultblending}
   \begin{tabular}{| r | c c |}
     \hline
       \textbf{Figure \ref{fig:blending}}  & \textbf{No blending} & \textbf{Level blending} \\ \hline
       \textbf{Samples per fragment} & 1 & 3 \\ 
-      \textbf{Avg. globe render time}  & 10.3 ms & 10.1 ms \\ 
-      \textbf{Avg. frame time}  & 40 ms &  49 ms \\ 
+      \textbf{Mean globe render time}  & 10.3 ms & 10.1 ms \\ 
+      \textbf{Mean frame time}  & 40 ms &  49 ms \\ 
       \textbf{Screenshot jpg size} & 1,1 MB & 0,7 MB \\
     \hline
   \end{tabular}
@@ -726,7 +726,7 @@ The impact of polar pinching on the chunk tree was evaluated using both distance
       \textbf{Map datasets:}      & HeightLayers = [GCS\_Elevation\cite{worldelevation3d}] \\
                                   & ColorLayers = [ESRI Imagery World 2D \cite{imageryworld2d}] \\
       \textbf{LOD Scale factor:}  & 10.0 \\
-      \textbf{Chunk Selction:}    & \textbf{Evaluated} \\
+      \textbf{Chunk Selection:}    & \textbf{Evaluated} \\
       \textbf{Culling:}           & Frustum culling, horizon culling \\
       \textbf{Camera View:}       & Facing down\\
       \textbf{Location:}          & Equator (at Quito, Ecuador) and North Pole\\

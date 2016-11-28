@@ -15,11 +15,11 @@ The base of the globe renderer uses a modified version of Cozzi and Rings Chunke
 The full LOD rendering system required several components of different complexity to be implemented. All components will be described in detail in this chapter.
 
 \section{Reference Ellipsoid}
-The \class{Ellipsoid} class was implemented to handle all geographic related calculations.  These calculations include conversions between geodetic and cartesian coordinates and different kinds of projections onto the ellipsoid surface. These calculations are sped up by internal caching of a range of precalculated values. Cozzi and Ring provide a complete reference on the implementation \cite[p. 17]{cozzi11}.
+The \class{Ellipsoid} class was implemented to handle all geographic related calculations.  These calculations include conversions between geodetic and Cartesian coordinates and different kinds of projections onto the ellipsoid surface. These calculations are sped up by internal caching of a range of pre-calculated values. Cozzi and Ring provide a complete reference on the implementation \cite[p. 17]{cozzi11}.
 
 The \class{Ellipsoid} uses several geographically related classes, which were used in multiple places within the implementation. These are:
 \begin{enumerate}
-	\item \class{Angle} - Handles angle related arithmetics, normalizations and unit abstractions (degrees and radians)
+	\item \class{Angle} - Handles angle related arithmetic, normalization and unit abstraction (degrees and radians)
 	\item \class{Geodetic2} - Represents a 2D geodetic coordinate (latitude, longitude)
 	\item \class{Geodetic3} - Represents a 3D geodetic coordinate (latitude, longitude, altitude)
 	\item \class{GeodeticPatch} - Represents a rectangular region in geodetic space
@@ -31,7 +31,7 @@ The base of the chunked LOD algorithm revolves around the self updating chunk tr
 \subsection{Chunks}
 As opposed to the definition of chunks in the background section \ref{section:chunkedlodbacground}, this implementation of chunks is very lightweight - it does not store any texture or triangle mesh data. Instead, it stores the information needed to query texture tiles from local in-memory caches. In the implementation suggested by Cozzi and Ring, terrain triangle meshes are stored in each chunk. In the case of this implementation however, all terrain is rendered using height mapped vertex grids. Thus there is no need for each chunk to store their own vertex arrays. Instead they can simply share one single instance of a vertex grid within a whole chunk tree. This means that vertices need to be offset by height mapping on the GPU which makes it possibly to dynamically change height datasets that does not require pre processing before they can be used for rendering.
 
-The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. This is done by evaluating all the leaf nodes of the chunk tree. Chunks that are cullable will indicate that they can be merged by their chunk parent node. Chunks that cannot be culled indicate whether they want be splitted or merged based on a chunk selection algorithm. If all child nodes to a common chunk parent want to merge, the parent will merge its children. If any chunk reports it want to be splitted, its chunk node will initialize four new children within the chunk tree.
+The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. This is done by evaluating all the leaf nodes of the chunk tree. Chunks that are cullable will indicate that they can be merged by their chunk parent node. Chunks that cannot be culled indicate whether they want be split or merged based on a chunk selection algorithm. If all child nodes to a common chunk parent want to merge, the parent will merge its children. If any chunk reports it want to be split, its chunk node will initialize four new children within the chunk tree.
 
 \subsection{Chunk Selection}
 \label{section:chunkselection}
@@ -252,14 +252,14 @@ As mentioned, \class{Tile Dataset}s can be configured to calculate some metadata
 To summarize, the implementation of \class{Tile Dataset} allow reading pixel data from a GDAL dataset corresponding to a specific \class{Tile Index}, along with metadata unless opted out. The \class{Raw Tile}s that are served are padded in order to perform smooth pixel blending between different tiles. \class{Raw Tile}s are not available for rendering since the data is not yet on the GPU.
 
 \subsection{Async Tile Dataset}
-\class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It provides a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important funcionalities: 1) enqueueing tile read jobs and 2) collect finished tile read jobs. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see figure \ref{fig:asynctiledataset}.
+\class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It provides a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important functionalities: 1) enqueing tile read jobs and 2) collect finished tile read jobs. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see figure \ref{fig:asynctiledataset}.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset.pdf}
     \end{subfigure}
-    \caption{Asynchronious reading of Raw tiles can be performed on separate threads. When the tile reading job is finished the raw tile will be appended to a concurrent queue}
+    \caption{Asynchronous reading of Raw tiles can be performed on separate threads. When the tile reading job is finished the raw tile will be appended to a concurrent queue}
     \label{fig:asynctiledataset}
 \end{figure}
 
@@ -671,7 +671,7 @@ Incorporating these few differences yields a similar class hierarchy, as illustr
     \label{fig:gpulayermanager}
 \end{figure}
 
-The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with a range of conformly named fields or plain GLSL arrays.
+The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with a range of conformally named fields or plain GLSL arrays.
 
 \subsubsection{Updating the GPU Data}
 
@@ -732,7 +732,7 @@ A chunk grid is defined by a number of segments $N$ in two dimensions, which is 
 
 The grid can be rendered using different methods to weight precision against accuracy. In the vertex shader, the vertex positions are set so that the chunk geometry can be rasterized and rendered as a mesh on the screen. Height mapping is performed by offsetting vertices in the direction of the geodetic normals on the GPU which means that vertex texture fetching is needed in the rendering pipeline.
 
-The mapping from geodetic coordinates to cartesian model space coordinates can be done on the GPU in single precision to position vertices on the globe. As discussed in section \ref{section:precision}, however, this is not sufficient to achieve sub meter precision on an Earth sized globe.
+The mapping from geodetic coordinates to Cartesian model space coordinates can be done on the GPU in single precision to position vertices on the globe. As discussed in section \ref{section:precision}, however, this is not sufficient to achieve sub meter precision on an Earth sized globe.
 
 \subsubsection{High Precision Rendering}
 
@@ -744,7 +744,7 @@ We have considered two different categories of rendering techniques: model space
 
 \subsubsection{Model Space Rendering}
 
-The most straightforward method for rendering geodetic chunks is to transform the geodetic coordinates of each vertex to cartesian model space coordinates using the inverse geographic projection transform, $P^{-1}(\phi, \theta)$, in the vertex shader. An affine transform can be applied to the vertex coordinates by knowing the geodetic coverage of the chunk. It can be derived from the chunk's tile index. The inverse projection transform is performed with limited precision floating point operations on the GPU but the accuracy will be high as vertices will be positioned exactly on the globe in geodetic coordinates. Figure \ref{fig:global}.
+The most straightforward method for rendering geodetic chunks is to transform the geodetic coordinates of each vertex to Cartesian model space coordinates using the inverse geographic projection transform, $P^{-1}(\phi, \theta)$, in the vertex shader. An affine transform can be applied to the vertex coordinates by knowing the geodetic coverage of the chunk. It can be derived from the chunk's tile index. The inverse projection transform is performed with limited precision floating point operations on the GPU but the accuracy will be high as vertices will be positioned exactly on the globe in geodetic coordinates. Figure \ref{fig:global}.
 
 \begin{figure}[htbp]
     \centering
@@ -759,7 +759,7 @@ The most straightforward method for rendering geodetic chunks is to transform th
     \begin{subfigure}[tb]{0.2\textwidth}
     	\includegraphics[width=\textwidth]{figures/implementation/rendering/gridonglobe.png}
     \end{subfigure}
-    \caption{Model space rendering of chunks is performed with a mapping of vertices from geodetic coordinates to cartesian coordinates.}
+    \caption{Model space rendering of chunks is performed with a mapping of vertices from geodetic coordinates to Cartesian coordinates.}
     \label{fig:global}
 \end{figure}
 
@@ -784,14 +784,14 @@ Camera space rendering is performed by transforming only a limited number of con
 \end{figure}
 
 \paragraph{Chunks as NURBS Surfaces}
-Non Uniform Rational B-Splines (NURBS) can represent all conic sections exactly which is important for modelling ellipses in the 1D case and ellipsoids in the 2D case. A geodetic chunk can be uniquely defined by nine control points which can be calculated using the tile index representing the chunk.
+Non Uniform Rational B-Splines (NURBS) can represent all conic sections exactly which is important for modeling ellipses in the 1D case and ellipsoids in the 2D case. A geodetic chunk can be uniquely defined by nine control points which can be calculated using the tile index representing the chunk.
 
 The positive aspect about rendering geodetic chunks as NURBS surfaces is that it is a unified way of rendering chunks and that the precision works for all scales. Chunks will always be mapped exactly on the ellipsoid and the precision will increase when the camera gets closer. However, the negative aspect that makes NURBS insufficient for texture mapped globes is the fact that the texture coordinates of the vertices do not linearly map to the geodetic coordinates of the chunk. In other words, vertices are not evenly distributed along the surface of the chunk which leads to distorted textures. The reason for this is the fact that NURBS are rational parametric functions. For example, a circle segment can be represented exactly but a given parameter value will not yield the same position along a circle segment as a circle segment parameterized as $\{x(t),y(t)\} = \{cos(t), sin(t)\}$. The $cos$ and $sin$ functions are irrational and can therefore not be represented with NURBS segments which by definition are rational.
 
 \paragraph{Chunks as Bilinear Surfaces}
 To avoid both the texture distortion of NURBS and the precision issues of model space rendering, we use a different method for rendering chunks that are closer to the camera and hence require higher precision. When the camera gets closer to the surface of the ellipsoid, the chunks will split and get smaller according to the chunk selection under Section \ref{section:chunkselection}. Smaller patches will automatically be better approximated as flat surfaces so that at a certain level, before the precision errors of the global patches become predominant, the rendering of patches can be switched to the a camera space rendering method which uses bilinear interpolation of vertex positions.
 
-This method is performed by, just as in the case of NURBS surfaces, transforming control points from cartesian model space to camera space where they can be cast to single precision representations. Instead of NURBS interpolation, a simple bilinear interpolation is used to place all the vertices on the surface defined by the four corner points of the patch that covers the chunk.
+This method is performed by, just as in the case of NURBS surfaces, transforming control points from Cartesian model space to camera space where they can be cast to single precision representations. Instead of NURBS interpolation, a simple bilinear interpolation is used to place all the vertices on the surface defined by the four corner points of the patch that covers the chunk.
 
 With bilinear interpolation, high precision is achieved for vertices placed close to the camera. Also, the vertices will be uniformly spaced which means that the textures will not be distorted. Worth noticing is that if bilinear interpolation rendering is performed on chunks with low level, the approximation will be less accurate. Switching to camera space rendering with bilinear interpolation at level 10 gives a reasonable balance between the ellipsoidal mapping of the model space rendering and the high precision of the camera space chunk rendering.
 
@@ -958,7 +958,7 @@ where $s$ is a scale factor determining how much of the higher level tile to use
 
 An interaction mode specifically for globe browsing had to be implemented to deal with the vast scale differences and limitations of camera movements required for browsing globes. 
 
-Representing the camera state as a three dimensional cartesian vector for the position and a quaternion for the rotation made it possible to achieve interaction solving the proposed objectives. Basic linear algebra was used on vectors such as the geodetic normal of the globe in the camera position geodetically projected on the surface, camera position and direction as well as the height offset of the terrain.
+Representing the camera state as a three dimensional Cartesian vector for the position and a quaternion for the rotation made it possible to achieve interaction solving the proposed objectives. Basic linear algebra was used on vectors such as the geodetic normal of the globe in the camera position geodetically projected on the surface, camera position and direction as well as the height offset of the terrain.
 
 The horizontal movement interaction speed was set to be proportional to the distance from the camera to the terrain surface. That way the user can come in close and slowly hover across the detailed terrains as well as quickly moving from one continent to the other by increasing the height to the surface.
 
