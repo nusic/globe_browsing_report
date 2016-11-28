@@ -132,7 +132,7 @@ The World Geodetic System 1984 (WGS84) standard defined by National Geospatial-I
 \label{fig:wgs84}
 \end{figure}
 
-\subsection{Tesselating the Ellipsoid}
+\subsection{Tessellating the Ellipsoid}
 
 Triangle models are still the most common way of modeling renderable objects in 3D computer graphics softwares, even though other rendering techniques such as volumetric ray casting also can be considered for terrain rendering \cite[p. 149]{cozzi11}.
 
@@ -140,7 +140,7 @@ A triangle mesh, or more generally a polygon mesh, is defined by a limited numbe
 
 \subsubsection{Geographic Grid Tessellation}
 \label{sec:geogrid}
-Tessellating the ellipsoid using a geographic grid is a very straightforward approach. Ellipsoid vertex positions can be calculated using a transform from geographic coordinates to Cartesian model space coordinates \cite[p. 25]{cozzi11}. Figure \ref{fig:tesselation_geo} shows three geographic grid tessellations of a sphere with constant number of latitudinal segments of 4, 8 and 16 respectively.
+Tessellating the ellipsoid using a geographic grid is a very straightforward approach. Ellipsoid vertex positions can be calculated using a transform from geographic coordinates to Cartesian model space coordinates \cite[p. 25]{cozzi11}. Figure \ref{fig:tessellation_geo} shows three geographic grid tessellations of a sphere with constant number of latitudinal segments of 4, 8 and 16 respectively.
 
 A common issue with geographic grids is something referred to as polar pinching. At both of the poles, segments will be pinched to one point which leads to an increasing amount of segments per area. This in turn results in oversampling in textures as well as possible visual artifacts in shading due to the very thin quads at the poles as well as possible performance penalties for highly tessellated globes.
 
@@ -159,15 +159,15 @@ A common issue with geographic grids is something referred to as polar pinching.
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_geo3.png}
     \end{subfigure}
-    \caption{Geographic grid tesselation of a sphere with constant number of latitudinal segments of 4, 8 and 16 respectively}
-    \label{fig:tesselation_geo}
+    \caption{Geographic grid tessellation of a sphere with constant number of latitudinal segments of 4, 8 and 16 respectively}
+    \label{fig:tessellation_geo}
 \end{figure}
 
 \subsubsection{Quadrilateralized Spherical Cube Tessellation}
  
 Another common tessellation method for spheres which can be generalized to ellipsoids is the quadrilateralized spherical cube tessellation. The standard approach is to subdivide a cube centered in the origin and then normalize the coordinates of all vertices to map them on a sphere. There are also other more complicated schemes designed to work with specific map projections \cite{dimi15}.
 
-To model an ellipsoid from a sphere, the vertices can be linearly transformed with a scaling in the $x$, $y$ and $z$ directions individually. Figure \ref{fig:tesselation_cube} shows a tessellated spherical cube of four different detail levels.
+To model an ellipsoid from a sphere, the vertices can be linearly transformed with a scaling in the $x$, $y$ and $z$ directions individually. Figure \ref{fig:tessellation_cube} shows a tessellated spherical cube of four different detail levels.
 
 \begin{figure}
     \centering
@@ -190,12 +190,12 @@ To model an ellipsoid from a sphere, the vertices can be linearly transformed wi
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_cube4.png}
     \end{subfigure}
     \caption{Quadrilateralized spherical cube tessellation with 0, 1, 2 and 3 subdivisions respectively}
-    \label{fig:tesselation_cube}
+    \label{fig:tessellation_cube}
 \end{figure}
 
 \subsubsection{Hierarchical Triangular Mesh}
 
-The hierarchical triangular mesh (HTM) is a method of modeling the sky dome as a sphere proposed by astronomers in the Sloan Digital Sky Survey \cite{htm}. Instead of uniformly dividing cube faces, an alternative option is to subdivide a normalized octahedron by, in each subdivision step, split every triangle into four new triangles, see figure \ref{fig:tesselation_htm}. An ellipsoid can be created from the sphere by normalizing the coordinates and linearly rescaling them the same way that can be done for the spherical cube tessellation.
+The hierarchical triangular mesh (HTM) is a method of modeling the sky dome as a sphere proposed by astronomers in the Sloan Digital Sky Survey \cite{htm}. Instead of uniformly dividing cube faces, an alternative option is to subdivide a normalized octahedron by, in each subdivision step, split every triangle into four new triangles, see figure \ref{fig:tessellation_htm}. An ellipsoid can be created from the sphere by normalizing the coordinates and linearly rescaling them the same way that can be done for the spherical cube tessellation.
 
 \begin{figure}
     \centering
@@ -217,13 +217,13 @@ The hierarchical triangular mesh (HTM) is a method of modeling the sky dome as a
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_htm4.png}
     \end{subfigure}
-    \caption{Hierarchical triangular mesh tesselation of a sphere with 0, 1, 2 and 3 subdivisions respectively}
-    \label{fig:tesselation_htm}
+    \caption{Hierarchical triangular mesh tessellation of a sphere with 0, 1, 2 and 3 subdivisions respectively}
+    \label{fig:tessellation_htm}
 \end{figure}
 
 \subsubsection{Hierarchical Equal Area IsoLatitude Pixelation}
 
-Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is a spherical tessellation scheme with corresponding map projection. The base level of the tessellation is built up of twelve quads, similar to a rhombic dodecahedron, which each can be subdivided further. The tessellation in figure \ref{fig:tesselation_healpix} shows how the vertices in the HEALPix tessellation leads to curvilinear quads.
+Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is a spherical tessellation scheme with corresponding map projection. The base level of the tessellation is built up of twelve quads, similar to a rhombic dodecahedron, which each can be subdivided further. The tessellation in figure \ref{fig:tessellation_healpix} shows how the vertices in the HEALPix tessellation leads to curvilinear quads.
 
 \begin{figure}
     \centering
@@ -240,13 +240,13 @@ Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is a spherical tessella
     \begin{subfigure}[b]{0.2\textwidth}
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_healpix3.png}
     \end{subfigure}
-    \caption{HEALPix tesselation of three different levels of detail}
-    \label{fig:tesselation_healpix}
+    \caption{HEALPix tessellation of three different levels of detail}
+    \label{fig:tessellation_healpix}
 \end{figure}
 
 \subsubsection{Geographic Grid Tessellation With Polar Caps}
 
-In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces polar caps to avoid polar issues related to geographic grids \cite{dimi15}. The polar caps are simply used as a replacement of the problematic, oversampled regions around the poles. The caps can be modelled as grids projected onto the ellipsoid surface in their own georeferenced coordinate systems. One obvious issue with polar caps is the edge problem that occurs due to the fact that the caps are defined as separate meshes with vertices that do not coincide with the geographic vertices of the equatorial region, see figure caps. Dimitrijevi\'{c} and Ran\v{c}i\'{c} solves the issue by using a type of edge blending between the equatorial and polar segments \cite{dimi15}. Figure \ref{fig:tesselation_caps} shows a sphere tessellated with one equatorial region and two polar regions.
+In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces polar caps to avoid polar issues related to geographic grids \cite{dimi15}. The polar caps are simply used as a replacement of the problematic, oversampled regions around the poles. The caps can be modelled as grids projected onto the ellipsoid surface in their own georeferenced coordinate systems. One obvious issue with polar caps is the edge problem that occurs due to the fact that the caps are defined as separate meshes with vertices that do not coincide with the geographic vertices of the equatorial region, see figure caps. Dimitrijevi\'{c} and Ran\v{c}i\'{c} solves the issue by using a type of edge blending between the equatorial and polar segments \cite{dimi15}. Figure \ref{fig:tessellation_caps} shows a sphere tessellated with one equatorial region and two polar regions.
 
 \begin{figure}
     \centering
@@ -264,7 +264,7 @@ In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ra
         \includegraphics[width=\textwidth]{figures/tessellation/tessellation_caps_proj3.png}
     \end{subfigure}
     \caption{Geographic tessellation of a sphere with polar caps}
-    \label{fig:tesselation_caps}
+    \label{fig:tessellation_caps}
 \end{figure}
 
 \subsection{2D Parameterisation for Map Projections}
@@ -577,7 +577,7 @@ A number of different LOD algorithms has been introduced for the purpose of glob
 \label{section:chunkedlodbacground}
 The Chunked LOD method fits into the category of a HLOD system and works by breaking down the surface of the globe into a quadtree of chunks. There are several different ways of spatially organizing chunks and they depend on the tessellation of the globe. 
 
-Using a geographic grid tesselation, the chunks are in geographic space using latitude $\phi$ and longitude $\theta$ coordinates. Figure \ref{fig:chunkedlod} demonstrates the layout of chunks as they are mapped in geographic coordinates onto an ellipsoid representation of a globe.
+Using a geographic grid tessellation, the chunks are in geographic space using latitude $\phi$ and longitude $\theta$ coordinates. Figure \ref{fig:chunkedlod} demonstrates the layout of chunks as they are mapped in geographic coordinates onto an ellipsoid representation of a globe.
 
 \begin{figure}[htbp]
     \centering

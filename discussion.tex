@@ -41,7 +41,7 @@ As seen in the results of section \ref{section:res_switching}, the level blendin
 
 As mentioned in section \ref{section:chunkselection}, the projected area based selection approach was concluded to be more efficient than the distance based. However, using the area based approach comes with the drawback of not being able to correctly perform distance based chunk switching using level blending on a per-fragment basis. The convenience of using a simple distance based chunk selection algorithm is that the exact same calculations can be used in a fragment shader to calculate the interpolation parameter for the different mip levels of the texture datasets. Calculating a correct interpolation parameter corresponding to the projected area based chunk selection algorithm is a harder problem, not considered in the scope of this thesis. Conceptually, one approach could be to use bilinear interpolation based on four blending control points in each corner of the chunk. These values, however, would inherently depend on the LOD level of neighboring chunks, which makes the problem non-trivial. 
 
-\subsection{Inconsistent Globebrowsing Performance}
+\subsection{Inconsistent Globe Browsing Performance}
 Using quad trees (chunk trees) is a simple approach for hierarchically dividing a region into smaller subregions. 
 However, the way the chunk trees are structured may cause different geographical regions to correspond to different types of chunk tree structures. 
 That is, two different chunks on the same chunk level can correspond to large differences in the total number of nodes in the chunk tree. 
@@ -57,7 +57,7 @@ Representing globes as ellipsoids and not as spheres was a decision settled earl
 The accuracy that the ellipsoidal model gives is important to be able to show near Earth orbits and rocket launches where the space crafts need to be positioned accurately relative to the WGS84 reference frame which is used in the SPICE library. 
 Other globes such as the planet Saturn has a clearly visible ellipsoidal shape due to its angular momentum. This can now be shown in OpenSpace by configuring the planet to have the correct radii.
 
-\section{Tesselation and Projection}
+\section{Tessellation and Projection}
 The choice of using geographic tessellation for the ellipsoid was a direct result of using equirectangular geodetic map projections. 
 The equirectangular geodetic map projection is very common for many public map datasets and was therefore a given choice to be able to visualize a vast amount of data on the globes surfaces.
 
