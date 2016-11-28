@@ -47,7 +47,6 @@ Earth rendered with a water mask layer enhancing specular contrasts between land
     \caption{Shaded globe using water mask texture}
 \end{figure}
 
-
 \clearpage
 \subsection{Night Layers}
 \FloatBarrier
@@ -66,6 +65,31 @@ Earth rendered with a night layer showing light coming from cities, which is onl
     \caption{Night layers are only rendered where there is night.}
 \end{figure}
 
+\clearpage
+\subsection{Color Overlays}
+\FloatBarrier
+
+To demonstrate color overlays, the three examples of figure \ref{fig:coloroverlays} show how different tile providers produces references useful for debugging or locating. 
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots/coloroverlay1.jpg}
+        \caption{Color Overlay: tile indices}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[bt]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots/coloroverlay2.jpg}
+        \caption{Color Overlay: size reference}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[bt]{0.90\textwidth}
+        \includegraphics[width=\textwidth]{figures/results/screenshots/coloroverlay3.jpg}
+        \caption{Color Overlay: reference features and reference labels \cite{gibs}}
+    \end{subfigure}
+    \caption{Earth rendered with different color overlays used for reference. Color Layer: ESRI Imagery World 2D \cite{imageryworld2d}}
+    \label{fig:coloroverlays}
+\end{figure}
 
 \clearpage
 \subsection{Grayscale Overlaying}

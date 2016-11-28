@@ -452,7 +452,6 @@ ChunkTile TileSelector::getChunkTile(TileProvider* tp, TileIndex ti){
         ascendToParent(ti, uvTransform);
       }
   }
-
   uvTransform.uvOffset = glm::vec2(0, 0);
   uvTransform.uvScale = glm::vec2(1, 1);
   return { Tile::TileUnavailable, uvTransform };
