@@ -113,15 +113,13 @@ NASA's Mars Reconnaissance Orbiter (MRO) is a satellite that has been orbiting M
 
 The Lunar Mapping Modeling Project (LMMP) is an initiative by NASA to gather and publish map data of the Moon from a vast range of lunar missions. The Lunar Reconnaissance Orbiter (LRO) is a satellite orbiting the moon and gathering map data for future landing missions. These maps have been put together into global image mosaics as well as DEMs. Most global maps from LMMP can be accessed via the ``OnMoon'' web interface \cite{onmoon}.
 
+\section{Modeling Globes}
 
-
-\section{Modelling Globes}
-
-We will discuss different proposed methods used for modelling and rendering of globes. The globe can be modelled either as a sphere or an ellipsoid and there are different tessellation schemes for meshing the globe. The tessellation depends on a map projection and out-of-core rendering requires a dynamic level of detail approach for rendering.
+We will discuss different proposed methods used for modeling and rendering of globes. The globe can be modeled either as a sphere or an ellipsoid and there are different tessellation schemes for meshing the globe. The tessellation depends on a map projection and out-of-core rendering requires a dynamic level of detail approach for rendering.
 
 \subsection{Globes as Ellipsoids}
 
-Planets, moons and asteroids are generally more accurately modelled as ellipsoids than as spheres. Planets are often stretched out along their equatorial axes due to their rotation which causes the centripetal force to counter some of the gravitational force acting on the mass. This effect was proven in 1687 by Isaac Newton in Principia Mathematica \cite{newton87}. The rotation causes a self-gravitating fluid body in equilibrium to take the form of an oblate ellipsoid, otherwise known as a biaxial ellipsoid with one semimajor and one semiminor axis. Globes can be modeled as triaxial ellipsoids for more accuracy when it comes to smaller, more irregularly shaped objects. For example Phobos, one of Mars' two moons, is more accurately modeled as a triaxial ellipsoid with radii of $27 \times 22 \times 18$ km \cite{cozzi11}.
+Planets, moons and asteroids are generally more accurately modeled as ellipsoids than as spheres. Planets are often stretched out along their equatorial axes due to their rotation which causes the centripetal force to counter some of the gravitational force acting on the mass. This effect was proven in 1687 by Isaac Newton in Principia Mathematica \cite{newton87}. The rotation causes a self-gravitating fluid body in equilibrium to take the form of an oblate ellipsoid, otherwise known as a biaxial ellipsoid with one semimajor and one semiminor axis. Globes can be modeled as triaxial ellipsoids for more accuracy when it comes to smaller, more irregularly shaped objects. For example Phobos, one of Mars' two moons, is more accurately modeled as a triaxial ellipsoid with radii of $27 \times 22 \times 18$ km \cite{cozzi11}.
 
 The World Geodetic System 1984 (WGS84) standard defined by National Geospatial-Intelligence Agency (NGA) models the Earth as a biaxial ellipsoid with a semimajor axis of 6,378,137 m and a semiminor axis of 6,356,752.3142 m \cite{cozzi11}. This is what is known as a reference ellipsoid; a mathematical description that approximates the geoid of the earth as closely as possible. The WGS84 standard is widely used for GIS and plays an important role in accurate placements of objects such as satellites or spacecrafts with position coordinates relatively close to the Earth's surface. In the WGS84 coordinate system, the x-axis points to the prime meridian, the z-axis points to the North pole and the y-axis completes the right handed coordinate system, see figure \ref{fig:wgs84}.
 
@@ -246,7 +244,7 @@ Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is a spherical tessella
 
 \subsubsection{Geographic Grid Tessellation With Polar Caps}
 
-In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces polar caps to avoid polar issues related to geographic grids \cite{dimi15}. The polar caps are simply used as a replacement of the problematic, oversampled regions around the poles. The caps can be modelled as grids projected onto the ellipsoid surface in their own georeferenced coordinate systems. One obvious issue with polar caps is the edge problem that occurs due to the fact that the caps are defined as separate meshes with vertices that do not coincide with the geographic vertices of the equatorial region, see figure caps. Dimitrijevi\'{c} and Ran\v{c}i\'{c} solves the issue by using a type of edge blending between the equatorial and polar segments \cite{dimi15}. Figure \ref{fig:tessellation_caps} shows a sphere tessellated with one equatorial region and two polar regions.
+In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces polar caps to avoid polar issues related to geographic grids \cite{dimi15}. The polar caps are simply used as a replacement of the problematic, oversampled regions around the poles. The caps can be modeled as grids projected onto the ellipsoid surface in their own georeferenced coordinate systems. One obvious issue with polar caps is the edge problem that occurs due to the fact that the caps are defined as separate meshes with vertices that do not coincide with the geographic vertices of the equatorial region, see figure caps. Dimitrijevi\'{c} and Ran\v{c}i\'{c} solves the issue by using a type of edge blending between the equatorial and polar segments \cite{dimi15}. Figure \ref{fig:tessellation_caps} shows a sphere tessellated with one equatorial region and two polar regions.
 
 \begin{figure}
     \centering
@@ -283,9 +281,9 @@ A map projection $P$ defines a transformation from Cartesian model space coordin
 
 where $x$, $y$ and $z$ are the Cartesian coordinates of a point on the ellipsoid surface. The parameters $s$ and $t$ are georeferenced coordinates defining all positions on the globe. The georeferenced coordinates can have different definition range depending on which projection is used. An example can be letting is $s = \phi \in [-90,90]$ and $t = \theta \in [-180,180]$ which are latitude and longitude respectively for geographic projections.
 
-The globally positive gaussian curvature of any intrinsic ellipsoid surface makes it impossible to unproject it on a flat 2D surface without any distortions. Since it is embedded in a 3D space, some distortions must be introduced when unprojecting the surface. The distortion can differ depending on the projection used. Equal-area projections preserve the size of a projected area as $\partial s \partial t / \partial s_0 \partial t_0 = 1$, while conformal projections preserve the shape of projected objects as $\partial s / \partial t = 1$; $s_0$ and $t_0$ are coordinates at the center of the projection with no distortion. No global projection can be both area-preserving and conformal \cite{dimi15}.
+The globally positive Gaussian curvature of any intrinsic ellipsoid surface makes it impossible to unproject it on a flat 2D surface without any distortions. Since it is embedded in a 3D space, some distortions must be introduced when unprojecting the surface. The distortion can differ depending on the projection used. Equal-area projections preserve the size of a projected area as $\partial s \partial t / \partial s_0 \partial t_0 = 1$, while conformal projections preserve the shape of projected objects as $\partial s / \partial t = 1$; $s_0$ and $t_0$ are coordinates at the center of the projection with no distortion. No global projection can be both area-preserving and conformal \cite{dimi15}.
 
-There are several possibilities for defining a coordinate transform for map projections. A common approach is to project the ellipsoid onto another shape that allows for being flattened out without distortion, such as a cube, a cylinder or a plane. These types of shapes are known as developable shapes and have zero gaussian curvature.
+There are several possibilities for defining a coordinate transform for map projections. A common approach is to project the ellipsoid onto another shape that allows for being flattened out without distortion, such as a cube, a cylinder or a plane. These types of shapes are known as developable shapes and have zero Gaussian curvature.
 
 The choice of map projection is tied together with the choice of ellipsoid tessellation. This is because the map often needs to be tiled up when rendering. Each tile has its local texture coordinate system which need to have a simple transform from the georeferenced coordinate system for texture sampling. If the tiles can be affinely transformed to the georeferenced coordinate system, texture sampling can be done on the fly; otherwise the georeferenced coordinates need to be re-projected which may be computationally heavy or impossible for real time applications.
 
@@ -337,7 +335,7 @@ In the case of perfect spheres, geocentric and geodetic projections of any point
 
 Geodetic coordinates are among the most commonly used geo referenced coordinate systems when mapping ellipsoids to two dimensions. Latitudinal distances are preserved after the coordinate transform. This is important for a map projection standard that can be used for both spheres and for ellipsoids to avoid distortions that will appear if the map is defined for a specific ellipsoid and then projected on a slightly different one.
 
-Equirectangular projections do not require specific ellipsoids to avoid distorsions on the mapped globe. The result of the wide usage is that many map providers choose to provide 2D maps defined in this coordinate system.
+Equirectangular projections do not require specific ellipsoids to avoid distortions on the mapped globe. The result of the wide usage is that many map providers choose to provide 2D maps defined in this coordinate system.
 
 Cozzi and Ring describes the transform from geodetic coordinates in the ellipsoid class \cite[p. 25]{cozzi11}. For the Earth, the most commonly used geodetic coordinate space is defined in the EPSG:4326 standard where the WGS84 ellipsoid is used.
 
@@ -375,7 +373,7 @@ The mercator projection compensates for the longitudinal distortion by introduci
     \label{fig:proj_mercator}
 \end{figure}
 
-The EPSG:3857 standard for mercator projection of the Earth, also known as web mercator, constrains the domain to $\phi \in [-85.06, 85.06]$. The standard uses a different projection that does not diverge at the polar regions. Web mercator is used by most online web map applications including Google Maps, Bing Maps, OpenStreetMap, Mapquest, Esri and Mapbox \cite{battersby14}.
+The EPSG:3857 standard for mercator projection of the Earth, also known as web mercator, constrains the domain to $\phi \in [-85.06, 85.06]$. The standard uses a different projection that does not diverge at the polar regions. Web mercator is used by most online web map applications including Google Maps, Bing Maps, OpenStreetMap, Mapquest, ESRI and Mapbox \cite{battersby14}.
 
 \subsubsection{Cube Map}
 
@@ -686,7 +684,7 @@ The interpolation parameter can be based on the distance to the camera or change
 
 \subsubsection{Cracks and skirts}
 \label{section:cracksandskirts}
-As chunks are tiled and rendered next to each other, it is desireable to make the borders between chunks as unnoticeable as possible. Even though the chunk meshes are generated according to the requirements mentioned in the Chunk subsection above, it is not possible to guarantee a watertight edge between two adjacent chunks of different LOD. Where adjacent chunks have different detail level, so called T-junctions till emerge. These T-junctions cause cracks between the chunks as an unwanted visual artifact.
+As chunks are tiled and rendered next to each other, it is desirable to make the borders between chunks as unnoticeable as possible. Even though the chunk meshes are generated according to the requirements mentioned in the Chunk subsection above, it is not possible to guarantee a watertight edge between two adjacent chunks of different LOD. Where adjacent chunks have different detail level, so called T-junctions till emerge. These T-junctions cause cracks between the chunks as an unwanted visual artifact.
 
 The easiest way to tackle this issue is not to try to remove the cracks, but instead try to hide them. The most common approach hides the cracks by simply adding an extra layer of vertices to the sides of sides of the mesh. This extra layer of vertices, which is also known as a skirt, is offset down vertically, as illustrated in figure \ref{fig:skirts}. 
 
@@ -726,13 +724,13 @@ The idea of clipmaps can be applied not only to textures but also to geometries 
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/geometryclipmap/clipmap_geo.pdf}
     \end{subfigure}
-    \caption{The Geometry Clipmaps follow the view point. Higher levels have coarser grids but covers a smaller area. The interior part of the grid can collapse so that higher level geometries can snap to their grid}
+    \caption{The Geometry Clipmaps follow the view point. Higher levels have coarser grids but covers smaller areas. The interior part of the grid can collapse so that higher level geometries can snap to their grid}
     \label{fig:clipmapgeometry}
 \end{figure}
 
 Geometry clipmaps limits the terrain representation to be in the form of height maps. This is because the clipmap geometry moves around when the focus point changes and since the underlying terrain should not follow the camera position, the clipmap geometries requires vertex shader texture fetching. The texture coordinates are offset as the geometry clipmap moves to follow the focus point.
 
-One of the main selling points for geometry clipmaps is the decrease in CPU workload and the increase in GPU triangle throughput \cite{cozzi11}. There is no need to traverse a hierarchical structure such a quadtree. The number of draw calls will remain equal the number of clip maps instead of the number of chunks which is often larger. The framerate will also be relatively consistent if the number of layers in the clipmap stack remains constant.
+One of the main selling points for geometry clipmaps is the decrease in CPU workload and the increase in GPU triangle throughput \cite{cozzi11}. There is no need to traverse a hierarchical structure such a quadtree. The number of draw calls will remain equal the number of clip maps instead of the number of chunks which is often larger. The frame rate will also be relatively consistent if the number of layers in the clipmap stack remains constant.
 
 \subsubsection{2D Grid Geometry Clipmaps}
 Using geometry clipmaps to achieve dynamic level of detail for a height mapped grid was proposed by Losasso and Hoppe \cite{losasso04}. The method is limited to rendering of equirectangular grids. When considering the ellipsoidal shape of a globe, the clipmap grid can be represented in geographic coordinates mapped on an ellipsoid where the map texture coordinates in the longitudinal direction wraps around the anti meridian. Rendering the clipmap close to the poles however will lead to polar pinching which breaks the globe as illustrated in figure \ref{fig:mipclip}.
