@@ -879,7 +879,7 @@ The ability to dynamically toggle layers with dynamic blending requires multiple
 
 We define a layer shader program to be a GLSL program object using vertex and fragment shading. Moreover, it fits the pipeline of rendering a chunk with a specific number of layer groups and a varying number of layers for each group.
 
-To decide whether or not a layer shader program needs to be preprocessed and re-compiled, the relevant Layer Shader Preprocessing Data is saved for the layer shader program and compared to the updated preprocessing data if it has been changed by the user. Table \ref{table:layergrouppreprocessingdata} shows what data is needed to preprocess layer shader programs. Key-value pairs can be used to set properties that are used on a per-globe basis. Examples are \textbf{performShading} : \emph{true} or \emph{false}, \textbf{useAtmosphere} : \emph{true} or \emph{false}. Letting the preprocessor handle these properties avoids the need of uniform variable uploading and GLSL if-statements. The preprocessor also handles unrolling of for-loops which go through all layers in a group, see Listing \ref{lst:loopthroughlayers}.
+To decide whether or not a layer shader program needs to be preprocessed and re-compiled, the relevant Layer Shader Preprocessing Data is saved for the layer shader program and compared to the updated preprocessing data to determine if it has been changed by the user. Table \ref{table:layergrouppreprocessingdata} shows what data is needed to preprocess layer shader programs. Key-value pairs can be used to set properties that are used on a per-globe basis. Examples are \textbf{performShading} : \emph{true} or \emph{false}, \textbf{useAtmosphere} : \emph{true} or \emph{false}. Letting the preprocessor handle these properties avoids the need of uniform variable uploading and GLSL if-statements. The preprocessor also handles unrolling of for-loops which go through all layers in a group, see Listing \ref{lst:loopthroughlayers}.
 
 
 \begin{table}
@@ -938,7 +938,7 @@ The interpolation parameter $t$ is calculated using the distance to the camera $
 t = l-log_2(\frac{s}{d}),
 \end{equation}
 
-where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough with two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor $s$ is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{fig:switchingblending} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
+where $s$ is a scale factor determining how much of the higher level tile to use in the blending. In the ideal case, the interpolation parameter should be a value between 0 and 1. However, adjacent chunks can have a difference in level greater than 1 which in turn leads to interpolation parameters with larger values. This is why it is not enough to use two Chunk Tiles per Chunk Tile Pile to guarantee no popping. Popping can also occur if the LOD scale factor $s$ is small enough for adjacent chunks to have even bigger difference in level. Figure \ref{fig:switchingblending} shows how the interpolation parameter from the desired level is used for blending between tiles of different level.
 
 \begin{figure}[htbp]
     \centering
