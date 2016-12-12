@@ -615,8 +615,8 @@ Assuming that the texture data is available in local memory, invoking the getChu
 As chunk tiles are guaranteed to be good for rendering on the GPU (since their tiles are guaranteed to have the status ``OK''), all \class{Chunk Tile Pile}s are guaranteed to be good for rendering as well. 
 
 \section{Managing Multiple Data Sources}
-The \class{Layer Manager} maintains and organizes different types of texture data sources into groups. This is required as different types of texture datasets are used for different purposes and thus rendered in different ways. The \class{Layer Manager} owns seven \class{Layer Groups}; these are:
-
+The \class{Layer Manager} maintains and organizes different types of texture data sources into groups. This is required as different types of texture datasets are used for different purposes and rendered in different ways. The \class{Layer Manager} owns seven \class{Layer Groups}; these are:
+\pagebreak
 \begin{enumerate}
 \item HeightLayers
 \item ColorLayers
@@ -647,7 +647,7 @@ Much like in image editing softwares, a layer in this context represents a raste
 
 \subsection{Layers on the GPU}
 
-The data hierarchy defined by \class{Layer Manager} can almost be reproduced on the GPU by using GLSL in a near object-oriented approach. In order to handle the data mapping between the CPU and GPU, a CPU representation for the GPU data was implemented. This allows for updating the values of uniform variables and map uniform names to uniform locations.
+The data hierarchy defined by \class{Layer Manager} can almost be reproduced on the GPU by using GLSL in a near object-oriented approach. In order to handle the data mapping between the CPU and GPU, a CPU representation of the GPU data hiearchy was implemented. This allows for easily updating the values of uniform variables and map uniform names to uniform locations.
 
 \subsubsection{CPU to GPU Data Mapping}
 
@@ -668,7 +668,7 @@ Incorporating these few differences yields a similar class hierarchy, as illustr
     \label{fig:gpulayermanager}
 \end{figure}
 
-The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with a range of conformally named fields or plain GLSL arrays.
+The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with either a range of conformally named fields or plain GLSL arrays.
 
 \subsubsection{Updating the GPU Data}
 
