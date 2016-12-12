@@ -1,5 +1,5 @@
 \chapter{Implementation}
-The virtual globe rendering system was implemented as a separate module, programmed in C++ for OpenSpace which, if desired, can be opted out when building the software. The implementation defines a namespace with all the necessary data structures, classes and functionality specifically related to globe rendering. The basic structure of a \class{Renderable Globe} with its necessary components is illustrated as a UML diagram in figure \ref{fig:renderableglobe}.
+The virtual globe rendering system was implemented as a separate module, programmed in C++ for OpenSpace which, if desired, can be opted out when building the software. The implementation defines a namespace with all the necessary data structures, classes and functionality specifically related to globe rendering. The top level class \class{Renderable Globe} with its necessary components is illustrated as a UML diagram in figure \ref{fig:renderableglobe}.
 
 \begin{figure}[htbp]
     \centering
@@ -10,9 +10,7 @@ The virtual globe rendering system was implemented as a separate module, program
     \label{fig:renderableglobe}
 \end{figure}
 
-The base of the globe renderer uses a modified version of Cozzi and Rings Chunked LOD algorithm. The globe is tessellated as an ellipsoid with a geometrical grid using geodetic map projection.
-
-The full LOD rendering system required several components of different complexity to be implemented. All components will be described in detail in this chapter.
+The chunked LOD approach implemented is a slightly modified version of what Cozzi and Ring\cite[p. 445]{cozzi11} uses. The globe is tessellated as an ellipsoid with a geometrical grid using geodetic map projection. 
 
 \section{Reference Ellipsoid}
 The \class{Ellipsoid} class was implemented to handle all geographic related calculations.  These calculations include conversions between geodetic and Cartesian coordinates and different kinds of projections onto the ellipsoid surface. These calculations are sped up by internal caching of a range of pre-calculated values. Cozzi and Ring provide a complete reference on the implementation \cite[p. 17]{cozzi11}.
@@ -26,12 +24,12 @@ The \class{Ellipsoid} uses several geographically related classes, which were us
 \end{enumerate}
 
 \section{Chunked LOD}
-The base of the chunked LOD algorithm revolves around the self updating chunk tree. The chunk tree is a data structure built up of \class{Chunk Node}s which have the ability to split or merge dynamically. Besides storing four \class{Chunk Node} children, each \class{Chunk Node} stores a \class{Chunk}.
+The base of the chunked LOD algorithm revolves around the self updating chunk tree. The chunk tree is a data structure built up of \class{Chunk Node}s which have the ability to split or merge dynamically. Besides storing four \class{Chunk Node} children and a reference to its \class{Chunked Lod Globe} owner, each \class{Chunk Node} stores a \class{Chunk}.
 
 \subsection{Chunks}
 As opposed to the definition of chunks in the background section \ref{section:chunkedlodbacground}, this implementation of chunks is very lightweight - it does not store any texture or triangle mesh data. Instead, it stores the information needed to query texture tiles from local in-memory caches. In the implementation suggested by Cozzi and Ring, terrain triangle meshes are stored in each chunk. In the case of this implementation however, all terrain is rendered using height mapped vertex grids. Thus there is no need for each chunk to store their own vertex arrays. Instead they can simply share one single instance of a vertex grid within a whole chunk tree. This means that vertices need to be offset by height mapping on the GPU which makes it possibly to dynamically change height datasets that does not require pre processing before they can be used for rendering.
 
-The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. This is done by evaluating all the leaf nodes of the chunk tree. Chunks that are cullable will indicate that they can be merged by their chunk parent node. Chunks that cannot be culled indicate whether they want be split or merged based on a chunk selection algorithm. If all child nodes to a common chunk parent want to merge, the parent will merge its children. If any chunk reports it want to be split, its chunk node will initialize four new children within the chunk tree.
+The most important part of the chunked LOD algorithm is the ability to dynamically select chunk nodes to split or merge. This is done by evaluating all the leaf nodes of the chunk tree. Chunks that are cullable will indicate that they can be merged by their chunk parent node. Chunks that cannot be culled indicate whether they want be split or merged based on a chunk selection algorithm. If all child nodes to a common chunk parent indicate they can be merged, the parent will merge its children. If any chunk reports it want to be split, its chunk node will initialize four new children within the chunk tree.
 
 \subsection{Chunk Selection}
 \label{section:chunkselection}
@@ -44,7 +42,7 @@ Letting the error depend on the distance between the closest point on the chunk 
 	\label{eq:loddistance}
 	e = l - log_2(\frac{s}{d}),
 \end{equation}
-where $e$ is the error, $l$ is the current level of the chunk, $s$ is a LOD scaling factor and $d$ is the distance between the closest point of the chunk and the camera. The closest point of the chunk can be either a corner or a point along one of the chunk edges. Using this distance as an error metric leads to bigger chunks farther from the camera where less detail is needed.
+where $e$ is the error, $l$ is the current level of the chunk, $s$ is a LOD scaling factor and $d$ is the distance between the closest point of the chunk and the camera. Using this distance as an error metric leads to bigger chunks farther from the camera where less detail is needed.
 
 
 \subsubsection{By Projected Area}
@@ -66,7 +64,7 @@ The projected area is a solid angle approximated by extracting three points on t
 The actual approximated solid angle is the projected triangle area multiplied by eight to accommodate a full chunk. This area is then subtracted by a constant value and scaled by a LOD scale factor to give similar LOD scaling as the distance dependent chunk selection.
 
 \subsection{Chunk Tree Growth Limitation}
-The chunk selection algorithms described above determine a suitable level of detail based on the camera. This causes chunks that have too large of an error to split. However, splitting a chunk will not result in higher level of detail unless the corresponding higher tile data is also currently available for rendering. Therefore, the growth of the chunk tree is be limited by checking if there is any tile data there in the first place. This is useful in two scenarios:
+The chunk selection algorithms described above determine a suitable level of detail based on the camera. This causes chunks that have too large of an error to split. However, splitting a chunk will not result in higher level of detail unless the corresponding higher tile data (textures, heightmaps, etc) is also currently available for rendering. Therefore, the growth of the chunk tree is be limited by checking if there is any tile data there in the first place. This is useful in two scenarios:
 
 \begin{enumerate}
 \item Rendering of sparse map datasets which contain geographical regions where there are no data
@@ -76,7 +74,7 @@ The chunk selection algorithms described above determine a suitable level of det
 Being able to limit the chunk tree in these two scenarios, unnecessary chunk rendering calls is be avoided.
 
 \subsection{Chunk Culling}
-Given a chunk tree with chunks selected based on the camera position, each chunk can be tested using chunk cullers to determine if they are ``cullable'' and therefore can be set to invisible so that the chunk renderer will not bother in rendering them. The two implemented chunk cullers are the frustum culler and the horizon culler. They both rely on and have access to minimum and maximum values of the chunk's height maps. 
+Given a chunk tree where the level of detail is selected based dynamically based on the camera, each chunk is then tested whether they are visible to the camera. Chunks that are not visible are said to be ``cullable'', and does not need to be rendered. The two chunk culling algorithms implemented are Frustum Culling and Horizon Culling. They both rely on - and have access to - the minimum and maximum values of the chunk's currently active height maps. 
 
 \subsubsection{Frustum Culling}
 Frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC) using the view-projection matrix of the camera followed by perspective division. Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view and thus is cullable. This is illustrated in figure \ref{fig:frustumculling}.
@@ -91,7 +89,7 @@ Frustum culling is implemented by first calculating a convex bounding polyhedron
 \end{figure}
 
 \subsubsection{Horizon Culling}
-Given an object in position $\vec{p}$ with a bounding radius $r$ on the surface of the globe, it can be determined if it is completely behind the globe's horizon or not. The calculations are simplified by approximating the globe as a sphere using the minimum radius $r_g$ of its ellipsoid. Using the minimum radius and not a bigger number ensures that false occluding (chunks marked as invisible actually being visible) is not possible \cite[p. 393]{cozzi11}. The minimum allowed distance $l$ to the object can be calculated as the distance to the horizon $l_h$ added to the minimum allowed distance to the object from the horizon $l_m$. See figure \ref{fig:horizonculling}. Once the minimum allowed distance is calculated it can be compared to the actual distance to the object to determine if it is cullable or not.
+Given a camera position, an object in position $\vec{p}$ with a bounding radius $r$ on the surface of the globe, it can be determined whether the object is completely hidden behind the globe's horizon or not. The calculations are simplified by approximating the globe as a sphere using the minimum radius $r_g$ of its ellipsoid. Using the minimum radius and not a bigger number ensures that false occluding (chunks marked as invisible actually being visible) is not possible \cite[p. 393]{cozzi11}. The minimum allowed distance $l$ to the object can be calculated as the distance to the horizon $l_h$ added to the minimum allowed distance to the object from the horizon $l_m$. See figure \ref{fig:horizonculling}. Once the minimum allowed distance is calculated it can be compared to the actual distance to the object to determine if it is cullable or not.
 
 \begin{figure}[htbp]
     \centering
@@ -102,7 +100,6 @@ Given an object in position $\vec{p}$ with a bounding radius $r$ on the surface 
         \put(135,95){$r$}
         \put(70,95){$r_g$}
         \put(130,80){$\vec{p}$}
-        
     \end{picture}
     \caption{Horizon culling is performed by comparing the length $l_h+l_m$ with the actual distance between the camera position and the object at position $\vec{p}$.}
     \label{fig:horizonculling}
@@ -114,9 +111,10 @@ When culling chunks, the closest position on the chunk is used as the position $
 Fetching the right texture and preparing it for rendering onto chunks is a fairly complicated process. Before digging into the details of this process, there are three concepts that need to be established, as they will be referred to throughout the description of the texture pipeline. These are:
 
 \begin{enumerate}
-	\item \textbf{\class{Tile Index}} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe
-	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with meta data. Each \class{Raw Tile} is associated with a \class{Tile Index}. They can be instantiated concurrently
-	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, tiles rely on an OpenGL context and must therefore be initialized on the rendering thread
+	\item \textbf{\class{Tile Index}} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe.
+    \item \textbf{\class{Tile Status}} - An enumeration value indicating whether the \class{Tile} is ``OK'', ``Unavailable'', ``Out of Range'' or whether reading the pixel data triggered an ``IO Error''.
+	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with meta data. Each \class{Raw Tile} is associated with a \class{Tile Index} and has a \class{Tile Status}. The \class{Raw Tile} class is guarantueed to be thread safe.
+	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, the \class{Tile} class rely on an OpenGL context and thus is not thread safe.
 \end{enumerate}
 
 All chunk height and texture data are represented using \class{Tiles}. \class{Tiles} are created on the client side (i.e. in OpenSpace) on the fly when they are needed. As the pixel data may need to be read from disk or even requested from remote servers, the whole tile preparation pipeline was implemented to be executed on separate threads in order to avoid blocking of the rendering thread with image data reads. 
@@ -124,7 +122,7 @@ All chunk height and texture data are represented using \class{Tiles}. \class{Ti
 During the iterative process of developing the texture tile pipeline, three layers of abstraction were introduced in order to deal with the fairly high complexity. See table \ref{table:tilepipeline}.
 
 \begin{center}
-  \begin{table}
+  \begin{table}[!htbp]
   \caption[]{Abstraction layers used in the texture data pipeline}
     \label{table:tilepipeline}
   \resizebox{\textwidth}{!}{\begin{tabular}{| c | c | c | c |}
@@ -143,10 +141,20 @@ During the iterative process of developing the texture tile pipeline, three laye
 The subsequent sections of this chapter will cover each abstraction layer in more detail, starting from the bottom and going up the stack.
 
 \subsection{GDAL}
-Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. GDAL is used as an abstraction layer between all the map formats and the representation of tile datasets. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. GDAL can also be used for disk based caching of data from remote servers. Reading pixel data using the GDAL RasterIO interface requires a set of parameters listed below and illustrated in figure \ref{fig:gdalio}:
+Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. Reading pixel data using the GDAL requires a set of parameters listed below and illustrated in figure \ref{fig:gdalio}:
+
+
+\begin{figure}[!h]
+    \centering
+    \begin{subfigure}[!h]{1.0\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalio.pdf}
+    \end{subfigure}
+    \caption{The required GDAL RasterIO parameters.}
+    \label{fig:gdalio}
+\end{figure}
 
 \begin{enumerate}
-	\item A map overview to read pixel data from (if the dataset has overviews)
+	\item A map overview (also known as mip map) to read pixel data from
 	\item A pixel region within that map overview to read pixels from
 	\item The raster band(s) (e.g. color channels) to read
 	\item A pointer to sufficient user allocated memory where GDAL can write the output of the read operation
@@ -155,15 +163,6 @@ Geospatial Data Abstraction Library (GDAL) is an open source library providing a
 	\item The data type to retrieve the pixel data in
 \end{enumerate}
 
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[bt]{1.0\textwidth}
-        \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalio.pdf}
-    \end{subfigure}
-    \caption{The required GDAL RasterIO parameters. Figure adapted from \cite{mapprojections}}
-    \label{fig:gdalio}
-\end{figure}
-
 With the given input parameters shown in figure \ref{fig:gdalio}, the resulting output would be the pixel data of the requested image region written with the pixel layout parameters to the provided memory block. The output is illustrated in figure \ref{fig:gdalioresult}.
 
 \begin{figure}[htbp]
@@ -171,11 +170,11 @@ With the given input parameters shown in figure \ref{fig:gdalio}, the resulting 
     \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalioresult.pdf}
     \end{subfigure}
-    \caption{Result of GDAL raster IO. Figure adapted from \cite{mapprojections}}
+    \caption{Result of GDAL raster IO.}
     \label{fig:gdalioresult}
 \end{figure}
 
-Using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \ref{appendix:localpatches} goes through a detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches of high resolution.
+The same interface can also be used to read sparse datasets. A detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches of high resolution can be founed in Appendix \ref{appendix:localpatches}.
 
 GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates. The geo-transform can be inverted to transform a georeferenced region to raster space when specifying the area of an image tile to read.
 
@@ -199,7 +198,7 @@ The IO description contains all tile specific information needed to perform a ma
     \begin{subfigure}[bt]{0.9\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/getiodescription.pdf}
     \end{subfigure}
-    \caption{Overview of the calculation of an IO description. Figure adapted from \cite{mapprojections}}
+    \caption{Overview of the calculation of an IO description.}
     \label{fig:getiodescription}
 \end{figure}
 
@@ -207,9 +206,9 @@ The IO description contains all tile specific information needed to perform a ma
 \item Calculate a \class{Geodetic Patch} from \class{Tile Index}
 \item Calculate the pixel coordinates for the patch in raster coordinate space
 \item Calculate a suitable map overview
-\item Transform pixel region to map overview
+\item Transform pixel region to map overview pixel space
 \item Add padding to the down scaled pixel region
-\item Finalize the gathered data to an IO description object.
+\item Collect the information in an IO description object.
 \end{enumerate}
 
 In the scheme in figure \ref{fig:getiodescription}, step 1 is performed using equation \ref{eq:latlongindex},
@@ -246,20 +245,20 @@ Where $n$ is the destination map overview and $m$ is the source map overview. Th
 Padding is added to the pixel region in order to perform correct interpolation of pixel values across different tiles later during rendering. However, this may cause the pixel region to extend outside the map region. Therefore the last finalize step also handles wrapping of the pixel region before returning the final IO description. The wrapping used is a CPU implementation of $GL\_REPEAT$.
 
 \subsubsection{Tile Meta Data}
-As mentioned, \class{Tile Dataset}s can be configured to calculate some metadata on the fly based on the pixel data that has been read. The metadata includes minimum and maximum pixel values within the pixel data and whether or not the pixel data contains missing-data values. Having access to minimum and maximum values for height layer tiles is required for the culling to be performed correctly since the cullers rely on having bounding boxes for the chunks. The meta data can not be requested directly from GDAL since the tiling can differ from the underlying image tiling abstracted away by GDAL. Calculating the meta data had to be performed by explicitly looping through all the pixel values on the client side. 
+As mentioned, \class{Tile Dataset}s can be configured to calculate some metadata on the fly based on the pixel data that has been read. The metadata includes minimum and maximum pixel values within the pixel data and whether or not the pixel data contains missing-data values. Having access to minimum and maximum values for height layer tiles is required for the culling to be performed correctly since the cullers rely on having bounding boxes for the chunks. The meta data is collected by explicitly looping through all the pixel values on the client side. 
 
 \subsubsection{Summary}
 To summarize, the implementation of \class{Tile Dataset} allow reading pixel data from a GDAL dataset corresponding to a specific \class{Tile Index}, along with metadata unless opted out. The \class{Raw Tile}s that are served are padded in order to perform smooth pixel blending between different tiles. \class{Raw Tile}s are not available for rendering since the data is not yet on the GPU.
 
 \subsection{Async Tile Dataset}
-\class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It provides a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important functionalities: 1) enqueing tile read jobs and 2) collect finished tile read jobs. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see figure \ref{fig:asynctiledataset}.
+\class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It defines a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important functionalities: 1) enqueing tile read jobs and 2) collect finished \class{Raw Tiles}. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see figure \ref{fig:asynctiledataset}.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset.pdf}
     \end{subfigure}
-    \caption{Asynchronous reading of Raw tiles can be performed on separate threads. When the tile reading job is finished the raw tile will be appended to a concurrent queue}
+    \caption{Asynchronous reading of Raw tiles can be performed on separate threads. When the tile reading job is finished the raw tile will be appended to a concurrent queue.}
     \label{fig:asynctiledataset}
 \end{figure}
 
@@ -268,25 +267,25 @@ To summarize, the implementation of \class{Tile Dataset} allow reading pixel dat
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset_gettiles.pdf}
     \end{subfigure}
-    \caption{Retrieving finished Raw tiles}
+    \caption{Retrieving finished \class{Raw Tiles}.}
     \label{fig:asynctiledataset2}
 \end{figure}
 
-The \class{Async Tile Dataset} internally keeps track of what tile indices it has enqueued and what tile pixel regions are currently being read. If a pixel region for a specific tile index is already enqueued or currently being read, the request is simply ignored. 
+The \class{Async Tile Dataset} internally keeps track of what tile indices it has enqueued and what tile pixel regions are currently being read. If a pixel region for a specific tile index is already enqueued or currently being read, the request is ignored. 
 
 
 \section{Providing Tiles}
-\class{Tile}s have three properties: a texture, metadata and a status. The status is used to report any type of problem with the tile. This includes IO errors, out-of-range errors or simply being unavailable. Tiles that have the ``OK'' status are uploaded to the GPU and can be used for rendering. 
+\class{Tile}s have three properties: a texture, metadata and a status. The status is used to report any type of problem with the tile. Tiles that have the status ``OK'' are uploaded to the GPU and can be used for rendering. 
 
 Tiles are provided for rendering through \class{Tile Provider}s. They define an interface that allow accessing tiles and meta data about the tiles. There are different types of tile providers, but they must all implement the following functionality:
 
 \begin{itemize}
-\item GetTile(\class{TileIndex}) - access the tile at the provided tile index
-\item GetDefaultTile() - returns a default tile with status ``OK''
-\item GetDepthTransform() - pixel value scale factor, e.g. for converting height map values to meters
-\item GetMaxLevel() - the highest mip level defined for the dataset
+\item GetTile(\class{TileIndex}) - access the \class{tile} at the provided \class{Tile Index}
+\item GetDefaultTile() - returns a default \class{Tile} with status ``OK''
+\item GetDepthTransform() - pixel value scale factor (for example converting height map values to meters)
+\item GetMaxLevel() - the maximum tile level supported by this provider)
 \item GetNoDataValue() - get value that should be interpreted as ``no data''
-\item CheckTileStatus(\class{TileIndex}) - check tile status with no side effects
+\item CheckTileStatus(\class{TileIndex}) - check \class{Tile Status} with no side effects
 \item Update() - called once per frame, allow for internal updates
 \item Reset() - full reset of internal state
 \end{itemize}
@@ -305,7 +304,7 @@ The most important functionality is the GetTile ability, which is used by client
 Several implementations of the tile provider interface were developed. They are all described below.
 
 \subsection{Caching Tile Provider}
-The \class{Caching Tile Provider} uses an \class{Async Tile Dataset} to read \class{Raw Tile}s as soon as client code tries to access a specific tile. It internally polls the \class{Async Tile Dataset} every frame for finished raw tiles. When there are ready raw tiles, the \class{Caching Tile Provider} converts the raw tiles into tiles. This is done in the initialization step which is part of the update method that is illustrated in figure \ref{fig:cachingtileprovider_update}. If no errors of the raw tile are reported, the tile gets the status ``OK'' and its texture data gets uploaded to the GPU. The tile also gets added to the in-memory cache. The functionality of accessing tiles is illustrated in figure \ref{fig:cachingtileprovider_gettile}.
+The \class{Caching Tile Provider} uses an \class{Async Tile Dataset} to read \class{Raw Tile}s as soon as client code tries to access a specific tile. It internally polls the \class{Async Tile Dataset} every update for finished raw tiles. The \class{Caching Tile Provider} converts the raw tiles into tiles. This is done in the initialization step which is part of the update method that is illustrated in figure \ref{fig:cachingtileprovider_update}. If no errors of the raw tile are reported, the tile gets the status ``OK'' and its texture data gets uploaded to the GPU. The tile also gets added to the in-memory ``Least Recently Used''-cache. The functionality of accessing tiles is illustrated in figure \ref{fig:cachingtileprovider_gettile}.
 
 The uploading of texture data to the GPU needs to be on the rendering thread since there is where the OpenGL context resides. Tiles with data uploaded to texture memory will enable it for use in rendering of a chunk.
 
@@ -320,7 +319,7 @@ The uploading of texture data to the GPU needs to be on the rendering thread sin
 
 The functionality for internally updating the tile cache is illustrated in figure \ref{fig:cachingtileprovider_update}.
 
-\begin{figure}[htbp]
+\begin{figure}[!h]
     \centering
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_update.pdf}
@@ -329,18 +328,18 @@ The functionality for internally updating the tile cache is illustrated in figur
     \label{fig:cachingtileprovider_update}
 \end{figure}
 
-Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario where a specific tile of index $\{3, 4, 2\}$ is requested within a sequence of render calls. The first requesting call to that tile will spawn a worker thread in the \class{Asynch Tile Dataset}. As soon as the \class{Tile} is initialized (uploaded to the GPU) and inserted in the cache, it will be accessible on the rendering thread. If the tile is not yet available the \class{Caching Tile Provider} will report that so that the calling function can continue without the use of that specific \class{Tile}.
+\FloatBarrier
 
-\begin{figure}[htbp]
+Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario where a specific tile of index $(3, 4, 2)$ is requested within a sequence of render calls. The first requesting call to that tile will spawn a worker thread in the \class{Asynch Tile Dataset}. As soon as the \class{Tile} is initialized (uploaded to the GPU) and inserted in the cache, it will be accessible on the rendering thread. If the tile is not yet available the \class{Caching Tile Provider} will report that so that the calling function can continue without the use of that specific \class{Tile}.
+
+\begin{figure}[!h]
     \centering
-    \begin{subfigure}[bt]{0.8\textwidth}
+    \begin{subfigure}[bt]{0.95\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_tilerequest.pdf}
     \end{subfigure}
     \caption{Tiles are fetched on demand. The first time a tile is requested, the asynchronous tile dataset will request it on a worker thread. As soon as the tile has been initialized it will have the status ``OK'' and can be used for rendering}
     \label{fig:cachingtileprovider_tilerequest}
 \end{figure}
-
-The caching policy implemented and used is LRU - ``Least Recently Used''. This means that tiles that have not been accessed for a while are thrown out only when the cache limit is exceeded, see section \ref{section:lrucaching} for details.
 
 \subsection{Temporal Tile Provider}
 In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented.
@@ -364,9 +363,7 @@ The \class{Temporal Tile Provider} is instantiated with a template URI containin
 </OpenSpaceTemporalGDALDataset>
 \end{lstlisting}
 
-At runtime, the \class{Temporal Tile Provider} checks the global simulation time, quantizes that time with respect to the provided time resolution and lazily instantiates new \class{Caching Tile Provider}s per timeframe within the temporal dataset. 
-
-A schematic illustration of the implementation of the \\ \class{Temporal Tile Provider} is illustrated in figure \ref{fig:temporaltileprovider_gettile}.
+At runtime, the \class{Temporal Tile Provider} checks the global simulation time, quantizes that time with respect to the provided time resolution and lazily instantiates new \class{Caching Tile Provider}s per timeframe within the temporal dataset. An schematic illustration is given in figure \ref{fig:temporaltileprovider_gettile}.
 
 \begin{figure}[htbp]
     \centering
@@ -386,7 +383,7 @@ This is a very simple implementation of the tile provider interface which only s
     \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/singleimagetileprovider_gettile.pdf}
     \end{subfigure}
-    \caption{Serving single tiles can be useful for debugging chunk and texture alignment}
+    \caption{Serving single tiles is useful for debugging chunk and texture alignment}
     \label{fig:singleimagetileprovider_gettile}
 \end{figure}
 
@@ -454,7 +451,7 @@ ChunkTile TileSelector::getChunkTile(TileProvider* tp, TileIndex ti){
   }
   uvTransform.uvOffset = glm::vec2(0, 0);
   uvTransform.uvScale = glm::vec2(1, 1);
-  return { Tile::TileUnavailable, uvTransform };
+  return { tp->getDefaultTile(), uvTransform };
 }
 \end{lstlisting}
 
@@ -618,8 +615,8 @@ Assuming that the texture data is available in local memory, invoking the getChu
 As chunk tiles are guaranteed to be good for rendering on the GPU (since their tiles are guaranteed to have the status ``OK''), all \class{Chunk Tile Pile}s are guaranteed to be good for rendering as well. 
 
 \section{Managing Multiple Data Sources}
-The \class{Layer Manager} maintains and organizes different types of texture data sources into groups. This is required as different types of texture datasets are used for different purposes and thus rendered in different ways. The \class{Layer Manager} owns seven \class{Layer Groups}; these are:
-
+The \class{Layer Manager} maintains and organizes different types of texture data sources into groups. This is required as different types of texture datasets are used for different purposes and rendered in different ways. The \class{Layer Manager} owns seven \class{Layer Groups}; these are:
+\pagebreak
 \begin{enumerate}
 \item HeightLayers
 \item ColorLayers
@@ -650,7 +647,7 @@ Much like in image editing softwares, a layer in this context represents a raste
 
 \subsection{Layers on the GPU}
 
-The data hierarchy defined by \class{Layer Manager} can almost be reproduced on the GPU by using GLSL in a near object-oriented approach. In order to handle the data mapping between the CPU and GPU, a CPU representation for the GPU data was implemented. This allows for updating the values of uniform variables and map uniform names to uniform locations.
+The data hierarchy defined by \class{Layer Manager} can almost be reproduced on the GPU by using GLSL in a near object-oriented approach. In order to handle the data mapping between the CPU and GPU, a CPU representation of the GPU data hiearchy was implemented. This allows for easily updating the values of uniform variables and map uniform names to uniform locations.
 
 \subsubsection{CPU to GPU Data Mapping}
 
@@ -671,7 +668,7 @@ Incorporating these few differences yields a similar class hierarchy, as illustr
     \label{fig:gpulayermanager}
 \end{figure}
 
-The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with a range of conformally named fields or plain GLSL arrays.
+The leaf classes within the class hierarchy store one uniform location each and represent one GLSL uniform value. The declaration of the layer uniforms within the shader code is defined so that it matches the exact same hierarchy. This is implemented by mapping C++ classes to GLSL structs and representing \emph{one-to-many} relationships as structs with either a range of conformally named fields or plain GLSL arrays.
 
 \subsubsection{Updating the GPU Data}
 
@@ -715,36 +712,24 @@ GPULayer::setValue(ProgramObject* p, Layer& l, TileIndex ti, int n){
 
 \section{Chunk Rendering}
 
-Given the ability to specify and use different layers to be used for rendering and the actual chunks that need to be visible, they are ready to be rendered. Rendering includes using vertex- and fragment shaders when invoking a rendering call on a given geometry; in this case, a grid.
+Rendering of chunks uses both vertex and fragment shaders. As the globe geometry is always represented as height maps, the same vertex geometry - a uniform grid - is used as a basis for rendering all chunks.
 
 \subsection{Grid}
+The vertex grid used for rendering a chunk has square size. It is defined by the number of segments $N$ along its sides, which is used to build up a two dimensional array of vertex coordinates. These vertex coordinates can be used both for texture fetching and as interpolation parameters in an inverse geographic projection to place each vertex in 3D space. The grid also contains the extra strip of vertices defining the skirt of the chunk. Figure \ref{fig:grid} shows how a the skirt region have $uv$-coordinate values less than 0 or greater than 1 in either the $u$ or the $v$ dimension. 
 
-A chunk grid is defined by a number of segments $N$ in two dimensions, which is used to build up a two dimensional array of vertex coordinates. These vertex coordinates can be used both for texture fetching and as interpolation parameters in an inverse geographic projection function to place a each vertex in 3D space. Figure \ref{fig:grid} shows how a surrounding region have coordinate values less than 0 or greater than 1 in either the $u$ or the $v$ dimension. This region is referred to as the skirt of the grid and it is offset in the vertical direction in the vertex shaders to cover cracks between chunks.
-
-\begin{figure}[htbp]
+\begin{figure}[!h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/implementation/rendering/grid.pdf}
-    \caption{Grid with skirts with a side of $N=4$ segments. Green represents the main area with texture coordinates $\in \left[  0, 1 \right] $ and blue is the skirt of the grid}
+    \caption{Grid with skirts with a side of $N=4$ segments. Green represents the main area with texture coordinates $\in \left[  0, 1 \right] $ and blue is the skirt of the grid.}
     \label{fig:grid}
 \end{figure}
 
 \subsection{Vertex Pipeline}
-
-The grid can be rendered using different methods to weight precision against accuracy. In the vertex shader, the vertex positions are set so that the chunk geometry can be rasterized and rendered as a mesh on the screen. Height mapping is performed by offsetting vertices in the direction of the geodetic normals on the GPU which means that vertex texture fetching is needed in the rendering pipeline.
-
-The mapping from geodetic coordinates to Cartesian model space coordinates can be done on the GPU in single precision to position vertices on the globe. As discussed in section \ref{section:precision}, however, this is not sufficient to achieve sub meter precision on an Earth sized globe.
-
-\subsubsection{High Precision Rendering}
-
-The first step in avoiding precision errors is what Cozzi and Ring refers to as rendering relative to center \cite{cozzi11}. In short, it boils down to calculating the model-view matrix in double precision on the CPU side and then casting the matrix to a single precision representation before uploading it to the GPU. This method works well for small objects where the vertices positioned close to the origin (center) of the model \cite{cozzi11}. For planet sized objects, we need to go further than that.
-
-One method that works for all models but can be considered naive as the number of vertices increases is what Cozzi and Ring refers to as CPU relative to eye rendering. By using a dynamic vertex buffer, all vertex positions can be transformed to camera space in double precision before being cast to single precision and dynamically uploaded to the GPU. This method becomes very tedious if the number of vertices is big. However, since the mesh of a chunk is essentially an ellipsoid segment, the whole mesh can be interpolated using a limited number of control points.
-
-We have considered two different categories of rendering techniques: model space rendering and camera space rendering. The techniques can be implemented differently and used at different scales to accommodate for flexibility, accuracy and precision.
+Rendering the grid includes performing displacement mapping of the vertices based on active heightmaps as well as offsetting skirt vertices downwards. Two different methods for rendering the vertex grid were implemented. The first method performs these operations in model space, whereas the second one performs these operations in camera space.
 
 \subsubsection{Model Space Rendering}
 
-The most straightforward method for rendering geodetic chunks is to transform the geodetic coordinates of each vertex to Cartesian model space coordinates using the inverse geographic projection transform, $P^{-1}(\phi, \theta)$, in the vertex shader. An affine transform can be applied to the vertex coordinates by knowing the geodetic coverage of the chunk. It can be derived from the chunk's tile index. The inverse projection transform is performed with limited precision floating point operations on the GPU but the accuracy will be high as vertices will be positioned exactly on the globe in geodetic coordinates. Figure \ref{fig:global}.
+The vertices of the grid is transformed into geographic space on the GPU using a transform derived from the chunk's tile index. From geographic space, an inverse projection transform is applied to place the vertices in the Chunk's Cartesian model space. From this space, the vertices are then displaced according to active height maps. This approach yields a limited precision of the vertices as they are defined relative to the center of the globe. However, it provides high accuracy as the vertices are positioned exactly on the globe in geodetic coordinates. Figure \ref{fig:global} illustrates inverse projection transform.
 
 \begin{figure}[htbp]
     \centering
@@ -763,18 +748,18 @@ The most straightforward method for rendering geodetic chunks is to transform th
     \label{fig:global}
 \end{figure}
 
-The model space rendering method essentially achieves the same precision as rendering a predefined chunk mesh relative to the center of mass of the globe. Figure \ref{fig:pipelineglobal} shows the pipeline for rendering a chunk using the model space method.
+Figure \ref{fig:pipelineglobal} shows the pipeline for rendering a chunk using the model space method.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/implementation/rendering/pipeline_global.pdf}
-    \caption{Vertex pipeline for model space rendering. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU}
+    \caption{Vertex pipeline for model space rendering. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU.}
     \label{fig:pipelineglobal}
 \end{figure}
 
 \subsubsection{Camera Space Rendering}
 
-Camera space rendering is performed by transforming only a limited number of control points for each chunk to camera space using double precision arithmetics. Once in camera space, the points can be cast to single precision and used for interpolation on the GPU to get all the final vertex positions of the chunk. Having the points in camera space solves the proposed precision issues since the precision will increase when the points are closer to the camera. This concept is illustrated in figure \ref{fig:local} where the vertex position vector precision increases as vertices are closer to the camera.
+Camera space rendering is performed by transforming the corner points of the chunk to camera space using double precision arithmetics. Once in camera space, the points are cast to single precision and uploaded to the GPU. All the other vertices within the grid is then positioned on the GPU using bilinear interpolation of the corner points in camera space. The bilinnear interpolation means the grid will be rendered without curvature. However, having the points in camera space solves the proposed precision issues since the precision will increase when the points are closer to the camera. This concept is illustrated in figure \ref{fig:local} where the vertex position vector precision increases as vertices are closer to the camera.
 
 \begin{figure}[htbp]
     \centering
@@ -782,18 +767,6 @@ Camera space rendering is performed by transforming only a limited number of con
     \caption{Interpolating vertex positions in camera space leads to high precision in the representation of vertex positions close to the camera compared to positions defined in model space.}
     \label{fig:local}
 \end{figure}
-
-\paragraph{Chunks as NURBS Surfaces}
-Non Uniform Rational B-Splines (NURBS) can represent all conic sections exactly which is important for modeling ellipses in the 1D case and ellipsoids in the 2D case. A geodetic chunk can be uniquely defined by nine control points which can be calculated using the tile index representing the chunk.
-
-The positive aspect about rendering geodetic chunks as NURBS surfaces is that it is a unified way of rendering chunks and that the precision works for all scales. Chunks will always be mapped exactly on the ellipsoid and the precision will increase when the camera gets closer. However, the negative aspect that makes NURBS insufficient for texture mapped globes is the fact that the texture coordinates of the vertices do not linearly map to the geodetic coordinates of the chunk. In other words, vertices are not evenly distributed along the surface of the chunk which leads to distorted textures. The reason for this is the fact that NURBS are rational parametric functions. For example, a circle segment can be represented exactly but a given parameter value will not yield the same position along a circle segment as a circle segment parameterized as $\{x(t),y(t)\} = \{cos(t), sin(t)\}$. The $cos$ and $sin$ functions are irrational and can therefore not be represented with NURBS segments which by definition are rational.
-
-\paragraph{Chunks as Bilinear Surfaces}
-To avoid both the texture distortion of NURBS and the precision issues of model space rendering, we use a different method for rendering chunks that are closer to the camera and hence require higher precision. When the camera gets closer to the surface of the ellipsoid, the chunks will split and get smaller according to the chunk selection under Section \ref{section:chunkselection}. Smaller patches will automatically be better approximated as flat surfaces so that at a certain level, before the precision errors of the global patches become predominant, the rendering of patches can be switched to the a camera space rendering method which uses bilinear interpolation of vertex positions.
-
-This method is performed by, just as in the case of NURBS surfaces, transforming control points from Cartesian model space to camera space where they can be cast to single precision representations. Instead of NURBS interpolation, a simple bilinear interpolation is used to place all the vertices on the surface defined by the four corner points of the patch that covers the chunk.
-
-With bilinear interpolation, high precision is achieved for vertices placed close to the camera. Also, the vertices will be uniformly spaced which means that the textures will not be distorted. Worth noticing is that if bilinear interpolation rendering is performed on chunks with low level, the approximation will be less accurate. Switching to camera space rendering with bilinear interpolation at level 10 gives a reasonable balance between the ellipsoidal mapping of the model space rendering and the high precision of the camera space chunk rendering.
 
 Figure \ref{fig:pipelinelocal} shows a flowchart of the local vertex rendering pipeline.
 
@@ -803,6 +776,11 @@ Figure \ref{fig:pipelinelocal} shows a flowchart of the local vertex rendering p
     \caption{Vertex pipeline for camera space rendering. Variables on the CPU are defined in double precision and cast to single precision before being uploaded to the GPU}
     \label{fig:pipelinelocal}
 \end{figure}
+
+
+\subsubsection{Combination}
+Both methods are used within the rendering system. Using the camera space rendering with bilinear interpolation method instead of model space rendering is done for chunks at level 10 and higher. This means that chunks with a latitudinal and longitudinal curvature of $360 / 2^{10} \simeq 0.3516$ degrees and less are rendered as flat surfaces.
+
 
 \subsection{Fragment Pipeline}
 
