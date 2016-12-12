@@ -31,13 +31,13 @@ The physical disk space of large global map datasets is often measured in teraby
 
 \subsection{Web Map Services}
 
-To standardize web requests for map data, the Open GIS Consortium (OGC) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some more specific examples of WMS-like services are WorldWind, VirtualEarth and AGS.
+To standardize web requests for map data, the Open GIS Consortium (OGC) specified a web map service interface \cite{wms06} and from that, specifications of several other map service interfaces have followed. The most common standards are Web Map Service (WMS), Tile Map Service (TMS) and Web Map Tile Service (WMTS). Some other, more specific, examples of WMS-like services are WorldWind, VirtualEarth and AGS.
 
 \subsubsection{WMS}
 
 The WMS interface instructs the map server to produce maps as image files with well defined geographic and dimensional parameters. The image files can have different format and compression depending on the provider. A WMS server has the ability to dynamically produce map patches of arbitrary size which puts some load on the server side \cite{wms06}. The basic elements supported by all WMS providers are the \emph{GetCapabilities} and the \emph{GetMap} operations. \emph{GetCapabilities} gives information about the available maps on the server and their corresponding georeferenced metadata. The \emph{GetMap} operation returns the map or a part of the map as an image file.
 
-WMS requests are done using HTTP GET where the standardized request parameters are provided as query parameters in the URL \cite{wms06}. For example, setting the query parameter \texttt{BBOX=-180,-90,180,90} specifies the size of the map in georeferenced coordinates while the parameters \texttt{WIDTH} and \texttt{HEIGHT} specify the size of the requested image in raster coordinates. All name and value pairs for the \emph{GetMap} request are defined under OpenGIS Web Map Server Implementation Specification \cite{wms06}.
+WMS requests are done using HTTP GET where the standardized request parameters are provided as query parameters in the URL \cite{wms06}. For example, setting the query parameter \texttt{BBOX=-180,-90,180,90} specifies the size of the map in georeferenced coordinates while the parameters \texttt{WIDTH} and \texttt{HEIGHT} specify the size of the requested image in raster coordinates. All name and value pairs for the \emph{GetMap} request are defined under the OpenGIS Web Map Server Implementation Specification \cite{wms06}.
 
 \subsubsection{TMS}
 
@@ -74,7 +74,7 @@ y_{child_n} = 2 y + ( \left\lfloor n / 2 \right\rfloor ~ mod ~ 2 ) \\
 
 \subsubsection{WMTS}
 
-Web Map Tile Service is another standard by OGC that requires tiled requests. It supports many of the features of WMS but, similar to TMS, removes the load of image processing from the server side and instead forces the client to handle combination and cutouts of patches if required. The standard specifies the \emph{GetCapabilities}, \emph{GetTile} and \emph{GetFeatureInfo} operations. These operations can be requested with different message encodings such as Key-Value Pairs, XML messages or XML messages embedded in SOAP envelopes \cite{wmts10}.
+Web Map Tile Service (WMTS) is another standard by OGC that requires tiled requests. It supports many of the features of WMS but, similar to TMS, removes the load of image processing from the server side and instead forces the client to handle combination and cutouts of patches if required. The standard specifies the \emph{GetCapabilities}, \emph{GetTile} and \emph{GetFeatureInfo} operations. These operations can be requested with different message encodings such as Key-Value Pairs, XML messages or XML messages embedded in SOAP envelopes \cite{wmts10}.
 
 \subsubsection{Tiled WMS}
 
@@ -88,7 +88,7 @@ There are several different standards for handling image data used in GIS softwa
 \item \textbf{GeoTIFF} - TIFF image with the inclusion of georeferenced metadata
 \item \textbf{IMG} - Image file format with georeferenced metadata
 \item \textbf{JPEG2000} - Georeferenced image format with lossy or lossless compression
-\item \textbf{CUB} - Georeferenced image file standard created by ISIS (Integrated Software for Imagers and Spectrometers)
+\item \textbf{CUB} - Georeferenced image file standard created by Integrated Software for Imagers and Spectrometers (ISIS)
 \end{itemize}
 
 \subsection{Available Imagery Products}
@@ -121,7 +121,7 @@ We will discuss different proposed methods used for modeling and rendering of gl
 
 Planets, moons and asteroids are generally more accurately modeled as ellipsoids than as spheres. Planets are often stretched out along their equatorial axes due to their rotation which causes the centripetal force to counter some of the gravitational force acting on the mass. This effect was proven in 1687 by Isaac Newton in Principia Mathematica \cite{newton87}. The rotation causes a self-gravitating fluid body in equilibrium to take the form of an oblate ellipsoid, otherwise known as a biaxial ellipsoid with one semimajor and one semiminor axis. Globes can be modeled as triaxial ellipsoids for more accuracy when it comes to smaller, more irregularly shaped objects. For example Phobos, one of Mars' two moons, is more accurately modeled as a triaxial ellipsoid with radii of $27 \times 22 \times 18$ km \cite{cozzi11}.
 
-The World Geodetic System 1984 (WGS84) standard defined by National Geospatial-Intelligence Agency (NGA) models the Earth as a biaxial ellipsoid with a semimajor axis of 6,378,137 m and a semiminor axis of 6,356,752.3142 m \cite{cozzi11}. This is what is known as a reference ellipsoid; a mathematical description that approximates the geoid of the earth as closely as possible. The WGS84 standard is widely used for GIS and plays an important role in accurate placements of objects such as satellites or spacecrafts with position coordinates relatively close to the Earth's surface. In the WGS84 coordinate system, the x-axis points to the prime meridian, the z-axis points to the North pole and the y-axis completes the right handed coordinate system, see figure \ref{fig:wgs84}.
+The World Geodetic System 1984 (WGS84) standard defined by National Geospatial-Intelligence Agency (NGA) models the Earth as a biaxial ellipsoid with a semimajor axis of 6,378,137 meters and a semiminor axis of 6,356,752.3142 meters \cite{cozzi11}. This is what is known as a reference ellipsoid; a mathematical description that approximates the geoid of the earth as closely as possible. The WGS84 standard is widely used for GIS and plays an important role in accurate placements of objects such as satellites or spacecrafts with position coordinates relatively close to the Earth's surface. In the WGS84 coordinate system, the x-axis points to the prime meridian, the z-axis points to the North pole and the y-axis completes the right handed coordinate system, see figure \ref{fig:wgs84}.
 
 \begin{figure}
 \centering
@@ -193,7 +193,7 @@ To model an ellipsoid from a sphere, the vertices can be linearly transformed wi
 
 \subsubsection{Hierarchical Triangular Mesh}
 
-The hierarchical triangular mesh (HTM) is a method of modeling the sky dome as a sphere proposed by astronomers in the Sloan Digital Sky Survey \cite{htm}. Instead of uniformly dividing cube faces, an alternative option is to subdivide a normalized octahedron by, in each subdivision step, split every triangle into four new triangles, see figure \ref{fig:tessellation_htm}. An ellipsoid can be created from the sphere by normalizing the coordinates and linearly rescaling them the same way that can be done for the spherical cube tessellation.
+The hierarchical triangular mesh (HTM) is a method of modeling the sky dome as a sphere proposed by astronomers in the Sloan Digital Sky Survey \cite{htm}. Instead of uniformly dividing cube faces, an alternative option is to subdivide a normalized octahedron by, in each subdivision step, split every triangle into four new triangles, see figure \ref{fig:tessellation_htm}.
 
 \begin{figure}
     \centering
@@ -244,7 +244,7 @@ Hierarchical Equal Area IsoLatitude Pixelation (HEALPix) is a spherical tessella
 
 \subsubsection{Geographic Grid Tessellation With Polar Caps}
 
-In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces polar caps to avoid polar issues related to geographic grids \cite{dimi15}. The polar caps are simply used as a replacement of the problematic, oversampled regions around the poles. The caps can be modeled as grids projected onto the ellipsoid surface in their own georeferenced coordinate systems. One obvious issue with polar caps is the edge problem that occurs due to the fact that the caps are defined as separate meshes with vertices that do not coincide with the geographic vertices of the equatorial region, see figure caps. Dimitrijevi\'{c} and Ran\v{c}i\'{c} solves the issue by using a type of edge blending between the equatorial and polar segments \cite{dimi15}. Figure \ref{fig:tessellation_caps} shows a sphere tessellated with one equatorial region and two polar regions.
+In their description of the ellipsoidal clipmaps method, Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces polar caps to avoid polar issues related to geographic grids \cite{dimi15}. The polar caps are simply used as a replacement of the problematic, oversampled regions around the poles. The caps can be modeled as grids projected onto the ellipsoid surface in their own georeferenced coordinate systems. One obvious issue with polar caps is the edge problem that occurs due to the fact that the caps are defined as separate meshes with vertices that do not coincide with the geographic vertices of the equatorial region, see figure \ref{fig:tessellation_caps}. Dimitrijevi\'{c} and Ran\v{c}i\'{c} solves the issue by using a type of edge blending between the equatorial and polar segments \cite{dimi15}. Figure \ref{fig:tessellation_caps} shows a sphere tessellated with one equatorial region and two polar regions.
 
 \begin{figure}
     \centering
@@ -287,7 +287,7 @@ There are several possibilities for defining a coordinate transform for map proj
 
 The choice of map projection is tied together with the choice of ellipsoid tessellation. This is because the map often needs to be tiled up when rendering. Each tile has its local texture coordinate system which need to have a simple transform from the georeferenced coordinate system for texture sampling. If the tiles can be affinely transformed to the georeferenced coordinate system, texture sampling can be done on the fly; otherwise the georeferenced coordinates need to be re-projected which may be computationally heavy or impossible for real time applications.
 
-The European Petroleum Survey Group (EPSG) \cite{epsg} has defined several standards for map projections of the Earth . Many of these are mentioned when discussing the different projections.
+The European Petroleum Survey Group (EPSG) \cite{epsg} has defined several standards for map projections of the Earth. Many of these are mentioned when discussing the different projections.
 
 \subsubsection{Geographic Projections}
 
@@ -327,7 +327,7 @@ Figure \ref{fig:geodetic} shows the difference between geocentric latitudes alon
     \put(82, 75){$\phi_c$}
     \label{fig:proj_equirectangular}
 \end{picture}
-\caption{Difference between geocentric latitudes, $\phi_c$ and geodetic latitudes, $\phi_d$ for a point $\vec{p}$ on the surface of an ellipsoid. The figure also shows the difference between geocentric and geodetic surface normals, $\hat{n_c}$ and $\hat{n_d}$, respectively }
+\caption{Difference between geocentric latitudes, $\phi_c$ and geodetic latitudes, $\phi_d$ for a point $\vec{p}$ on the surface of an ellipsoid. The figure also shows the difference between geocentric and geodetic surface normals, $\hat{n_c}$ and $\hat{n_d}$, respectively.}
 \label{fig:geodetic}
 \end{figure}
 
@@ -337,7 +337,7 @@ Geodetic coordinates are among the most commonly used geo referenced coordinate 
 
 Equirectangular projections do not require specific ellipsoids to avoid distortions on the mapped globe. The result of the wide usage is that many map providers choose to provide 2D maps defined in this coordinate system.
 
-Cozzi and Ring describes the transform from geodetic coordinates in the ellipsoid class \cite[p. 25]{cozzi11}. For the Earth, the most commonly used geodetic coordinate space is defined in the EPSG:4326 standard where the WGS84 ellipsoid is used.
+Cozzi and Ring describes the transform from geodetic coordinates in the ellipsoid class \cite[p. 25]{cozzi11}. For the Earth, the most commonly used geodetic coordinate space is defined in the EPSG:4326 standard where the WGS84 ellipsoid is used \cite{spatialref}.
 
 \subsubsection{Mercator Projection}
 
@@ -354,7 +354,7 @@ The mercator projection is a cylindrical projection widely used for presenting g
         \includegraphics[width=\textwidth]{figures/central_park_mercator.png}
         \caption{The mercator projection is conformal and preserves aspect ratio. Figure from \cite{worldimagery}}
     \end{subfigure}
-    \caption{Unwrapped equirectangular and mercator projections. The mercator projection works when it is unwrapped due to it being conformal (preserving aspect ratio)}
+    \caption{Unwrapped equirectangular and mercator projections. The mercator projection works when it is unwrapped due to it being conformal (preserving aspect ratio).}
     \label{fig:mercator}
 \end{figure}
 
@@ -373,7 +373,7 @@ The mercator projection compensates for the longitudinal distortion by introduci
     \label{fig:proj_mercator}
 \end{figure}
 
-The EPSG:3857 standard for mercator projection of the Earth, also known as web mercator, constrains the domain to $\phi \in [-85.06, 85.06]$. The standard uses a different projection that does not diverge at the polar regions. Web mercator is used by most online web map applications including Google Maps, Bing Maps, OpenStreetMap, Mapquest, ESRI and Mapbox \cite{battersby14}.
+The EPSG:3857 standard for mercator projection of the Earth, also known as web mercator, constrains the domain to $\phi \in [-85.06, 85.06]$ \cite{spatialref}. The standard uses a different projection that does not diverge at the polar regions. Web mercator is used by most online web map applications including Google Maps, Bing Maps, OpenStreetMap, Mapquest, ESRI and Mapbox \cite{battersby14}.
 
 \subsubsection{Cube Map}
 
@@ -436,7 +436,7 @@ The map projection that is used for the HEALPix tessellation is equal-area as th
 
 For parameterization of limited parts of the globe, such as the isolated poles, there are different projections to consider. Most common are different types of azimuthal projections. These projections are defined by projecting all points of the map through a common intersection point and onto a flat surface. The Gnomonic projection maps all great circle segments (geodesics) to straight lines by having the common intersection point in the center of the globe.
 
-Stereographic projections are defined when the common intersection point is positioned on the surface of the globe on the opposite side of the pole to project. Polar stereographic projections are used to parameterize the surface of the poles of the Earth. The standards EPSG:3413 and EPSG:3031 define the stereographic projections for the North Pole and the South Pole respectively.
+Stereographic projections are defined when the common intersection point is positioned on the surface of the globe on the opposite side of the pole to project. Polar stereographic projections are used to parameterize the surface of the poles of the Earth. The standards EPSG:3413 and EPSG:3031 define the stereographic projections for the North Pole and the South Pole respectively \cite{spatialref}.
 
 Dimitrijevi\'{c} and Ran\v{c}i\'{c} use another polar coordinate system to re-project from geodetic coordinates in runtime. The transformation is a rotation of 90 degrees around the global $x-$axis so that the resulting parametric coordinates of the pole are given in their own geographic space with the main meridian as equator. This projection is also known as the Cassini projection and it can be both defined for spheres as well as generalized to ellipsoids. Polar projections are shown in figure \ref{fig:proj_polar}.
 
@@ -461,12 +461,12 @@ Dimitrijevi\'{c} and Ran\v{c}i\'{c} use another polar coordinate system to re-pr
 \end{figure}
 
 \section{Dynamic Level of Detail}
-Dynamic level of detail (LOD) is an important part in handling the extensive amount of data used in an out-of-core rendering software. The goal is to maximize the visual information on screen while minimizing the workload. In their book Rendering virtual 3D globes, Cozzi and Ring describes LOD rendering algorithms by three typical steps. \cite[p. 367]{cozzi11}
+Dynamic level of detail (LOD) is an important part in handling the extensive amount of data used in an out-of-core rendering software. The goal is to maximize the visual information on screen while minimizing the workload. In their book 3D Engine Design for Virtual Globes, Cozzi and Ring describes LOD rendering algorithms by three typical steps: \cite[p. 367]{cozzi11}
 
 \begin{enumerate}
-    \item \textbf{Generation} - Create versions at different level of detail of a model
-    \item \textbf{Selection} - Choose a version based on some criteria or error metric (e.g. distance to object or the projected area it occupies on the screen)
-    \item \textbf{Switching} - Transitions from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
+    \item \textbf{Generation} - Create versions at different level of detail of a model.
+    \item \textbf{Selection} - Choose a version based on some criteria or error metric (e.g. distance to object or the projected area it occupies on the screen).
+    \item \textbf{Switching} - Transition from one version to another in order to avoid noticing of the change in LOD known as popping artifacts.
 \end{enumerate}
 
 There are different types of LOD approaches for terrain rendering and a suitable approach should be chosen based on characteristics of the terrain. Terrains can for example be restricted to being represented as height maps - a characteristic that can be exploited by the rendering algorithm. Cozzi and Ring describe the following three categories of LOD approaches: Discrete Level of Detail, Continuous Level of Detail and Hierarchical Level of Detail \cite[p. 368-371]{cozzi11}.
@@ -493,7 +493,7 @@ In the Discrete Level Of Detail (DLOD) approach, multiple different representati
     \label{fig:dlod}
 \end{figure}
 
-At run time, the main objective is to select one (or generate) a suitable representation. This approach does not provide any means of dealing with large scale datasets, which makes it unsuitable for globe rendering \cite{cozzi11}.
+At run time, the main objective is to select one (or generate) a suitable representation. This approach does not provide any means of dealing with large scale datasets which requires multiple levels of detail at the same time. This makes it unsuitable for globe rendering \cite{cozzi11}.
 
 
 \subsection{Continuous Level of Detail}
@@ -522,11 +522,11 @@ A special branch of CLOD worth mentioning is the so called infinite LOD. In this
 
 \subsection{Hierarchical Level of Detail}
 \label{section:hlod}
-Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLOD algorithms operates on hierarchically arranged, predefined chunks of the full model. Each chunk is processed, stored and rendered separately. By doing this, HLOD approaches tackles the weaknesses of CLOD, essentially by doing the following.
+Hierarchical Level of Detail (HLOD) can be seen as a generalization of DLOD. HLOD algorithms operates on hierarchically arranged, predefined chunks of the full model. Each chunk is processed, stored and rendered separately. By doing this, HLOD approaches tackles the weaknesses of CLOD, essentially by doing the following:
 
 \begin{enumerate}
-    \item Reducing processing time on CPU: The only CPU task that HLOD algorithms has to deal with during runtime is to select a suitable subset of the predefined chunks for rendering. This is a relatively fast procedure in contrast to iteratively applying changes to the raw geometry, as done in CLOD
-    \item Reducing the data traffic to GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis and can not be cached on the GPU. Being able to perform GPU caching allows HLOD to better minimize the traffic to the GPU
+    \item Reducing processing time on CPU: The only CPU task that HLOD algorithms has to deal with during runtime is to select a suitable subset of the predefined chunks for rendering. This is a relatively fast procedure in contrast to iteratively applying changes to the raw geometry, as done in CLOD.
+    \item Reducing data traffic to the GPU: Data is uploaded to the GPU in larger batches but not very often, since the data is static and GPU caching can be done. With CLOD, the geometry data is updated on a per-frame basis and can not be cached on the GPU. Being able to perform GPU caching allows HLOD to better minimize the traffic to the GPU.
 \end{enumerate}
 
 HLOD uses spatial hierarchical data structures such as binary trees, quadtrees or octrees for storing the chunk data. The root node of the tree holds a full representation of the model at its lowest level of detail in one single chunk. At successive levels, the model is represented at a higher level of detail but divided up into several chunks. This concept is illustrated with a quad tree holding chunks representing a bunny model in figure \ref{fig:hlod}.
@@ -540,10 +540,10 @@ HLOD uses spatial hierarchical data structures such as binary trees, quadtrees o
     \label{fig:hlod}
 \end{figure}
 
-Generally, selecting all the chunks at a specific level in the tree yields a complete representation of the model. Furthermore, chunks may be selected from different levels for different parts of the model and still yield a full representation of the model. This allows for view dependent rendering of the model. Algorithm chunk selection describes pseudo code for recursively rendering the full model at view dependent level of detail.
+Generally, selecting all the chunks at a specific level in the tree yields a complete representation of the model. Furthermore, chunks may be selected from different levels for different parts of the model and still yield a full representation of the model. This allows for view dependent rendering of the model. Algorithm \ref{alg:chunkselection} describes pseudo code for recursively rendering the full model at view dependent level of detail.
 
 \begin{algorithm}[htp]
-  \caption{Selecting chunks to render}
+  %\caption{Selecting chunks to render}
   \SetKwFunction{RenderLOD}{}
   \SetKwProg{myalg}{RenderLOD}{}{}
   \myalg{\RenderLOD{Camera C, ChunkNode N}}{
@@ -556,7 +556,7 @@ Generally, selecting all the chunks at a specific level in the tree yields a com
     }
   }{}
     \label{alg:chunkselection}
-  \caption{Selecting chunks to render. The error metric depends on the camera and the chunk to render. A given chunk always has a smaller error metric than its parent}
+  \caption{Selecting chunks to render. The error metric depends on the camera state and the chunk to render. A given chunk always has a smaller error metric than its parent.}
 \end{algorithm} 
 
 This example uses a depth first approach for rendering of chunks. Other common schemes for traversing the hierarchy are breadth first and inverse breadth first.
@@ -573,7 +573,7 @@ A number of different LOD algorithms has been introduced for the purpose of glob
 
 \subsection{Chunked LOD}
 \label{section:chunkedlodbacground}
-The Chunked LOD method fits into the category of a HLOD system and works by breaking down the surface of the globe into a quadtree of chunks. There are several different ways of spatially organizing chunks and they depend on the tessellation of the globe. 
+The Chunked LOD method fits into the HLOD category and works by breaking down the surface of the globe into a quadtree of chunks. There are several different ways of spatially organizing chunks and they depend on the tessellation of the globe. 
 
 Using a geographic grid tessellation, the chunks are in geographic space using latitude $\phi$ and longitude $\theta$ coordinates. Figure \ref{fig:chunkedlod} demonstrates the layout of chunks as they are mapped in geographic coordinates onto an ellipsoid representation of a globe.
 
@@ -618,17 +618,12 @@ where $\phi_{NE}$ and $\theta_{NE}$ are the latitude and the longitude of the no
 Chunks should store the following data:
 
 \begin{enumerate}
-    \item A mesh defining the terrain geometry (positions, normals, texture coordinates) 
-    \item A monotonic geometric error, based on the vertices distances to the fully detailed mesh. The children of a chunk always have a smaller geometric error as they can better fit the highest level of detail model
-    \item A known bounding volume encapsulating the mesh and all the chunk's children. This is used along with the geometric error metric when selecting suitable chunks for rendering
+    \item A mesh defining the terrain geometry (positions, normals, texture coordinates). 
+    \item A monotonic geometric error based on the vertices distances to the fully detailed mesh. The children of a chunk always have smaller geometric error as they can better fit the highest level of detail model.
+    \item A known bounding volume encapsulating the mesh and all the chunk's children. This is used along with the geometric error metric when selecting suitable chunks for rendering.
 \end{enumerate}
 
-Depending on the implementation of the chunked LOD algorithm, these properties can be either calculated on the fly or preprocessed as suggested by Cozzi and Ring \cite[p. 447]{cozzi11}. Furthermore, the chunk mesh must fulfill two important requirements: 
-
-\begin{enumerate}
-    \item Vertices defined in each corner of the mesh
-    \item Defined edges along its sides such that when two adjacent chunks are rendered next to each other, there is no gap in between them
-\end{enumerate}
+Depending on the implementation of the chunked LOD algorithm, these properties can be either calculated on the fly or preprocessed as suggested by Cozzi and Ring \cite[p. 447]{cozzi11}. Furthermore, the chunk mesh must have defined edges along its sides such that when two adjacent chunks are rendered next to each other, there is no gap in between them.
 
 \subsubsection{Culling}
 An important thing to consider when dealing with chunks of a virtual globe is the fact that the chunks that are selected for rendering might not actually be visible on the screen. Needless to say, this is a waste of computational power and by eliminating these unnecessary draw calls, the performance of the globe renderer can be increased.
@@ -684,7 +679,7 @@ The interpolation parameter can be based on the distance to the camera or change
 
 \subsubsection{Cracks and skirts}
 \label{section:cracksandskirts}
-As chunks are tiled and rendered next to each other, it is desirable to make the borders between chunks as unnoticeable as possible. Even though the chunk meshes are generated according to the requirements mentioned in the Chunk subsection above, it is not possible to guarantee a watertight edge between two adjacent chunks of different LOD. Where adjacent chunks have different detail level, so called T-junctions till emerge. These T-junctions cause cracks between the chunks as an unwanted visual artifact.
+As chunks are tiled and rendered next to each other, it is desirable to make the borders between chunks as unnoticeable as possible. Even though the chunk meshes are generated according to the requirements mentioned in the Chunk subsection above, it is not possible to guarantee a watertight edge between two adjacent chunks of different LOD. Where adjacent chunks have different detail level, so called T-junctions till emerge. These T-junctions cause cracks between the chunks as unwanted visual artifacts.
 
 The easiest way to tackle this issue is not to try to remove the cracks, but instead try to hide them. The most common approach hides the cracks by simply adding an extra layer of vertices to the sides of sides of the mesh. This extra layer of vertices, which is also known as a skirt, is offset down vertically, as illustrated in figure \ref{fig:skirts}. 
 
@@ -706,7 +701,7 @@ By adding skirts to the chunk meshes, the model will not be rendered with visibl
 
 
 \subsection{Geometry Clipmaps}
-A clipmap texture is a dynamic mip map where each image in the so called clipmap stack is clipped down to a constant size. This reduces the amount of memory of the whole texture to increase linearly instead of exponentially with the number of overlays for LOD textures \cite{tanner98}. Figure \ref{fig:clipmapmipmap} a shows the difference between the amount of texture data stored in a regular mip map compared to a clip map.
+A clipmap texture is a dynamic mip map where each image is clipped down to a constant size. This reduces the amount of memory of the whole texture to increase linearly instead of exponentially with the number of overlays for LOD textures \cite{tanner98}. Figure \ref{fig:clipmapmipmap} a shows the difference between the amount of texture data stored in a regular mip map compared to a clip map.
 
 \begin{figure}[htbp]
     \centering
@@ -728,9 +723,9 @@ The idea of clipmaps can be applied not only to textures but also to geometries 
     \label{fig:clipmapgeometry}
 \end{figure}
 
-Geometry clipmaps limits the terrain representation to be in the form of height maps. This is because the clipmap geometry moves around when the focus point changes and since the underlying terrain should not follow the camera position, the clipmap geometries requires vertex shader texture fetching. The texture coordinates are offset as the geometry clipmap moves to follow the focus point.
+Geometry clipmaps limits the terrain representation to be in the form of height maps. This is because the clipmap geometry moves around when the focus point changes and since the underlying terrain should not follow the camera position, the clipmap geometries require vertex shader texture fetching. The texture coordinates are offset as the geometry clipmap moves to follow the focus point.
 
-One of the main selling points for geometry clipmaps is the decrease in CPU workload and the increase in GPU triangle throughput \cite{cozzi11}. There is no need to traverse a hierarchical structure such a quadtree. The number of draw calls will remain equal the number of clip maps instead of the number of chunks which is often larger. The frame rate will also be relatively consistent if the number of layers in the clipmap stack remains constant.
+One of the main selling points for geometry clipmaps is the decrease in CPU workload and the increase in GPU triangle throughput \cite{cozzi11}. There is no need to traverse a hierarchical structure such a quadtree. The number of draw calls will remain equal the number of clip maps instead of the number of chunks which is often larger. The frame rate will also be relatively consistent if the number of layers in the clipmap stack remains constant \cite{cozzi11}.
 
 \subsubsection{2D Grid Geometry Clipmaps}
 Using geometry clipmaps to achieve dynamic level of detail for a height mapped grid was proposed by Losasso and Hoppe \cite{losasso04}. The method is limited to rendering of equirectangular grids. When considering the ellipsoidal shape of a globe, the clipmap grid can be represented in geographic coordinates mapped on an ellipsoid where the map texture coordinates in the longitudinal direction wraps around the anti meridian. Rendering the clipmap close to the poles however will lead to polar pinching which breaks the globe as illustrated in figure \ref{fig:mipclip}.
@@ -756,7 +751,7 @@ Clipmap grids can also be used to model a spherical cube representation of a glo
 Spherical clipmaps takes advantage of the fact that no observer will ever see more than half a globe at any time. The vertices of the clipmap are described in polar coordinates with the center of the grid always following the camera position \cite{clasen06}. The coordinates of the vertices will therefore not have any correspondence to texture coordinates which is why the algorithm is not widely adopted \cite{dimi15}. 
 
 \subsubsection{Ellipsoidal Clipmaps}
-Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces ellipsoidal clipmaps as a level of detail rendering method for globes \cite{dimi15}. It uses a geographic grid for the polar regions of the globe and solves the polar issues with the use of polar caps. The advantages compared to spherical cube clipmaps is that it uses the well known geographic map projection and reduces the number of geometry clipmap partitions from six to two. The globe is divided into one equatorial region and two polar regions. If the distance is close enough to the globe (3,000 km above the surface for the Earth), a maximum of two partitions is needed at any time \cite{dimi15}.
+Dimitrijevi\'{c} and Ran\v{c}i\'{c} introduces ellipsoidal clipmaps as a level of detail rendering method for globes \cite{dimi15}. It uses a geographic grid for the polar regions of the globe and solves the polar issues with the use of polar caps. The advantages compared to spherical cube clipmaps is that it uses the well known geographic map projection and reduces the number of geometry clipmap partitions from six to two. The globe is divided up into one equatorial region and two polar regions. If the distance is close enough to the globe (3,000 km above the surface for the Earth), a maximum of two partitions is needed at any time \cite{dimi15}.
 
 The area distortion and the aspect distortion of the map projection of the ellipsoidal clipmap method is low compared to cube map projections but requires extra care to hide the discontinuities that appear at the edges between the equatorial and polar partitions \cite{dimi15}.
 
@@ -789,7 +784,7 @@ The most generally used level of detail algorithms of today are chunked LOD and 
 \label{section:precision}
 Modern graphics cards work with floating point variables and single precision is the common standard \cite{segal10}. With OpenGL 4.0 came the introduction of double precision floating point numbers within the GLSL shader programming language \cite{segal10}. The double precision floating point operations are significantly slower than their single precision counterparts \cite{dimi15}; we choose to avoid double precision floating point operations on the GPU for this reason.
 
-In most computer graphics applications it is often sufficient to describe positional information in single precision floating point values. However, when simulating and visualizing the full scale of the universe and at the same time globes with sub meter resolution, the issues of low precision float operations easily become predominant unless handled right.
+In most computer graphics applications it is often sufficient to describe positional information in single precision floating point values. However, when simulating and visualizing the full scale of the universe and at the same time globes with sub meter resolution, the issues of low precision float operations easily become predominant unless handled with care.
 
 \subsection{Floating Point Numbers}
 A floating point number $y$ is represented by a sign bit $s$, a significand $c \in N$, a base (also known as the radix) $b \in Z, b > 2$ and an exponent $q \in Z$. See equation \ref{eq:float}.
@@ -848,7 +843,7 @@ The problem is already handled in OpenSpace with the use of a linear depth buffe
 
 A negative aspect about setting the value of \texttt{gl\_FragDepth} explicitly is that early depth testing is not possible. This is OpenGL's method of discarding fragments before the fragment shader has been invoked. Not performing early depth testing leads to lower frame rates if the fragment shader is heavy. Kemen discussed the implications of setting \texttt{gl\_FragDepth} explicitly and concluded that for regular fragment processing, the change in frame rate was not significant for the Outerra software \cite{kemen12}.
 
-Other previously proposed methods for handling depth buffer issues include logarithmic depth buffer and multiple view frustums and complementary depth buffering \cite{cozzi11}.
+Other previously proposed methods for handling depth buffer issues include using multiple view frustums and complementary depth buffering \cite{cozzi11}.
 
 \section{Caching}
 
@@ -865,7 +860,7 @@ There are six levels of caching important to take into consideration for globe r
 \item Remote server
 \end{enumerate}
 
-When implementing a globe rendering system, the local RAM memory caching is of most interested and needs to be implemented explicitly.
+When implementing a globe rendering system, the local RAM memory caching is of most interest and needs to be implemented explicitly.
 
 \subsection{Cache Replacement Policies}
 There are multiple different cache replacement policies, each used for different purposes. Some common policies are: First-In-First-Out, Last-In-First-Out, Least-Recently-Used, Most-Recently-Used, Least-Frequently-Used, \\ Most-Frequently-Used.
