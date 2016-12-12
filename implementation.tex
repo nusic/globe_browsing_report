@@ -24,12 +24,12 @@ The \class{Ellipsoid} uses several geographically related classes, which were us
 \end{enumerate}
 
 \section{Chunked LOD}
-The base of the chunked LOD algorithm revolves around the self updating chunk tree. The chunk tree is a data structure built up of \class{Chunk Node}s which have the ability to split or merge dynamically. Besides storing four \class{Chunk Node} children, each \class{Chunk Node} stores a \class{Chunk}.
+The base of the chunked LOD algorithm revolves around the self updating chunk tree. The chunk tree is a data structure built up of \class{Chunk Node}s which have the ability to split or merge dynamically. Besides storing four \class{Chunk Node} children and a reference to its \class{Chunked Lod Globe} owner, each \class{Chunk Node} stores a \class{Chunk}.
 
 \subsection{Chunks}
 As opposed to the definition of chunks in the background section \ref{section:chunkedlodbacground}, this implementation of chunks is very lightweight - it does not store any texture or triangle mesh data. Instead, it stores the information needed to query texture tiles from local in-memory caches. In the implementation suggested by Cozzi and Ring, terrain triangle meshes are stored in each chunk. In the case of this implementation however, all terrain is rendered using height mapped vertex grids. Thus there is no need for each chunk to store their own vertex arrays. Instead they can simply share one single instance of a vertex grid within a whole chunk tree. This means that vertices need to be offset by height mapping on the GPU which makes it possibly to dynamically change height datasets that does not require pre processing before they can be used for rendering.
 
-The most important part of the chunked LOD algorithm is the ability to dynamically select which chunks to split or merge. This is done by evaluating all the leaf nodes of the chunk tree. Chunks that are cullable will indicate that they can be merged by their chunk parent node. Chunks that cannot be culled indicate whether they want be split or merged based on a chunk selection algorithm. If all child nodes to a common chunk parent want to merge, the parent will merge its children. If any chunk reports it want to be split, its chunk node will initialize four new children within the chunk tree.
+The most important part of the chunked LOD algorithm is the ability to dynamically select chunk nodes to split or merge. This is done by evaluating all the leaf nodes of the chunk tree. Chunks that are cullable will indicate that they can be merged by their chunk parent node. Chunks that cannot be culled indicate whether they want be split or merged based on a chunk selection algorithm. If all child nodes to a common chunk parent indicate they can be merged, the parent will merge its children. If any chunk reports it want to be split, its chunk node will initialize four new children within the chunk tree.
 
 \subsection{Chunk Selection}
 \label{section:chunkselection}
@@ -42,7 +42,7 @@ Letting the error depend on the distance between the closest point on the chunk 
 	\label{eq:loddistance}
 	e = l - log_2(\frac{s}{d}),
 \end{equation}
-where $e$ is the error, $l$ is the current level of the chunk, $s$ is a LOD scaling factor and $d$ is the distance between the closest point of the chunk and the camera. The closest point of the chunk can be either a corner or a point along one of the chunk edges. Using this distance as an error metric leads to bigger chunks farther from the camera where less detail is needed.
+where $e$ is the error, $l$ is the current level of the chunk, $s$ is a LOD scaling factor and $d$ is the distance between the closest point of the chunk and the camera. Using this distance as an error metric leads to bigger chunks farther from the camera where less detail is needed.
 
 
 \subsubsection{By Projected Area}
@@ -64,7 +64,7 @@ The projected area is a solid angle approximated by extracting three points on t
 The actual approximated solid angle is the projected triangle area multiplied by eight to accommodate a full chunk. This area is then subtracted by a constant value and scaled by a LOD scale factor to give similar LOD scaling as the distance dependent chunk selection.
 
 \subsection{Chunk Tree Growth Limitation}
-The chunk selection algorithms described above determine a suitable level of detail based on the camera. This causes chunks that have too large of an error to split. However, splitting a chunk will not result in higher level of detail unless the corresponding higher tile data is also currently available for rendering. Therefore, the growth of the chunk tree is be limited by checking if there is any tile data there in the first place. This is useful in two scenarios:
+The chunk selection algorithms described above determine a suitable level of detail based on the camera. This causes chunks that have too large of an error to split. However, splitting a chunk will not result in higher level of detail unless the corresponding higher tile data (textures, heightmaps, etc) is also currently available for rendering. Therefore, the growth of the chunk tree is be limited by checking if there is any tile data there in the first place. This is useful in two scenarios:
 
 \begin{enumerate}
 \item Rendering of sparse map datasets which contain geographical regions where there are no data
@@ -74,7 +74,7 @@ The chunk selection algorithms described above determine a suitable level of det
 Being able to limit the chunk tree in these two scenarios, unnecessary chunk rendering calls is be avoided.
 
 \subsection{Chunk Culling}
-Given a chunk tree with chunks selected based on the camera position, each chunk can be tested using chunk cullers to determine if they are ``cullable'' and therefore can be set to invisible so that the chunk renderer will not bother in rendering them. The two implemented chunk cullers are the frustum culler and the horizon culler. They both rely on and have access to minimum and maximum values of the chunk's height maps. 
+Given a chunk tree where the level of detail is selected based dynamically based on the camera, each chunk is then tested whether they are visible to the camera. Chunks that are not visible are said to be ``cullable'', and does not need to be rendered. The two chunk culling algorithms implemented are Frustum Culling and Horizon Culling. They both rely on - and have access to - the minimum and maximum values of the chunk's currently active height maps. 
 
 \subsubsection{Frustum Culling}
 Frustum culling is implemented by first calculating a convex bounding polyhedron for the chunk to be tested. The bounding volume is calculated on the fly and takes into account any enabled height maps used to displace the vertices, making sure it fully encapsulates the displaced chunk vertices. The polyhedron is built up of eight vertices which are transformed to normalized device coordinates (NDC) using the view-projection matrix of the camera followed by perspective division. Once in NDC, an axis aligned bounding box (AABB) for the vertices is extracted. This AABB can then be tested against the screen bounds to determine if the chunk is outside the camera's field of view and thus is cullable. This is illustrated in figure \ref{fig:frustumculling}.
@@ -89,7 +89,7 @@ Frustum culling is implemented by first calculating a convex bounding polyhedron
 \end{figure}
 
 \subsubsection{Horizon Culling}
-Given an object in position $\vec{p}$ with a bounding radius $r$ on the surface of the globe, it can be determined if it is completely behind the globe's horizon or not. The calculations are simplified by approximating the globe as a sphere using the minimum radius $r_g$ of its ellipsoid. Using the minimum radius and not a bigger number ensures that false occluding (chunks marked as invisible actually being visible) is not possible \cite[p. 393]{cozzi11}. The minimum allowed distance $l$ to the object can be calculated as the distance to the horizon $l_h$ added to the minimum allowed distance to the object from the horizon $l_m$. See figure \ref{fig:horizonculling}. Once the minimum allowed distance is calculated it can be compared to the actual distance to the object to determine if it is cullable or not.
+Given a camera position, an object in position $\vec{p}$ with a bounding radius $r$ on the surface of the globe, it can be determined whether the object is completely hidden behind the globe's horizon or not. The calculations are simplified by approximating the globe as a sphere using the minimum radius $r_g$ of its ellipsoid. Using the minimum radius and not a bigger number ensures that false occluding (chunks marked as invisible actually being visible) is not possible \cite[p. 393]{cozzi11}. The minimum allowed distance $l$ to the object can be calculated as the distance to the horizon $l_h$ added to the minimum allowed distance to the object from the horizon $l_m$. See figure \ref{fig:horizonculling}. Once the minimum allowed distance is calculated it can be compared to the actual distance to the object to determine if it is cullable or not.
 
 \begin{figure}[htbp]
     \centering
@@ -100,7 +100,6 @@ Given an object in position $\vec{p}$ with a bounding radius $r$ on the surface 
         \put(135,95){$r$}
         \put(70,95){$r_g$}
         \put(130,80){$\vec{p}$}
-        
     \end{picture}
     \caption{Horizon culling is performed by comparing the length $l_h+l_m$ with the actual distance between the camera position and the object at position $\vec{p}$.}
     \label{fig:horizonculling}
