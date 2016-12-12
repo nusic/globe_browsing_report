@@ -64,14 +64,14 @@ The projected area is a solid angle approximated by extracting three points on t
 The actual approximated solid angle is the projected triangle area multiplied by eight to accommodate a full chunk. This area is then subtracted by a constant value and scaled by a LOD scale factor to give similar LOD scaling as the distance dependent chunk selection.
 
 \subsection{Chunk Tree Growth Limitation}
-The chunk selection algorithms described above determine a suitable level of detail based on the camera. This causes chunks that have too large of an error to split. However, splitting a chunk will not result in higher level of detail unless the corresponding higher tile data (textures, heightmaps, etc) is also currently available for rendering. Therefore, the growth of the chunk tree is be limited by checking if there is any tile data there in the first place. This is useful in two scenarios:
+The chunk selection algorithms described above determine a suitable level of detail based on the camera. This causes chunks that have too large of an error to split. However, splitting a chunk will not result in higher level of detail unless the corresponding higher tile data (textures, heightmaps, etc) is also currently available for rendering. Therefore, the growth of the chunk tree is limited by checking if there is any tile data there in the first place. This is useful in two scenarios:
 
 \begin{enumerate}
 \item Rendering of sparse map datasets which contain geographical regions where there are no data
 \item Rendering of map datasets which are queried from remote servers; there will always be some delay where the queried map data is not yet available
 \end{enumerate}
 
-Being able to limit the chunk tree in these two scenarios, unnecessary chunk rendering calls is be avoided.
+By enabling limiting the chunk tree growth in these two scenarios, unnecessary chunk rendering calls can be avoided.
 
 \subsection{Chunk Culling}
 Given a chunk tree where the level of detail is selected based dynamically based on the camera, each chunk is then tested whether they are visible to the camera. Chunks that are not visible are said to be ``cullable'', and does not need to be rendered. The two chunk culling algorithms implemented are Frustum Culling and Horizon Culling. They both rely on - and have access to - the minimum and maximum values of the chunk's currently active height maps. 
@@ -112,7 +112,7 @@ Fetching the right texture and preparing it for rendering onto chunks is a fairl
 
 \begin{enumerate}
 	\item \textbf{\class{Tile Index}} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe.
-    \item \textbf{\class{Tile Status}} - An enumeration value indicating whether the \class{Tile} is ``OK'', ``Unavailable'', ``Out of Range'' or whether reading the pixel data triggered an ``IO Error''.
+    \item \textbf{\class{Tile Status}} - An enumeration value indicating whether the \class{Tile} is ``OK'', ``Unavailable'', ``Out of Range'' or whether reading the pixel data triggered an ``IO Error''. Tiles that have the status ?OK? are uploaded to the GPU and can be used for rendering.
 	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with meta data. Each \class{Raw Tile} is associated with a \class{Tile Index} and has a \class{Tile Status}. The \class{Raw Tile} class is guarantueed to be thread safe.
 	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, the \class{Tile} class rely on an OpenGL context and thus is not thread safe.
 \end{enumerate}
@@ -271,7 +271,7 @@ To summarize, the implementation of \class{Tile Dataset} allow reading pixel dat
     \label{fig:asynctiledataset2}
 \end{figure}
 
-The \class{Async Tile Dataset} internally keeps track of what tile indices it has enqueued and what tile pixel regions are currently being read. If a pixel region for a specific tile index is already enqueued or currently being read, the request is ignored. 
+The \class{Async Tile Dataset} internally keeps track of what tile indices it has enqueued and what tile pixel regions are currently being read. If a pixel region for a specific tile index is already enqueued or currently being read, the request is ignored. Figure \ref{fig:asynctiledataset2} shows how raw tiles can be fetched once they are finished and enqueued.
 
 
 \section{Providing Tiles}

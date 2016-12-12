@@ -99,7 +99,7 @@ There are several organizations working on gathering GIS data that can be visual
 
 NASA Global Imagery Browse Services (GIBS) provides several global map datasets with information about Earth's changing climate \cite{gibs}. The two satellites Aqua and Terra orbit the Earth and are continuously measuring multi band quantities such as corrected reflectance and surface reflectance along with a range of scientific parameters such as surface and water temperatures, ozone, carbon dioxide and more. Many of the GIBS datasets are updated temporally so that changes can be seen over time. Map tiles are requested through a TMS interface and a date and time parameter can be set to specify a map within a certain time range.
 
-Environmental Systems Research Institute (ESRI) is the provider of the software ArcGIS that lets their users create and publish map data through different types of web map services. There are a lot of free maps to use; not only for Earth but other globes are covered too. ESRI supports a web publication interface where web maps can be searched and studied in an online map viewer. Many of the maps are given in mercator coordinates since they are meant to be viewed projected on a flat surface such as a screen where aspect ratio should be preserved.
+Environmental Systems Research Institute (ESRI) is the provider of the software ArcGIS that lets their users create and publish map data through different types of web map services. There are a lot of free maps to use; not only for Earth but other globes are covered too. ESRI supports a web publication interface where web maps can be searched and studied in an online map viewer.
 
 National Oceanic and Atmospheric Administration (NOAA) for the U.S. Department of Commerce gathers and provides weather data of the US that are hosted through different web map services using the ArcGIS online \cite{arcgis} interface by ESRI.
 
@@ -392,7 +392,7 @@ Cube maps lack the polar singularities apparent in geographic parameterizations.
     \label{fig:proj_cube}
 \end{figure}
 
-Due to the traditions of map projections this is not a common format used for map services so re-projection from a more common format is often required.
+Due to the traditions of map projections this is not a common format used for map services so reprojection from a more common format is often required.
 
 There are different cube map projections with different amount of area- and aspect distortions. Dimitrijevi\'{c} and Ran\v{c}i\'{c} mention and compares spherical cube, adjusted spherical cube, Outerra spherical cube and quadrilateralized spherical cube \cite{dimi15}.
 
@@ -438,7 +438,7 @@ For parameterization of limited parts of the globe, such as the isolated poles, 
 
 Stereographic projections are defined when the common intersection point is positioned on the surface of the globe on the opposite side of the pole to project. Polar stereographic projections are used to parameterize the surface of the poles of the Earth. The standards EPSG:3413 and EPSG:3031 define the stereographic projections for the North Pole and the South Pole respectively \cite{spatialref}.
 
-Dimitrijevi\'{c} and Ran\v{c}i\'{c} use another polar coordinate system to re-project from geodetic coordinates in runtime. The transformation is a rotation of 90 degrees around the global $x-$axis so that the resulting parametric coordinates of the pole are given in their own geographic space with the main meridian as equator. This projection is also known as the Cassini projection and it can be both defined for spheres as well as generalized to ellipsoids. Polar projections are shown in figure \ref{fig:proj_polar}.
+Dimitrijevi\'{c} and Ran\v{c}i\'{c} use another polar coordinate system to re-project from geodetic coordinates in runtime. The transformation is a rotation of 90 degrees around the global $x-$axis so that the resulting parametric coordinates of the pole are given in their own geographic space with the meridian as equator. This projection is also known as the Cassini projection and it can be both defined for spheres as well as generalized to ellipsoids. Polar projections are shown in figure \ref{fig:proj_polar}.
 
 \begin{figure}[htbp]
     \centering
