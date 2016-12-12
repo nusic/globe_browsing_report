@@ -1,5 +1,5 @@
 \chapter{Implementation}
-The virtual globe rendering system was implemented as a separate module, programmed in C++ for OpenSpace which, if desired, can be opted out when building the software. The implementation defines a namespace with all the necessary data structures, classes and functionality specifically related to globe rendering. The basic structure of a \class{Renderable Globe} with its necessary components is illustrated as a UML diagram in figure \ref{fig:renderableglobe}.
+The virtual globe rendering system was implemented as a separate module, programmed in C++ for OpenSpace which, if desired, can be opted out when building the software. The implementation defines a namespace with all the necessary data structures, classes and functionality specifically related to globe rendering. The top level class \class{Renderable Globe} with its necessary components is illustrated as a UML diagram in figure \ref{fig:renderableglobe}.
 
 \begin{figure}[htbp]
     \centering
@@ -10,9 +10,7 @@ The virtual globe rendering system was implemented as a separate module, program
     \label{fig:renderableglobe}
 \end{figure}
 
-The base of the globe renderer uses a modified version of Cozzi and Rings Chunked LOD algorithm. The globe is tessellated as an ellipsoid with a geometrical grid using geodetic map projection.
-
-The full LOD rendering system required several components of different complexity to be implemented. All components will be described in detail in this chapter.
+The chunked LOD approach implemented is a slightly modified version of what Cozzi and Ring\cite[p. 445]{cozzi11} uses. The globe is tessellated as an ellipsoid with a geometrical grid using geodetic map projection. 
 
 \section{Reference Ellipsoid}
 The \class{Ellipsoid} class was implemented to handle all geographic related calculations.  These calculations include conversions between geodetic and Cartesian coordinates and different kinds of projections onto the ellipsoid surface. These calculations are sped up by internal caching of a range of pre-calculated values. Cozzi and Ring provide a complete reference on the implementation \cite[p. 17]{cozzi11}.
