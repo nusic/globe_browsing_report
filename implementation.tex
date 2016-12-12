@@ -275,17 +275,17 @@ The \class{Async Tile Dataset} internally keeps track of what tile indices it ha
 
 
 \section{Providing Tiles}
-\class{Tile}s have three properties: a texture, metadata and a status. The status is used to report any type of problem with the tile. This includes IO errors, out-of-range errors or simply being unavailable. Tiles that have the ``OK'' status are uploaded to the GPU and can be used for rendering. 
+\class{Tile}s have three properties: a texture, metadata and a status. The status is used to report any type of problem with the tile. Tiles that have the status ``OK'' are uploaded to the GPU and can be used for rendering. 
 
 Tiles are provided for rendering through \class{Tile Provider}s. They define an interface that allow accessing tiles and meta data about the tiles. There are different types of tile providers, but they must all implement the following functionality:
 
 \begin{itemize}
-\item GetTile(\class{TileIndex}) - access the tile at the provided tile index
-\item GetDefaultTile() - returns a default tile with status ``OK''
-\item GetDepthTransform() - pixel value scale factor, e.g. for converting height map values to meters
-\item GetMaxLevel() - the highest mip level defined for the dataset
+\item GetTile(\class{TileIndex}) - access the \class{tile} at the provided \class{Tile Index}
+\item GetDefaultTile() - returns a default \class{Tile} with status ``OK''
+\item GetDepthTransform() - pixel value scale factor (for example converting height map values to meters)
+\item GetMaxLevel() - the maximum tile level supported by this provider)
 \item GetNoDataValue() - get value that should be interpreted as ``no data''
-\item CheckTileStatus(\class{TileIndex}) - check tile status with no side effects
+\item CheckTileStatus(\class{TileIndex}) - check \class{Tile Status} with no side effects
 \item Update() - called once per frame, allow for internal updates
 \item Reset() - full reset of internal state
 \end{itemize}
@@ -304,7 +304,7 @@ The most important functionality is the GetTile ability, which is used by client
 Several implementations of the tile provider interface were developed. They are all described below.
 
 \subsection{Caching Tile Provider}
-The \class{Caching Tile Provider} uses an \class{Async Tile Dataset} to read \class{Raw Tile}s as soon as client code tries to access a specific tile. It internally polls the \class{Async Tile Dataset} every frame for finished raw tiles. When there are ready raw tiles, the \class{Caching Tile Provider} converts the raw tiles into tiles. This is done in the initialization step which is part of the update method that is illustrated in figure \ref{fig:cachingtileprovider_update}. If no errors of the raw tile are reported, the tile gets the status ``OK'' and its texture data gets uploaded to the GPU. The tile also gets added to the in-memory cache. The functionality of accessing tiles is illustrated in figure \ref{fig:cachingtileprovider_gettile}.
+The \class{Caching Tile Provider} uses an \class{Async Tile Dataset} to read \class{Raw Tile}s as soon as client code tries to access a specific tile. It internally polls the \class{Async Tile Dataset} every update for finished raw tiles. The \class{Caching Tile Provider} converts the raw tiles into tiles. This is done in the initialization step which is part of the update method that is illustrated in figure \ref{fig:cachingtileprovider_update}. If no errors of the raw tile are reported, the tile gets the status ``OK'' and its texture data gets uploaded to the GPU. The tile also gets added to the in-memory ``Least Recently Used''-cache. The functionality of accessing tiles is illustrated in figure \ref{fig:cachingtileprovider_gettile}.
 
 The uploading of texture data to the GPU needs to be on the rendering thread since there is where the OpenGL context resides. Tiles with data uploaded to texture memory will enable it for use in rendering of a chunk.
 
@@ -319,7 +319,7 @@ The uploading of texture data to the GPU needs to be on the rendering thread sin
 
 The functionality for internally updating the tile cache is illustrated in figure \ref{fig:cachingtileprovider_update}.
 
-\begin{figure}[htbp]
+\begin{figure}[!h]
     \centering
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_update.pdf}
@@ -328,18 +328,18 @@ The functionality for internally updating the tile cache is illustrated in figur
     \label{fig:cachingtileprovider_update}
 \end{figure}
 
-Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario where a specific tile of index $\{3, 4, 2\}$ is requested within a sequence of render calls. The first requesting call to that tile will spawn a worker thread in the \class{Asynch Tile Dataset}. As soon as the \class{Tile} is initialized (uploaded to the GPU) and inserted in the cache, it will be accessible on the rendering thread. If the tile is not yet available the \class{Caching Tile Provider} will report that so that the calling function can continue without the use of that specific \class{Tile}.
+\FloatBarrier
 
-\begin{figure}[htbp]
+Figure \ref{fig:cachingtileprovider_tilerequest} demonstrates a typical scenario where a specific tile of index $(3, 4, 2)$ is requested within a sequence of render calls. The first requesting call to that tile will spawn a worker thread in the \class{Asynch Tile Dataset}. As soon as the \class{Tile} is initialized (uploaded to the GPU) and inserted in the cache, it will be accessible on the rendering thread. If the tile is not yet available the \class{Caching Tile Provider} will report that so that the calling function can continue without the use of that specific \class{Tile}.
+
+\begin{figure}[!h]
     \centering
-    \begin{subfigure}[bt]{0.8\textwidth}
+    \begin{subfigure}[bt]{0.95\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/cachingtileprovider_tilerequest.pdf}
     \end{subfigure}
     \caption{Tiles are fetched on demand. The first time a tile is requested, the asynchronous tile dataset will request it on a worker thread. As soon as the tile has been initialized it will have the status ``OK'' and can be used for rendering}
     \label{fig:cachingtileprovider_tilerequest}
 \end{figure}
-
-The caching policy implemented and used is LRU - ``Least Recently Used''. This means that tiles that have not been accessed for a while are thrown out only when the cache limit is exceeded, see section \ref{section:lrucaching} for details.
 
 \subsection{Temporal Tile Provider}
 In order to incorporate time-resolved map datasets into the rendering scheme, a tile provider for this specific purpose was implemented.
@@ -363,9 +363,7 @@ The \class{Temporal Tile Provider} is instantiated with a template URI containin
 </OpenSpaceTemporalGDALDataset>
 \end{lstlisting}
 
-At runtime, the \class{Temporal Tile Provider} checks the global simulation time, quantizes that time with respect to the provided time resolution and lazily instantiates new \class{Caching Tile Provider}s per timeframe within the temporal dataset. 
-
-A schematic illustration of the implementation of the \\ \class{Temporal Tile Provider} is illustrated in figure \ref{fig:temporaltileprovider_gettile}.
+At runtime, the \class{Temporal Tile Provider} checks the global simulation time, quantizes that time with respect to the provided time resolution and lazily instantiates new \class{Caching Tile Provider}s per timeframe within the temporal dataset. An schematic illustration is given in figure \ref{fig:temporaltileprovider_gettile}.
 
 \begin{figure}[htbp]
     \centering
@@ -385,7 +383,7 @@ This is a very simple implementation of the tile provider interface which only s
     \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/tileprovider/singleimagetileprovider_gettile.pdf}
     \end{subfigure}
-    \caption{Serving single tiles can be useful for debugging chunk and texture alignment}
+    \caption{Serving single tiles is useful for debugging chunk and texture alignment}
     \label{fig:singleimagetileprovider_gettile}
 \end{figure}
 
