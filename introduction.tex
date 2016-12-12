@@ -103,24 +103,3 @@ There are multiple technical challenges to tackle when designing a virtual globe
 \end{itemize}
 
 Details in issues and proposed solutions to these challenges will be discussed throughout the thesis.
-
-\section{Coordinate Systems}
-
-When dealing in mapping and rendering of globes, conversion between different coordinate systems becomes important. The coordinate systems needed for considering in development are listed below:
-
-\begin{itemize}
-\item \textbf{Cartesian coordinates} - Normal right handed OpenGL coordinates. Can be either in model space, world space or camera space.
-
-\begin{itemize}
-\item \textbf{World space coordinates} - Coordinate space where the globe does not necessarily have to be in the origin. This, for example, can be the J2000 coordinate system which have the origin in the barycenter of the solar system.
-\item \textbf{Model space coordinates} - Coordinate space where the center of mass of the globe is positioned in the origin. This, for example, can be the WGS84 reference frame for the Earth.
-\item \textbf{Camera space coordinates} - Standard OpenGL camera space where $-z$ is in the view direction of the camera.
-\end{itemize}
-
-\item \textbf{Georeferenced coordinates (projection coordinates)} - Two or three dimensional coordinate space defining a position on the globe surface. This, for example, can be defined in geodetics ($latitude$ and $longitude$) with or without the inclusion of an $altitude$ coordinate.
-
-\item \textbf{Raster coordinates} - Two dimensional coordinate space defined for a map or an image. Coordinates are \emph{line} and \emph{pixel}.
-
-\item \textbf{Texture coordinates (uv coordinates)} - Two dimensional coordinate space defined for one sub section of a map known as a tile.
-
-\end{itemize}
