@@ -312,7 +312,9 @@ Geographic coordinates are defined with a latitude $\phi$ and a longitude $\thet
 The simplest geographic parameterization uses geocentric coordinates. Here the latitude and longitude are defined as the angle between a vector from the origin to a point on the ellipsoid surface and the $xy-$ and $xz-$planes respectively.
 
 \paragraph{Geodetic projection}
-The equirectangular cylindrical projection, using geodetic coordinates, is another variety of the geographic coordinate systems where the distance differential along the latitude $\partial \phi$ maps linearly to the latitude differential of the projected coordinates of the map.
+% The equirectangular cylindrical projection, using geodetic coordinates, is another variety of the geographic coordinate systems where the distance differential along the latitude $\partial \phi$ maps linearly to the latitude differential of the projected coordinates of the map.
+
+Another standard, well used in ellipsoid representations makes use of so called geodetic coordinates. This variety of geographic coordinate systems is defined by the normal of the surface of the ellipsoid where the longitudinal angle is the angle between the normal and the $yx$-plane.
 
 Figure \ref{fig:geodetic} shows the difference between geocentric latitudes along with difference in surface normals.
 
@@ -333,9 +335,7 @@ Figure \ref{fig:geodetic} shows the difference between geocentric latitudes alon
 
 In the case of perfect spheres, geocentric and geodetic projections of any point will yield the same result.
 
-Geodetic coordinates are among the most commonly used geo referenced coordinate systems when mapping ellipsoids to two dimensions. Latitudinal distances are preserved after the coordinate transform. This is important for a map projection standard that can be used for both spheres and for ellipsoids to avoid distortions that will appear if the map is defined for a specific ellipsoid and then projected on a slightly different one.
-
-Equirectangular projections do not require specific ellipsoids to avoid distortions on the mapped globe. The result of the wide usage is that many map providers choose to provide 2D maps defined in this coordinate system.
+Geodetic coordinates are among the most commonly used geo referenced coordinate systems when mapping ellipsoids to two dimensions.
 
 Cozzi and Ring describes the transform from geodetic coordinates in the ellipsoid class \cite[p. 25]{cozzi11}. For the Earth, the most commonly used geodetic coordinate space is defined in the EPSG:4326 standard where the WGS84 ellipsoid is used \cite{spatialref}.
 
