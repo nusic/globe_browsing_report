@@ -111,9 +111,10 @@ When culling chunks, the closest position on the chunk is used as the position $
 Fetching the right texture and preparing it for rendering onto chunks is a fairly complicated process. Before digging into the details of this process, there are three concepts that need to be established, as they will be referred to throughout the description of the texture pipeline. These are:
 
 \begin{enumerate}
-	\item \textbf{\class{Tile Index}} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe
-	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with meta data. Each \class{Raw Tile} is associated with a \class{Tile Index}. They can be instantiated concurrently
-	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, tiles rely on an OpenGL context and must therefore be initialized on the rendering thread
+	\item \textbf{\class{Tile Index}} - A tuple of three integers $(level, x, y)$ indexing a specific map region on the globe.
+    \item \textbf{\class{Tile Status}} - An enumeration value indicating whether the \class{Tile} is ``OK'', ``Unavailable'', ``Out of Range'' or whether reading the pixel data triggered an ``IO Error''.
+	\item \textbf{\class{Raw Tile}} - A texture carved out to fit the geographical region of a specific chunk, along with meta data. Each \class{Raw Tile} is associated with a \class{Tile Index} and has a \class{Tile Status}. The \class{Raw Tile} class is guarantueed to be thread safe.
+	\item \textbf{\class{Tile}} - Like a \class{Raw Tile}, but the texture data is uploaded to the GPU and ready to use for rendering (unless it has a status not equal to ``OK''). As opposed to \class{Raw Tiles}, the \class{Tile} class rely on an OpenGL context and thus is not thread safe.
 \end{enumerate}
 
 All chunk height and texture data are represented using \class{Tiles}. \class{Tiles} are created on the client side (i.e. in OpenSpace) on the fly when they are needed. As the pixel data may need to be read from disk or even requested from remote servers, the whole tile preparation pipeline was implemented to be executed on separate threads in order to avoid blocking of the rendering thread with image data reads. 
@@ -121,7 +122,7 @@ All chunk height and texture data are represented using \class{Tiles}. \class{Ti
 During the iterative process of developing the texture tile pipeline, three layers of abstraction were introduced in order to deal with the fairly high complexity. See table \ref{table:tilepipeline}.
 
 \begin{center}
-  \begin{table}
+  \begin{table}[!htbp]
   \caption[]{Abstraction layers used in the texture data pipeline}
     \label{table:tilepipeline}
   \resizebox{\textwidth}{!}{\begin{tabular}{| c | c | c | c |}
@@ -140,10 +141,20 @@ During the iterative process of developing the texture tile pipeline, three laye
 The subsequent sections of this chapter will cover each abstraction layer in more detail, starting from the bottom and going up the stack.
 
 \subsection{GDAL}
-Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. GDAL is used as an abstraction layer between all the map formats and the representation of tile datasets. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. GDAL can also be used for disk based caching of data from remote servers. Reading pixel data using the GDAL RasterIO interface requires a set of parameters listed below and illustrated in figure \ref{fig:gdalio}:
+Geospatial Data Abstraction Library (GDAL) is an open source library providing a uniform interface for reading, manipulating and writing geospatial data in the form of raster and vector data models \cite{gdal}. It provides an interface allowing client code to specify pixel regions within a dataset to read from, independent of the underlying image format. Reading pixel data using the GDAL requires a set of parameters listed below and illustrated in figure \ref{fig:gdalio}:
+
+
+\begin{figure}[!h]
+    \centering
+    \begin{subfigure}[!h]{1.0\textwidth}
+        \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalio.pdf}
+    \end{subfigure}
+    \caption{The required GDAL RasterIO parameters.}
+    \label{fig:gdalio}
+\end{figure}
 
 \begin{enumerate}
-	\item A map overview to read pixel data from (if the dataset has overviews)
+	\item A map overview (also known as mip map) to read pixel data from
 	\item A pixel region within that map overview to read pixels from
 	\item The raster band(s) (e.g. color channels) to read
 	\item A pointer to sufficient user allocated memory where GDAL can write the output of the read operation
@@ -152,15 +163,6 @@ Geospatial Data Abstraction Library (GDAL) is an open source library providing a
 	\item The data type to retrieve the pixel data in
 \end{enumerate}
 
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[bt]{1.0\textwidth}
-        \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalio.pdf}
-    \end{subfigure}
-    \caption{The required GDAL RasterIO parameters. Figure adapted from \cite{mapprojections}}
-    \label{fig:gdalio}
-\end{figure}
-
 With the given input parameters shown in figure \ref{fig:gdalio}, the resulting output would be the pixel data of the requested image region written with the pixel layout parameters to the provided memory block. The output is illustrated in figure \ref{fig:gdalioresult}.
 
 \begin{figure}[htbp]
@@ -168,11 +170,11 @@ With the given input parameters shown in figure \ref{fig:gdalio}, the resulting 
     \begin{subfigure}[bt]{0.5\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/gdalioresult.pdf}
     \end{subfigure}
-    \caption{Result of GDAL raster IO. Figure adapted from \cite{mapprojections}}
+    \caption{Result of GDAL raster IO.}
     \label{fig:gdalioresult}
 \end{figure}
 
-Using the RasterIO interface on an open GDAL dataset, the notion of image format is completely abstracted away. This is a great advantage which also allows GDAL to support sparse datasets. Appendix \ref{appendix:localpatches} goes through a detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches of high resolution.
+The same interface can also be used to read sparse datasets. A detailed example of how to use GDAL for reading sparse datasets such as local, georeferenced, image patches of high resolution can be founed in Appendix \ref{appendix:localpatches}.
 
 GDAL also provides the coefficients of a geo-transform which defines the mapping from raster coordinates to georeferenced coordinates. The geo-transform can be inverted to transform a georeferenced region to raster space when specifying the area of an image tile to read.
 
@@ -196,7 +198,7 @@ The IO description contains all tile specific information needed to perform a ma
     \begin{subfigure}[bt]{0.9\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/getiodescription.pdf}
     \end{subfigure}
-    \caption{Overview of the calculation of an IO description. Figure adapted from \cite{mapprojections}}
+    \caption{Overview of the calculation of an IO description.}
     \label{fig:getiodescription}
 \end{figure}
 
@@ -204,9 +206,9 @@ The IO description contains all tile specific information needed to perform a ma
 \item Calculate a \class{Geodetic Patch} from \class{Tile Index}
 \item Calculate the pixel coordinates for the patch in raster coordinate space
 \item Calculate a suitable map overview
-\item Transform pixel region to map overview
+\item Transform pixel region to map overview pixel space
 \item Add padding to the down scaled pixel region
-\item Finalize the gathered data to an IO description object.
+\item Collect the information in an IO description object.
 \end{enumerate}
 
 In the scheme in figure \ref{fig:getiodescription}, step 1 is performed using equation \ref{eq:latlongindex},
@@ -243,20 +245,20 @@ Where $n$ is the destination map overview and $m$ is the source map overview. Th
 Padding is added to the pixel region in order to perform correct interpolation of pixel values across different tiles later during rendering. However, this may cause the pixel region to extend outside the map region. Therefore the last finalize step also handles wrapping of the pixel region before returning the final IO description. The wrapping used is a CPU implementation of $GL\_REPEAT$.
 
 \subsubsection{Tile Meta Data}
-As mentioned, \class{Tile Dataset}s can be configured to calculate some metadata on the fly based on the pixel data that has been read. The metadata includes minimum and maximum pixel values within the pixel data and whether or not the pixel data contains missing-data values. Having access to minimum and maximum values for height layer tiles is required for the culling to be performed correctly since the cullers rely on having bounding boxes for the chunks. The meta data can not be requested directly from GDAL since the tiling can differ from the underlying image tiling abstracted away by GDAL. Calculating the meta data had to be performed by explicitly looping through all the pixel values on the client side. 
+As mentioned, \class{Tile Dataset}s can be configured to calculate some metadata on the fly based on the pixel data that has been read. The metadata includes minimum and maximum pixel values within the pixel data and whether or not the pixel data contains missing-data values. Having access to minimum and maximum values for height layer tiles is required for the culling to be performed correctly since the cullers rely on having bounding boxes for the chunks. The meta data is collected by explicitly looping through all the pixel values on the client side. 
 
 \subsubsection{Summary}
 To summarize, the implementation of \class{Tile Dataset} allow reading pixel data from a GDAL dataset corresponding to a specific \class{Tile Index}, along with metadata unless opted out. The \class{Raw Tile}s that are served are padded in order to perform smooth pixel blending between different tiles. \class{Raw Tile}s are not available for rendering since the data is not yet on the GPU.
 
 \subsection{Async Tile Dataset}
-\class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It provides a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important functionalities: 1) enqueing tile read jobs and 2) collect finished tile read jobs. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see figure \ref{fig:asynctiledataset}.
+\class{Async Tile Dataset}s utilize a shared thread pool and own a \class{Tile Dataset}. It defines a concurrent job posting interface for concurrent reads within the \class{Tile Dataset}. It has two important functionalities: 1) enqueing tile read jobs and 2) collect finished \class{Raw Tiles}. Reading \class{Raw Tile}s on separate threads ensures that the render thread will not be delayed by image data requests, see figure \ref{fig:asynctiledataset}.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset.pdf}
     \end{subfigure}
-    \caption{Asynchronous reading of Raw tiles can be performed on separate threads. When the tile reading job is finished the raw tile will be appended to a concurrent queue}
+    \caption{Asynchronous reading of Raw tiles can be performed on separate threads. When the tile reading job is finished the raw tile will be appended to a concurrent queue.}
     \label{fig:asynctiledataset}
 \end{figure}
 
@@ -265,11 +267,11 @@ To summarize, the implementation of \class{Tile Dataset} allow reading pixel dat
     \begin{subfigure}[bt]{0.6\textwidth}
         \includegraphics[width=\textwidth]{figures/implementation/pipeline/asynctiledataset_gettiles.pdf}
     \end{subfigure}
-    \caption{Retrieving finished Raw tiles}
+    \caption{Retrieving finished \class{Raw Tiles}.}
     \label{fig:asynctiledataset2}
 \end{figure}
 
-The \class{Async Tile Dataset} internally keeps track of what tile indices it has enqueued and what tile pixel regions are currently being read. If a pixel region for a specific tile index is already enqueued or currently being read, the request is simply ignored. 
+The \class{Async Tile Dataset} internally keeps track of what tile indices it has enqueued and what tile pixel regions are currently being read. If a pixel region for a specific tile index is already enqueued or currently being read, the request is ignored. 
 
 
 \section{Providing Tiles}
