@@ -17,7 +17,7 @@ The ability to read and render local patches will be developed further to ensure
 \section{Other Features}
 There are other features that naturally can be incorporated to make the software more usable. 
 
-A switching algorithm implemented on the shader corresponding to the area based chunk selection algorithm can be researched and explored with further.
+A switching algorithm implemented on the shader corresponding to the area based chunk selection algorithm can be researched and explored further.
 
 Another switching approach than the level blending approach introduced can be to temporally interpolate between levels as chunks are split. This will decrease the number of textures needed for switching but will still lead to visible edges between chunks of different levels.
 
@@ -28,4 +28,4 @@ Annotations such as country names can currently only be rendered using pixel bas
 Other types of tile providers can also be implemented. Examples are: text tile provider for visualizing a lat-long grid, temporal tile provider using local image data.
 
 \section{Other Uses of Chunked LOD Spheres in Astro-Visualization}
-Rendering of ellipsoidal or spherical models is not only useful for globes. Being able to browse the night sky using an inverted sphere also requires a LOD approach to be able to visualize the most distant objects. World Wide Telescope uses such a  technique to render photographs of distant galaxies when pointing the camera to the sky. The edge of our observable Universe could also be rendered as a sphere textured with the WMAP or the Planck mapping of the cosmic microwave background radiation.
+Rendering of ellipsoidal or spherical models is not only useful for globes. Being able to browse the night sky using an inverted sphere also requires a LOD approach to be able to visualize the most distant objects in high level of detail. World Wide Telescope uses such a  technique to render photographs of distant galaxies when pointing the camera to the sky. The edge of our observable Universe could also be rendered as a sphere textured with a mapping of the cosmic microwave background radiation.

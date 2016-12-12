@@ -1,75 +1,81 @@
 \chapter{Results}
 \label{chapter:results}
-Two types of results are presented in this chapter: Screenshots showing different visual aspects of the system and benchmarks focusing on the achieved performance.
+Two types of results are presented in this chapter: screenshots showing different visual aspects of the system and benchmarks focusing on the achieved performance.
 
 \section{Screenshots}
-Screenshots from the implemented system are presented and described in each subsection below. 
+Screenshots from the implemented system are presented and described in each subsection below. Figure \ref{fig:researthshaded} shows the Earth shaded using a simple implementation of an atmosphere together with a daily image of surface reflectance.
 
 \begin{figure}[h]
   \centering
-  \begin{subfigure}[bt]{0.9\textwidth}
+  \begin{subfigure}[bt]{0.8\textwidth}
     \includegraphics[width=\textwidth]{figures/results/screenshots/specular_earth.jpg}
-    \caption{Shaded Earth rendered with NASA GIBS VIIRS daily image \cite{gibs}}
   \end{subfigure}
+  \caption{Shaded Earth rendered with NASA GIBS VIIRS daily image \cite{gibs}}
+  \label{fig:researthshaded}
 \end{figure}
 
 \clearpage
 \subsection{Height Mapping}
 \FloatBarrier
-Earth rendered with a height dataset displacing the chunks' vertices according to the geometric shape of the ground. No atmosphere is rendered.
+Figure \ref{fig:resheightmapping} shows the Earth rendered with a height dataset displacing the chunks' vertices according to the geometric shape of the ground.
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[bt]{0.9\textwidth}
+    \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/height_bali.png}
-        \caption{The volcano Gunung Agung at Bali.}
+        \caption{The volcano Gunung Agung on Bali.}
     \end{subfigure}
-    \begin{subfigure}[bt]{0.9\textwidth}
+    \par\bigskip
+    \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/height_mt_everest.png}
         \caption{Looking south from Mount Everest}
     \end{subfigure}
-    \caption{Earth rendered with a height map dataset}
+    \caption{Earth rendered with ESRI World Elevation 3D height map \cite{worldelevation3d}. Color layer: ESRI Imagery World 2D \cite{imageryworld2d}}
+    \label{fig:resheightmapping}
 \end{figure}
 
 \clearpage
 \subsection{Water Masking}
 \FloatBarrier
-Earth rendered with a water mask layer enhancing specular contrasts between land and water.
+Figure \ref{fig:reswatermask} shows the Earth rendered with a water mask layer enhancing specular contrasts between land and water.
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[bt]{0.9\textwidth}
+    \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/specular_brazil.png}
-        \caption{Sun's specular reflection in Amazon River.}
+        \caption{Sun's specular reflection in the Amazon River.}
     \end{subfigure}
-    \begin{subfigure}[bt]{0.9\textwidth}
+    \par\bigskip
+    \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/specular_indonesia.png}
         \caption{Sun's specular reflection around Bali, Indonesia.}
     \end{subfigure}
-    \caption{Shaded globe using water mask texture}
+    \caption{Shaded Earth using water mask texture. Color layer: ESRI Imagery World 2D \cite{imageryworld2d}}
+    \label{fig:reswatermask}
 \end{figure}
 
 \clearpage
 \subsection{Night Layers}
 \FloatBarrier
-Earth rendered with a night layer showing light coming from cities, which is only rendered where there is night. 
+Figure \ref{fig:reswatermask} shows the Earth rendered with a night layer showing light from cities, which is only rendered on the night side of the planet. 
 
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[bt]{0.9\textwidth}
+    \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/night_earth.png}
         \caption{Earth at night}
     \end{subfigure}
-    \begin{subfigure}[bt]{0.9\textwidth}
+    \par\bigskip
+    \begin{subfigure}[bt]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/night_new_deli.png}
         \caption{New Deli at night}
     \end{subfigure}
-    \caption{Night layers are only rendered where there is night.}
+    \caption{Night layers are only rendered on the night side of the planet. Night layer: NASA GIBS VIIRS Earth at night \cite{gibs}}
 \end{figure}
 
 \clearpage
 \subsection{Color Overlays}
 \FloatBarrier
 
-To demonstrate color overlays, the three examples of figure \ref{fig:coloroverlays} show how different tile providers produces references useful for debugging or locating. 
+To demonstrate color overlays, the three examples of figure \ref{fig:coloroverlays} show how different tile providers produce references useful for debugging or locationing. 
 
 \begin{figure}[h]
     \centering
@@ -82,35 +88,37 @@ To demonstrate color overlays, the three examples of figure \ref{fig:coloroverla
         \includegraphics[width=\textwidth]{figures/results/screenshots/coloroverlay2.jpg}
         \caption{Color Overlay: size reference}
     \end{subfigure}
-    ~
+    
+    \par\bigskip
     \begin{subfigure}[bt]{0.90\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots/coloroverlay3.jpg}
         \caption{Color Overlay: reference features and reference labels \cite{gibs}}
     \end{subfigure}
-    \caption{Earth rendered with different color overlays used for reference. Color Layer: ESRI Imagery World 2D \cite{imageryworld2d}}
+    \caption{Earth rendered with different color overlays used for reference. Color layer: ESRI Imagery World 2D \cite{imageryworld2d}}
     \label{fig:coloroverlays}
 \end{figure}
 
 \clearpage
 \subsection{Grayscale Overlaying}
 \FloatBarrier
-The canyon Candor Chasma at Mars is rendered with a low resolution color layer combined with a higher resolution grayscale overlay.
+in figure \ref{fig:hsvblending}, Mars' great canyon Valles Marineris is rendered with a low resolution color layer combined with a higher resolution grayscale overlay.
 
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/valles_marineris1.jpg}
-        \caption{Color Layer: Viking MDIM}
+        \caption{Color layer: Viking MDIM \cite{viking}}
     \end{subfigure}
     ~
     \begin{subfigure}[bt]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/valles_marineris2.jpg}
-        \caption{Grayscale Layer: CTX Mosaic}
+        \caption{Grayscale layer: CTX Mosaic}
     \end{subfigure}
-    ~
+    
+    \par\bigskip
     \begin{subfigure}[bt]{0.90\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/valles_marineris3.jpg}
-        \caption{CTX Mosaic HSV blended on top of Viking MDIM}
+        \caption{CTX Mosaic HSV blended on top of Viking MDIM \cite{viking}}
     \end{subfigure}
     \caption{Valles Marineris, Mars with different layers}
     \label{fig:hsvblending}
@@ -121,6 +129,8 @@ The canyon Candor Chasma at Mars is rendered with a low resolution color layer c
 \label{section:localpatchesresult}
 \FloatBarrier
 
+Figure \ref{fig:localpatches} shows the approach of local DTM patches in West Candor Chasma.  
+
 \begin{figure}[h]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
@@ -130,14 +140,15 @@ The canyon Candor Chasma at Mars is rendered with a low resolution color layer c
     ~
     \begin{subfigure}[t]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/west_candor_chasma2.jpg}
-        \caption{CTX mosaic, CTX DTM patch and HiRISE DTM patch}
+        \caption{CTX mosaic, CTX DTM patch and 25 cm per pixel DTM patch}
     \end{subfigure}
-    ~
+    
+    \par\bigskip
     \begin{subfigure}[t]{0.90\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/west_candor_chasma3.jpg}
         \caption{CTX mosaic, CTX DTM patch and HiRISE 25 cm per pixel DTM patch closeup}
     \end{subfigure}
-    \caption{Local DTM patches of West Candor Chasma, Valles Marineris, Mars. All figures use Color Layer: Viking MDIM, Height Map: MOLA}
+    \caption{Local DTM patches of West Candor Chasma, Valles Marineris, Mars. All figures use color layer: Viking MDIM \cite{viking} and height layer: MOLA \cite{mola}.}
     \label{fig:localpatches}
 \end{figure}
 
@@ -159,24 +170,25 @@ Using the vast amount of datasets provided by NASA GIBS \cite{gibs}, several sci
         \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/land_temp.jpg}
         \caption{Land temperature}
     \end{subfigure}
-    ~
+    \par\bigskip
     \begin{subfigure}[t]{0.90\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_science_params/sea_surface.jpg}
         \caption{Sea surface temperature}
     \end{subfigure}
-    \caption{Visualization of scientific parameters on the globe. All these datasets are temporal and can be animated over time. Datasets from \cite{gibs}}
+    \caption{Visualization of scientific parameters on the globe. All these datasets are temporal and can be animated over time. Datasets from \cite{gibs}.}
     \label{fig:sciparam}
 \end{figure}
 
 \clearpage
 \subsection{Visual Debugging: Bounding Volumes}
 \FloatBarrier
-Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by polyhedron shapes.
+Bounding polyhedra are calculated on the fly for each chunk, taking onto consideration any currently enabled height dataset. These bounding volumes are then used for by culling algorithms. Figure \ref{fig:boundingvolume} shows how smaller, more planar chunks can be encapsulated more tightly than large chunks by polyhedron shapes of eight vertices converging to rectangular blocks for high chunk levels.
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds1.jpg}
         \caption{}
+        \label{fig:tetrahedrablocks}
     \end{subfigure}
     ~
     \begin{subfigure}[bt]{0.45\textwidth}
@@ -191,8 +203,9 @@ Bounding polyhedra are calculated on the fly for each chunk, taking onto conside
     \begin{subfigure}[bt]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/results/screenshots_thesis_old/bounds4.jpg}
         \caption{}
+        \label{fig:cuboidblocks}
     \end{subfigure}
-    \caption{Rendering the bounding polyhedra for chunks at Mars. Note how the polyhedra start out as tetrahedra for the largest chunks in a) and converges towards cuboids as seen in d). }
+    \caption{Rendering the bounding polyhedra for chunks at Mars. Note how the polyhedra start out as tetrahedra for the largest chunks in \ref{fig:tetrahedrablocks} and converge to rectangular blocks as seen in \ref{fig:cuboidblocks}. }
     \label{fig:boundingvolume}
 \end{figure}
 
@@ -213,7 +226,7 @@ Figure \ref{fig:frustummars} shows a camera frustum visualized and the affect of
 \section{Benchmarking}
 \label{section:benchmarking}
 \FloatBarrier
-This section cover a range of benchmarks diagnosing the behavior and performance of the system. The specifications for the computer used for benchmarking is specified in table \ref{table:benchmark host}. 
+This section cover a range of benchmarks diagnosing the behavior and performance of the system. The specifications for the computer used for benchmarking is defined in table \ref{table:benchmark host}. 
 
 \begin{table}[h]
   \centering
@@ -234,7 +247,7 @@ This section cover a range of benchmarks diagnosing the behavior and performance
 \clearpage
 \subsection{Top Down Views}
 \FloatBarrier
-The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}. The camera views for the evaluation points are shown in Figure \ref{fig:topdown} and the results are presented in Figure \ref{fig:topdowngraph1}.
+The chunk rendering algorithm was evaluated for a top down view at different distances to the ground. The settings for the evaluation are presented in Table \ref{table:settingstopdown}. The camera views for the evaluation points are shown in figure \ref{fig:topdown} and the results are presented in figure \ref{fig:topdowngraph1}.
 \begin{table}[h]
   \centering
   \caption[]{Globe rendering settings for top down view benchmark}
@@ -335,10 +348,10 @@ The chunk rendering algorithm was evaluated for a top down view at different dis
 \subsection{Culling for Distance Based Chunk Selection}
 \label{ch:culld}
 \FloatBarrier
-The two culling algorithms \emph{Frustum culling} and \emph{Horizon culling} were evaluated in combination with the \emph{distance based} chunk selection algorithm.
+The two culling algorithms frustum culling and horizon culling were evaluated in combination with the distance based chunk selection algorithm.
 The settings used are provided in table \ref{table:cullingdsettings}. 
 Figure \ref{fig:cullingdcam} shows the camera view evaluated. 
-Figure \ref{fig:cullingd} shows an overview of the rendered chunks with the results shown in figure \ref{fig:topdowngraphd}.
+Figure \ref{fig:cullingd} shows an overview of the rendered chunks with the results shown in figure \ref{fig:cullingcomp}.
 
 
 \begin{table}[h]
@@ -464,7 +477,7 @@ Figure \ref{fig:cullingd} shows an overview of the rendered chunks with the resu
 \label{ch:culla}
 
 \FloatBarrier
-The two culling algorithms \emph{Frustum culling} and \emph{Horizon culling} were evaluated in combination with the \emph{area based} chunk selection algorithm.
+The two culling algorithms frustum culling and horizon culling were evaluated in combination with the area based chunk selection algorithm.
 The settings used are provided in table \ref{table:cullingasettings}. 
 Figure \ref{fig:cullingacam} shows the camera view evaluated. 
 Figure \ref{fig:cullinga} shows an overview of the rendered chunks with the results shown in figure \ref{fig:topdowngrapha}.
@@ -596,6 +609,7 @@ Figure \ref{fig:cullinga} shows an overview of the rendered chunks with the resu
 The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared and evaluated in relation to each other. In figure \ref{fig:lodcomp} the two approaches are compared where both frustum culling and horizon culling were enabled.
 
 \begin{figure}[h]
+\centering
 \begin{tikzpicture}
     \begin{axis}[
         width  = 0.9*\textwidth,
@@ -637,7 +651,7 @@ The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared
 
     \end{axis}
 \end{tikzpicture}
-\caption{Comparison of Distance based - and Area based chunk selection}
+\caption{Comparison of distance based and area based chunk selection}
 \label{fig:lodcomp}
 \end{figure}
 
@@ -645,7 +659,7 @@ The benchmark results in section \ref{ch:culld} and \ref{ch:culla} were compared
 \subsection{Switching Using Level Blending}
 \label{section:res_switching}
 \FloatBarrier
-The visual result of using the distance based level blending is shown in Figure \ref{fig:blending2}.
+The visual result of using the distance based level blending is shown in figure \ref{fig:blending2}.
 \begin{figure}[h]
     \centering
     \begin{subfigure}[bt]{0.48\textwidth}
